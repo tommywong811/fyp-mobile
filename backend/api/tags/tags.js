@@ -1,0 +1,1 @@
+export {findTags as tags} from "./findTags";

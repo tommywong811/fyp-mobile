@@ -1,0 +1,11 @@
+'use strict';
+
+const MAX_WEIGHT = 65535;
+const CONNECTOR_SMALLEST_WEIGHT = 0.00000001;
+const INF = Number.POSITIVE_INFINITY;
+
+export {
+  MAX_WEIGHT,
+  CONNECTOR_SMALLEST_WEIGHT,
+  INF,
+};
