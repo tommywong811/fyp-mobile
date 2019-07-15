@@ -1,10 +1,7 @@
 import {Image, View, StyleSheet, Text, Platform} from 'react-native';
 import React from 'react';
 import {api} from '../../backend';
-import RNFetchBlob from 'rn-fetch-blob';
-import shorthash from 'shorthash';
-import { isNumericLiteral } from '@babel/types';
-import RNFS from 'react-native-fs';
+
 
 class MapTile extends React.Component {
     state = {

@@ -13,6 +13,8 @@ import TestCase from './frontend/testBack/testBack';
 import Floor from './frontend/components/floor/index';
 import { db/*, api*/ } from "./backend";
 import MapTile from './frontend/mapTile'
+import * as plugin from './frontend/plugins/MapTiles' 
+
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
   android:
@@ -27,16 +29,23 @@ export default class App extends Component<Props> {
   render() {
     return (
         <View style={styles.container}>
+          <Button title='GET' onPress={onPressHandler}/>
           <MapTile floorId='1'
-          X={-1412}
-          Y={-1386}
-          zoomLevel={0} />
+          X={0}
+          Y={0}
+          zoomLevel={1} />
         </View>
     );
   }
 
 }
 
+function onPressHandler(){
+  const data = plugin.generateMapTiles(-1431, -1386, 4516, 3291, '1', 0);
+  const gg = plugin.mapTilesRefactor(data);
+  console.log(gg);
+  console.log(data);
+}
 
 const styles = StyleSheet.create({
   container: {
