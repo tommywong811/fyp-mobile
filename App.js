@@ -8,12 +8,12 @@
 import 'node-libs-react-native/globals';
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View, Image, Alert, Button} from 'react-native';
-import MainScreen from './frontend/mainScreen/index';
+import MapCanvas from './frontend/components/MapCanvas';
 import TestCase from './frontend/testBack/testBack';
-import Floor from './frontend/components/floor/index';
 import { db/*, api*/ } from "./backend";
-import MapTile from './frontend/mapTile'
-import * as plugin from './frontend/plugins/MapTiles' 
+import MapTile from './frontend/mapTile';
+import * as plugin from './frontend/plugins/MapTiles'; 
+import * as floor from './frontend/reducer/floors';
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -26,7 +26,7 @@ type Props = {};
 export default class App extends Component<Props> {
 
 
-  render() {
+  /*render() {
     return (
         <View style={styles.container}>
           <Button title='GET' onPress={onPressHandler}/>
@@ -36,15 +36,24 @@ export default class App extends Component<Props> {
           zoomLevel={1} />
         </View>
     );
+  }*/
+  render(){
+    return (
+      <View style={StyleSheet.container}>
+        <MapCanvas />
+      </View>
+    );
   }
 
 }
 
 function onPressHandler(){
-  const data = plugin.generateMapTiles(-1431, -1386, 4516, 3291, '1', 0);
-  const gg = plugin.mapTilesRefactor(data);
+  console.log("Pressed");
+  /*const data = plugin.generateMapTiles(-1431, -1386, 4516, 3291, '1', 0);
+  const gg = plugin.mapTilesRefactor(data);　　　　
   console.log(gg);
-  console.log(data);
+  console.log(data);*/
+
 }
 
 const styles = StyleSheet.create({

@@ -70,6 +70,21 @@ export function generateMapTiles(offsetX, offsetY, width, height, floor, level){
 
         nextTileX += MAP_TILE_WIDTH;
     }while(nextTileX - x < width + MAP_TILE_WIDTH)
+
+    for(i = 0; i < mapTiles.length; i++){
+        try{
+            let uri = api.mapTiles({
+                floorId: mapTiles[i].floorId,
+                x: mapTiles[i].x,
+                y: mapTiles[i].y,
+                zoomLevel: mapTiles[i].zoomLevel
+            });
+            mapTiles[i] = {...mapTiles[i], uri: uri};
+        }catch(err){
+            mapTiles.splice(i, 1);
+            i--;
+        }
+    }
     return mapTiles;
 }
 
