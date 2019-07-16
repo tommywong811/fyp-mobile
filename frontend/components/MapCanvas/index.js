@@ -43,7 +43,19 @@ export default class MapCanvasWrapper extends React.Component{
     render(){
         return (
             <Provider store={store}>
-                <MapCanvas />
+              <PanGestureHandler 
+                maxPointers={1}
+                onGestureEvent={this.onGestureEvent}
+                onHandlerStateChange={this.onGestureEvent}
+                >
+                <Animated.View 
+                  style={{transform: [
+                    {translateX: this.transX},
+                    {translateY: this.transY}
+                  ]}}>
+                  <MapCanvas />
+                </Animated.View>    
+              </PanGestureHandler>
             </Provider>
         );
     }
