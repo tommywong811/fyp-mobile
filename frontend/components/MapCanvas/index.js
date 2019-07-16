@@ -16,8 +16,8 @@ const { width, height } = Dimensions.get("window");
 export default class MapCanvasWrapper extends React.Component{
     dragX = new Value(0);
     dragY = new Value(0);
-    offsetX = new Value(width/2);
-    offsetY = new Value(height/2);
+    offsetX = new Value(0);
+    offsetY = new Value(0);
     gestureState = new Value(-1);
     onGestureEvent = event([
         {

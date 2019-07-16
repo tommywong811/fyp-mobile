@@ -73,19 +73,30 @@ export function generateMapTiles(offsetX, offsetY, width, height, floor, level){
 
     for(i = 0; i < mapTiles.length; i++){
         try{
-            let uri = api.mapTiles({
+            let dir = api.mapTiles({
                 floorId: mapTiles[i].floorId,
                 x: mapTiles[i].x,
                 y: mapTiles[i].y,
                 zoomLevel: mapTiles[i].zoomLevel
             });
-            mapTiles[i] = {...mapTiles[i], uri: uri};
+            mapTiles[i] = {...mapTiles[i], uri: dirToUri(dir)};
         }catch(err){
             mapTiles.splice(i, 1);
             i--;
         }
     }
-    return mapTiles;
+    var tempMapTiles = mapTilesRefactor(mapTiles);
+    var w = tempMapTiles[0].length;
+    var h = tempMapTiles.length;
+    var result = []
+    for(i = 0; i < tempMapTiles[0].length; i++){
+        for(j = 0; j < tempMapTiles.length; j++){
+            result.push(tempMapTiles[j][i]);
+        }
+    }
+
+
+    return {result: result, dimension: {width: w, height: h}};
 }
 
 export function mapTilesRefactor(mapTiles){
@@ -107,4 +118,22 @@ export function mapTilesRefactor(mapTiles){
     result.push(row);
     
     return result;
+}
+
+export function getMapTileDim(mapTiles){
+    const firstItem = mapTiles[0];
+    var x = firstItem.x;
+    var height = 0, width;
+    for(i = 0; i < mapTiles.length; i++){
+        if(mapTiles[i].x == x){
+            height++;
+        }else{
+            break;
+        }
+    }
+    width = mapTiles.length / height;
+    return{
+        width: width,
+        height: height
+    };
 }
