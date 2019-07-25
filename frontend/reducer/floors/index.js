@@ -13,8 +13,8 @@ export default floorReducer = (state = initialState, action) => {
     switch(action.type){
         case CHANGE_FLOOR:
             return {
-                ...state,
-                currentFloor: state.data[action.payload.floor]
+                data: state.data,
+                currentFloor: state.data[1]
             };
         default:
             return state;

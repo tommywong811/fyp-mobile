@@ -34,7 +34,7 @@ function getMapTileDir(x, y, floor, level) {
     });
 }
 
-function dirToUri(dir){
+export function dirToUri(dir){
     const extension = (Platform.OS === 'android') ? 'file://' : '';
     const uri = `${extension}${dir}`;
     return uri;
@@ -71,6 +71,7 @@ export function generateMapTiles(offsetX, offsetY, width, height, floor, level){
         nextTileX += MAP_TILE_WIDTH;
     }while(nextTileX - x < width + MAP_TILE_WIDTH)
 
+
     for(i = 0; i < mapTiles.length; i++){
         try{
             let dir = api.mapTiles({
@@ -85,6 +86,7 @@ export function generateMapTiles(offsetX, offsetY, width, height, floor, level){
             i--;
         }
     }
+
     var tempMapTiles = mapTilesRefactor(mapTiles);
     var w = tempMapTiles[0].length;
     var h = tempMapTiles.length;
@@ -97,6 +99,18 @@ export function generateMapTiles(offsetX, offsetY, width, height, floor, level){
 
 
     return {result: result, dimension: {width: w, height: h}};
+}
+
+export function getFloorDimension(offsetX, offsetY, width, height){
+    const {x, y} = getMapTileNumber(offsetX, offsetY);
+    const w = Math.ceil(width / MAP_TILE_WIDTH);
+    const h = Math.ceil(height / MAP_TILE_HEIGHT);
+    return {
+        left: x,
+        top: y,
+        width: w,
+        height: h
+    }
 }
 
 export function mapTilesRefactor(mapTiles){
@@ -136,4 +150,21 @@ export function getMapTileDim(mapTiles){
         width: width,
         height: height
     };
+}
+
+export function getDefualtView(left, top, numOfRow, numOfCol, floorId, zoomLevel, cacheImage){
+    for(i = 0; i < numOfRow; i++){
+        for(j = 0; j < numOfCol; j++){
+            try{
+                var dir = api.mapTiles({
+                    floorId: floorId,
+                    x: left + j * MAP_TILE_WIDTH,
+                    y: top + i * MAP_TILE_HEIGHT,
+                    zoomLevel: zoomLevel
+                });
+                uri = dirToUri(dir);
+                cacheImage[i][j] = {uri: uri};
+            }catch(error){}
+        }
+    }
 }
