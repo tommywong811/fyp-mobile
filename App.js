@@ -18,7 +18,7 @@ import PinchCanvas from './frontend/components/PinchCanvas/pinchCanvas';
 import allReducer from './frontend/reducer/index';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
-import Navigator from './frontend/components/Navigator';
+import Navigator from './frontend/components/Navigator/wrapper';
 import mapCanvas from './frontend/components/MapCanvas/mapCanvas';
 const store = createStore(allReducer);
 import Gg from './frontend/components/test/test';
@@ -42,21 +42,16 @@ export default class App extends Component<Props> {
 
 
   render(){
-    /*return (
-      <View style={StyleSheet.container}>
+    return (
         <Provider store={store}>
           <Navigator />
         </Provider>
-        
-      </View>
-    );*/
-    return (
-        <View style={styles.container}>
-          <MapCanvas />
-          
-        </View>
-        
     );
+    /*return (
+        <View style={styles.container}>
+          <TestCase />
+        </View>
+    );*/
   }
 
 }
