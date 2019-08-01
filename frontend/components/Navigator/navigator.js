@@ -4,11 +4,15 @@ import {
     Text, 
     View, 
     StyleSheet,
-    Dimensions
+    Dimensions,
+    ScrollView
 } from 'react-native';
 import { connect } from 'react-redux';
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
-import { CHANGE_FLOOR } from '../../reducer/floors/actionList';
+import { 
+    CHANGE_FLOOR, 
+    CHANGE_BUILDING
+} from '../../reducer/floors/actionList';
 
 const {width, height} = Dimensions.get('window');
 
@@ -18,9 +22,13 @@ class Navigator extends React.Component{
         super(props);
         this.onPressHandler = this.onPressHandler.bind(this);
         this._renderDrawer = this._renderDrawer.bind(this);
-        this._allBuildings = this._getUniqueBuildingId(this.props.allFloors)
+        this._allBuildings = this._getUniqueBuildingId(this.props.allFloors);
+        this._getAllFloors = this._getAllFloors.bind(this);
         console.log(this.props);
-        console.log(CHANGE_FLOOR);
+        console.log(this.props.allFloors);
+        this.state = {
+            allFloorIds : this._getAllFloors()
+        }
     }
 
     _getUniqueBuildingId(data){
@@ -34,24 +42,14 @@ class Navigator extends React.Component{
         return result;
     }
 
+    _getAllFloors(){
+        return this.props.allFloors.filter((item) => item.buildingId === this.props.currBuilding)
+    }
 
     _renderDrawer(){
-        /*return(
-            <View>
-                <Text h1>Buildings</Text>
-                <View style={styles.lineStyle} />
-                {this._allBuildings.map(item => 
-                    <RetriveableButton
-                        key={item}
-                        name={item}
-                    >
-                    </RetriveableButton>)}
-                <View style={styles.lineStyle} />
-                <Text h2>Floors</Text>
-            </View>
-        );*/
         return(
             <View>
+                <ScrollView scrollEventThrottle={16}>
                 <Text h1>Buildings</Text>
                 <View style={styles.lineStyle} />
                 {this._allBuildings.map(item => 
@@ -60,15 +58,26 @@ class Navigator extends React.Component{
                         title={item}
                         onPress={()=>{
                             if(item !== this.props.currBuilding){
-                                //console.log('make some change');
-                                this.props.change_floor(item);
-                                console.log(this.props);
+                                this.props.change_building(item);
                             }
                         }}
                     >
                     </Button>)}
                 <View style={styles.lineStyle} />
                 <Text h2>Floors</Text>
+                {this._getAllFloors().map(item => 
+                    <Button
+                        key={item._id}
+                        title={item._id}
+                        onPress={()=>{
+                            if(item._id !== this.props.currFloor){
+                                this.props.change_floor(item._id, item.buildingId);
+                            }
+                        }}    
+                    >
+                    </Button>)
+                }
+                </ScrollView>
             </View>
         );
     }
@@ -92,7 +101,7 @@ class Navigator extends React.Component{
                 >
                     <View>
                         <Text>
-                            {this.props.currBuilding}
+                            {`${this.props.currBuilding}   ${this.props.currFloor}`}
                         </Text>
                     </View>
                 </DrawerLayout>
@@ -117,7 +126,9 @@ function mapStateToProps(state){
 
 function mapDispatchToProps(dispatch){
     return {
-        change_floor: (floor) => dispatch({type: CHANGE_FLOOR, payload: {buildingId: floor}})
+        change_floor: (floor, buildingId) => 
+            dispatch({type: CHANGE_FLOOR, payload: {floor: floor, buildingId: buildingId}}),
+        change_building: (floor) => dispatch({type: CHANGE_BUILDING, payload: {buildingId: floor}})
     };
 }
 
