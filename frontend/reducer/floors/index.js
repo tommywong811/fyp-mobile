@@ -8,7 +8,7 @@ import {
 
 initialState = {
     data: api.floors().data,
-    currentFloor: api.floors().data[0]
+    currentFloor: api.floors().data[9]
 }
 
 function changeBuilding(data, payload, currentFloor){

@@ -80,7 +80,6 @@ export default class MapCanvasWrapper extends React.Component{
 
     render(){
         return (
-            
               <PanGestureHandler 
                 ref={this.panRef}
                 maxPointers={2}

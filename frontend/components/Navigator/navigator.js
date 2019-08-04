@@ -1,21 +1,25 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 import { 
     Button, 
     Text, 
     View, 
     StyleSheet,
     Dimensions,
-    ScrollView
+    ScrollView,
+    FlatList
 } from 'react-native';
-import { connect } from 'react-redux';
-import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 import { 
     CHANGE_FLOOR, 
     CHANGE_BUILDING
 } from '../../reducer/floors/actionList';
 
-const {width, height} = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 
+/**
+ * childrenView: 
+ */
 class Navigator extends React.Component{
 
     constructor(props){
@@ -24,8 +28,7 @@ class Navigator extends React.Component{
         this._renderDrawer = this._renderDrawer.bind(this);
         this._allBuildings = this._getUniqueBuildingId(this.props.allFloors);
         this._getAllFloors = this._getAllFloors.bind(this);
-        console.log(this.props);
-        console.log(this.props.allFloors);
+        //console.log(this.props);
         this.state = {
             allFloorIds : this._getAllFloors()
         }
@@ -90,7 +93,7 @@ class Navigator extends React.Component{
 
     render(){
         return(
-            <View style={{flex: 1, zIndex: 1}}>
+            <View style={{flex:6, zIndex: 1}}>
                 <DrawerLayout
                     ref={drawer => {this.drawer=drawer}}
                     drawerWidth={width * 2 / 3}
@@ -99,11 +102,7 @@ class Navigator extends React.Component{
                     drawerBackgroundColor="#ddd"
                     renderNavigationView={this._renderDrawer}
                 >
-                    <View>
-                        <Text>
-                            {`${this.props.currBuilding}   ${this.props.currFloor}`}
-                        </Text>
-                    </View>
+                    {this.props.children}
                 </DrawerLayout>
             </View>
         );
@@ -113,10 +112,6 @@ class Navigator extends React.Component{
 
 function mapStateToProps(state){
     return {
-        offSetX: state.floorReducer.currentFloor.startX,
-        offSetY: state.floorReducer.currentFloor.startY,
-        width: state.floorReducer.currentFloor.mapWidth,
-        height: state.floorReducer.currentFloor.mapHeight,
         currFloor: state.floorReducer.currentFloor._id,
         currBuilding: state.floorReducer.currentFloor.buildingId,
         allFloors: state.floorReducer.data,

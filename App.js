@@ -18,13 +18,14 @@ import PinchCanvas from './frontend/components/PinchCanvas/pinchCanvas';
 import allReducer from './frontend/reducer/index';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
-import Navigator from './frontend/components/Navigator/wrapper';
+//import Navigator from './frontend/components/Navigator/wrapper';
+import Navigator from './frontend/components/Navigator/navigator'
 import mapCanvas from './frontend/components/MapCanvas/mapCanvas';
+import MapTiles from './frontend/components/mapTiles/MapTiles';
 const store = createStore(allReducer);
-import Gg from './frontend/components/test/test';
 
-
-
+//import MapTiles from './frontend/components/mapTiles/wrapper';
+import PinchTest from './frontend/components/mapTiles/pinchTest';
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -43,15 +44,15 @@ export default class App extends Component<Props> {
 
   render(){
     return (
-        <Provider store={store}>
-          <Navigator />
-        </Provider>
+      <Provider store={store}>
+          <Navigator>
+              <MapTiles />
+          </Navigator>
+      </Provider>
     );
-    /*return (
-        <View style={styles.container}>
-          <TestCase />
-        </View>
-    );*/
+    /*return(
+      <PinchTest />
+    )*/
   }
 
 }

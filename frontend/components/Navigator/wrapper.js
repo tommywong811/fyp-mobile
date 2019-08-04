@@ -10,7 +10,9 @@ export default class NavigatorWrapper extends React.Component{
     render(){
         return(
             <Provider store={store}>
-                <Navigator />
+                <Navigator>
+                    {this.props.children}    
+                </Navigator>
             </Provider>
         )
     }
