@@ -8,7 +8,6 @@ import {
     StyleSheet,
     Dimensions,
     ScrollView,
-    FlatList
 } from 'react-native';
 import { 
     CHANGE_FLOOR, 
@@ -33,7 +32,7 @@ class Navigator extends React.Component{
             allFloorIds : this._getAllFloors()
         }
     }
-
+    //get all unique building name
     _getUniqueBuildingId(data){
         let tempData = data.map(item => item.buildingId);
         let result = []
@@ -44,7 +43,7 @@ class Navigator extends React.Component{
         }
         return result;
     }
-
+    //Get all floor names in one building
     _getAllFloors(){
         return this.props.allFloors.filter((item) => item.buildingId === this.props.currBuilding)
     }
@@ -177,5 +176,7 @@ const styles = StyleSheet.create({
         borderWidth: 0.5,
         borderColor:'black',
         margin:10,
-      },    
+      }, text1:{
+          
+      } 
 })

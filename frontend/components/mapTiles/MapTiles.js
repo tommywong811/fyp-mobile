@@ -1,10 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux'; 
 import {
-    Text,
     Image,
-    View,
-    Animated
+    Animated,
+    View
 } from 'react-native';
 import NotFoundZoom0 from '../../asset/notFoundZoom0';
 import { getFloorDimension, dirToUri } from '../../plugins/MapTiles';
@@ -23,11 +22,7 @@ class MapTiles extends React.Component{
     constructor(props){
         super(props);
         this._initialCache = this._initialCache.bind(this);
-        this._initialCache()
-
-        this._prepareDir = this._prepareDir.bind(this);
-        // this._prepareDir();
-
+        this._initialCache();
         this._renderAllMapTile = this._renderAllMapTile.bind(this);
         this._initialPanHandler = this._initialPanHandler.bind(this);
         this._initialPanHandler();
@@ -35,7 +30,7 @@ class MapTiles extends React.Component{
         this._initialPinchHandler();
         this._onPanHandlerStateChange = this._onPanHandlerStateChange.bind(this);
         this._onPinchHandlerStateChange = this._onPinchHandlerStateChange.bind(this);
-        console.log(this.props);
+        //console.log(this.props.cache);
     }
 
     _initialCache(){
@@ -45,10 +40,10 @@ class MapTiles extends React.Component{
         const height = this.props.dim.height;
         this.cache = new Array(height);
         for(i = 0; i < height; i++){
-            this.cache[i] = new Array(width);
+            this.cache[i] = new Array(width + 1);
         } 
         for(i = 0; i < height; i++){
-            for(j = 0; j < width; j++){
+            for(j = 0; j < width + 1; j++){
                 this.cache[i][j] = {
                     logicLeft: logicTileSize * j + left,
                     logicTop: logicTileSize * i + top,
@@ -75,18 +70,23 @@ class MapTiles extends React.Component{
         );
     }
 
-    /**
-     * Initial state for pinch handler (2-Finger zooming in/out)
-     */
     _initialPinchHandler(){
         this._baseScale = new Animated.Value(1);
         this._pinchScale = new Animated.Value(1);
         this._scale = Animated.multiply(this._baseScale, this._pinchScale);
         this._lastScale = 1;
-        this._onPinchGestureEvent = Animated.event(
-            [ { nativeEvent: { scale : this._pinchScale}}, ], 
-            { useNativeDriver: { USE_NATIVE_DRIVER: true } }
+        this._onPinchGestrueEvent = Animated.event(
+            [{nativeEvent: {scale: this._pinchScale}}],
+            { useNativeDriver: { USE_NATIVE_DRIVER: true }}
         )
+    }
+
+    _onPinchHandlerStateChange(event){
+        if(event.nativeEvent.oldState === State.ACTIVE){
+            this._lastScale *= event.nativeEvent.scale;
+            this._baseScale.setValue(this._lastScale);
+            this._pinchScale.setValue(1);
+        }
     }
 
     _onPanHandlerStateChange(event){
@@ -97,31 +97,6 @@ class MapTiles extends React.Component{
           this._translateX.setValue(0);
           this._translateY.setOffset(this._lastOffset.y);
           this._translateY.setValue(0);
-        }
-    }
-
-    _onPinchHandlerStateChange(event){
-        if (event.nativeEvent.oldState === State.ACTIVE) {
-            this._lastScale *= event.nativeEvent.scale;
-            this._baseScale.setValue(this._lastScale);
-            this._pinchScale.setValue(1);
-        }
-    }
-
-    _prepareDir(){
-        for(i = 0; i < this.props.cache.length; i++){
-            for(j = 0; j < this.props.cache[i].length; j++){
-                try{
-                    this.props.cache[i][j].dir = api.mapTiles({
-                        floorId: this.props.cache[i][j].floorId,
-                        x: this.props.cache[i][j].logicLeft,
-                        y: this.props.cache[i][j].logicTop,
-                        zoomLevel: this.props.cache[i][j].zoomLevel
-                    })
-                }catch(err){
-                    this.props.cache[i][j].dir = NOT_Found;
-                }
-            }
         }
     }
 
@@ -145,13 +120,13 @@ class MapTiles extends React.Component{
         return (
             this.props.cache.map(
                 (row, rowIndex) => (
-                    <Animated.View style={{flexDirection: 'row'}} key={rowIndex}>
+                    <View style={{flexDirection: 'row'}} key={rowIndex}>
                         {row.map(
-                            (item) => <Animated.Image source={{uri: dirToUri(item.dir)}}
-                            key={item.dir}
-                            style={{width:120, height:120}}/>
+                            (item, index) => <Image source={{uri: dirToUri(item.dir)}}
+                            key={`${rowIndex} ${index}`}
+                            style={{width:80, height:80}}/>
                         )}
-                    </Animated.View>
+                    </View>
                 )
             )
         );
@@ -159,34 +134,30 @@ class MapTiles extends React.Component{
 
     render(){
         return(
-            <PanGestureHandler
-            ref={this.panRef}
-            maxPointers={2}
-            onGestureEvent={this._onGestureEvent}
-            onHandlerStateChange={this._onPanHandlerStateChange}>
-                <Animated.View style={{flex: 1}}>
-                    <PinchGestureHandler
-                    ref={this.pinchRef}
-                    onGestureEvent={this._onPinchGestureEvent}
-                    onHandlerStateChange={this._onPinchHandlerStateChange}
-                    >
-                    <Animated.View
-                        style={[{
-                            transform:[
-                                {translateX: this._translateX},
-                                {translateY: this._translateY},
-                                {scale: this._scale},
-                                {perspective: 200}
-                            ]
-                        }, ]}
-                    >
-                        {this._renderAllMapTile()}
-                    </Animated.View>
-                    </PinchGestureHandler>
+            <PinchGestureHandler
+                        ref={this.pinchRef}
+                        onGestureEvent={this._onPinchGestrueEvent}
+                        onHandlerStateChange={this._onPinchHandlerStateChange}>
+                <Animated.View style={{flex:1}}>
+                <PanGestureHandler
+                ref={this.panRef}
+                maxPointers={1}
+                onGestureEvent={this._onGestureEvent}
+                onHandlerStateChange={this._onPanHandlerStateChange}>
+                            <Animated.View
+                            style={[{
+                                transform:[
+                                    {translateX: this._translateX},
+                                    {translateY: this._translateY},
+                                    {scale: this._scale}
+                                ]
+                            }, ]}>
+                            {this._renderAllMapTile()}
+                            </Animated.View>
+                </PanGestureHandler>  
                 </Animated.View>
-            </PanGestureHandler>
-            
-        );
+            </PinchGestureHandler>
+        )
     }
 }  
 
@@ -197,10 +168,10 @@ function cacheReducer(dim, zoomLevel, currFloor){
     const width = dim.width;
     const height = dim.height;
     for(i = 0; i < height; i++){
-        cache[i] = new Array(width);
+        cache[i] = new Array(width + 1);
     } 
     for(i = 0; i < height; i++){
-        for(j = 0; j < width; j++){
+        for(j = 0; j < width + 1; j++){
             cache[i][j] = {
                 logicLeft: logicTileSize * j + left,
                 logicTop: logicTileSize * i + top,

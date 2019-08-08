@@ -8,7 +8,7 @@ import {
 
 initialState = {
     data: api.floors().data,
-    currentFloor: api.floors().data[9]
+    currentFloor: api.floors().data[0]
 }
 
 function changeBuilding(data, payload, currentFloor){
@@ -25,7 +25,6 @@ function changeFloor(data, payload, currentFloor){
     for(i = 0; i < data.length; i++){
         if(payload.buildingId === data[i].buildingId &&
             payload.floor === data[i]._id){
-                console.log("YES");
             return data[i];
         }
     }

@@ -105,6 +105,7 @@ export function getFloorDimension(offsetX, offsetY, width, height){
     const {x, y} = getMapTileNumber(offsetX, offsetY);
     const w = Math.ceil(width / MAP_TILE_WIDTH);
     const h = Math.ceil(height / MAP_TILE_HEIGHT);
+    //console.log(`w:${w} h:${h} x:${x} y${y}`);
     return {
         left: x,
         top: y,

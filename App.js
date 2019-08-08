@@ -7,25 +7,15 @@
  */
 import 'node-libs-react-native/globals';
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View, Image, Alert, Button} from 'react-native';
-import MapCanvas from './frontend/components/MapCanvas';
-import TestCase from './frontend/testBack/testBack';
-import { db/*, api*/ } from "./backend";
-import MapTile from './frontend/mapTile';
-import { Drawer } from 'react-native-material-ui';
-import PinchCanvas from './frontend/components/PinchCanvas/pinchCanvas';
-
+import {Platform, StyleSheet, Text, View, Image, Alert, Button, Animated} from 'react-native';
+import DownloadProgress from './frontend/components/progress/progress';
 import allReducer from './frontend/reducer/index';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
-//import Navigator from './frontend/components/Navigator/wrapper';
-import Navigator from './frontend/components/Navigator/navigator'
-import mapCanvas from './frontend/components/MapCanvas/mapCanvas';
-import MapTiles from './frontend/components/mapTiles/MapTiles';
 const store = createStore(allReducer);
 
-//import MapTiles from './frontend/components/mapTiles/wrapper';
-import PinchTest from './frontend/components/mapTiles/pinchTest';
+/**TEST IMPORT */
+
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -45,14 +35,9 @@ export default class App extends Component<Props> {
   render(){
     return (
       <Provider store={store}>
-          <Navigator>
-              <MapTiles />
-          </Navigator>
+        <DownloadProgress />
       </Provider>
-    );
-    /*return(
-      <PinchTest />
-    )*/
+    )
   }
 
 }
