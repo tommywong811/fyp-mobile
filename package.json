@@ -7,6 +7,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@dudigital/react-native-zoomable-view": "^1.0.13",
     "@react-native-community/async-storage": "^1.5.0",
     "bson": "^4.0.2",
     "fastpriorityqueue": "^0.6.3",
@@ -27,6 +28,7 @@
     "react-native-progress": "^3.6.0",
     "react-native-reanimated": "^1.1.0",
     "react-native-zip-archive": "^4.1.1",
+    "react-native-zoom-view": "^1.0.2",
     "react-redux": "^7.1.0",
     "realm": "^2.29.0",
     "redux": "^4.0.1",

@@ -3,7 +3,8 @@ import { connect } from 'react-redux';
 import {
     Image,
     Animated,
-    View
+    View,
+    Text
 } from 'react-native';
 import NotFoundZoom0 from '../../asset/notFoundZoom0';
 import { getFloorDimension, dirToUri } from '../../plugins/MapTiles';
@@ -14,6 +15,7 @@ import {
     PinchGestureHandler,
     State 
 } from 'react-native-gesture-handler';
+import ReactNativeZoomableView from '@dudigital/react-native-zoomable-view/src/ReactNativeZoomableView';
 
 const NOT_Found = 'NOT FOUND'; 
 class MapTiles extends React.Component{
@@ -134,29 +136,32 @@ class MapTiles extends React.Component{
 
     render(){
         return(
-            <PinchGestureHandler
-                        ref={this.pinchRef}
-                        onGestureEvent={this._onPinchGestrueEvent}
-                        onHandlerStateChange={this._onPinchHandlerStateChange}>
+            <PanGestureHandler
+            ref={this.panRef}
+            maxPointers={1}
+            onGestureEvent={this._onGestureEvent}
+            onHandlerStateChange={this._onPanHandlerStateChange}>
                 <Animated.View style={{flex:1}}>
-                <PanGestureHandler
-                ref={this.panRef}
-                maxPointers={1}
-                onGestureEvent={this._onGestureEvent}
-                onHandlerStateChange={this._onPanHandlerStateChange}>
-                            <Animated.View
+                    <ReactNativeZoomableView
+                    maxZoom={1.5}
+                    minZoom={0.5}
+                    zoomStep={0.5}
+                    initialZoom={1}
+                    bindToBorders={true}
+                    onZoomAfter={this.logOutZoomState}
+                    >
+                        <Animated.View
                             style={[{
                                 transform:[
                                     {translateX: this._translateX},
                                     {translateY: this._translateY},
-                                    {scale: this._scale}
                                 ]
-                            }, ]}>
+                        }, ]}>
                             {this._renderAllMapTile()}
-                            </Animated.View>
-                </PanGestureHandler>  
+                        </Animated.View>
+                    </ReactNativeZoomableView>
                 </Animated.View>
-            </PinchGestureHandler>
+            </PanGestureHandler>
         )
     }
 }  
