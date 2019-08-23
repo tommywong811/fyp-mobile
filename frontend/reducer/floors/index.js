@@ -2,13 +2,21 @@ import {api} from '../../../backend'
 
 import {
     CHANGE_FLOOR,
-    CHANGE_BUILDING
+    CHANGE_BUILDING,
+    CHANGE_CURRX,
+    CHANGE_CURRY,
+    CHANGE_SUMX,
+    CHANGE_SUMY
 } from './actionList'
 
 
 initialState = {
     data: api.floors().data,
-    currentFloor: api.floors().data[0]
+    currentFloor: api.floors().data[0],
+    currX: 0,
+    currY: 0,
+    sumX: 0,
+    sumY: 0,
 }
 
 function changeBuilding(data, payload, currentFloor){
@@ -38,12 +46,31 @@ export default floorReducer = (state = initialState, action) => {
                 ...state,
                 currentFloor: changeBuilding(state.data, action.payload, state.currentFloor)
             };
-        case CHANGE_FLOOR:{
+        case CHANGE_FLOOR:
             return {
                 ...state,
                 currentFloor: changeFloor(state.data, action.payload, state.currentFloor)
             };
-        }
+        case CHANGE_CURRX:
+            return {
+                ...state,
+                currX: action.payload.currX
+            };
+        case CHANGE_CURRY:
+            return {
+                ...state,
+                currY: action.payload.currY
+            };
+        case CHANGE_SUMX:
+            return {
+                ...state,
+                sumX: action.payload.sumX
+            };
+        case CHANGE_SUMY:
+            return {
+                ...state,
+                sumY: action.payload.sumY
+            }
         default:
             return state;
     }

@@ -15,7 +15,8 @@ import { Provider } from 'react-redux';
 const store = createStore(allReducer);
 
 /**TEST IMPORT */
-
+import TestMap from './frontend/components/mapTiles/TestMap';
+import TestNavigator from './frontend/components/Navigator/testNavigator';
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -38,6 +39,13 @@ export default class App extends Component<Props> {
         <DownloadProgress />
       </Provider>
     )
+    /*return (
+      <Provider store={store}>
+        <TestNavigator>
+          <TestMap></TestMap>
+        </TestNavigator>
+      </Provider>
+    )*/
   }
 
 }

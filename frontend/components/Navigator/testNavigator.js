@@ -12,8 +12,7 @@ import {
     CHANGE_FLOOR, 
     CHANGE_BUILDING
 } from '../../reducer/floors/actionList';
-import { Button, Icon } from 'native-base';
-import SearchBar from '../searchBar/searchBar';
+import { Button } from 'native-base';
 const {width} = Dimensions.get('window');
 
 /**
@@ -128,14 +127,8 @@ class Navigator extends React.Component{
                     drawerBackgroundColor="#ddd"
                     renderNavigationView={this._renderDrawer}
                 >
-                    <View style={{position:'absolute',zIndex:1, flexDirection:'row'}}>
-                        <Button transparent rounded onPress={()=>this.drawer.openDrawer()}>
-                            <Icon name='bars' />
-                        </Button>
-                        <SearchBar />
-                        <Button transparent>
-                            <Icon name='enter' />
-                        </Button>
+                    <View style={{position:'absolute',zIndex:1}}>
+                        <Text>Move</Text>
                     </View>
                     {this.props.children}
                 </DrawerLayout>
