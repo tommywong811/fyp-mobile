@@ -12,10 +12,11 @@ import {
     CHANGE_FLOOR, 
     CHANGE_BUILDING
 } from '../../reducer/floors/actionList';
-import { Button, Icon } from 'native-base';
+import { Button } from 'native-base';
 import SearchBar from '../searchBar/searchBar';
 const {width} = Dimensions.get('window');
-
+import Icon from 'react-native-vector-icons/AntDesign';
+import * as Base from 'native-base';
 /**
  * childrenView: 
  */
@@ -50,7 +51,7 @@ class Navigator extends React.Component{
     _buildingnameToString(name){
         switch(name){
             case 'academicBuilding': return 'Academic Building';
-            case 'cyt': return 'Academic Building';
+            case 'cyt': return 'CYT';
             case 'ias': return 'IAS'; 
             case 'lsk': return 'LSK';
             case 'campusMap': return 'Campus Map';
@@ -129,12 +130,12 @@ class Navigator extends React.Component{
                     renderNavigationView={this._renderDrawer}
                 >
                     <View style={{position:'absolute',zIndex:1, flexDirection:'row'}}>
-                        <Button transparent rounded onPress={()=>this.drawer.openDrawer()}>
-                            <Icon name='bars' />
+                        <Button light onPress={()=>this.drawer.openDrawer()}>
+                            <Base.Icon name='arrow-forward' />
                         </Button>
                         <SearchBar />
-                        <Button transparent>
-                            <Icon name='enter' />
+                        <Button light>
+                            <Icon size={30} name='enter' />
                         </Button>
                     </View>
                     {this.props.children}
