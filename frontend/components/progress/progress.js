@@ -25,7 +25,7 @@ export default class ProgressBar extends React.Component{
 
     _addProgressHandler(written, total){
         this.setState({
-            finished: written >= total ? true : false,
+            finished: Number(written) >= Number(total) ? true : false,
             written: written,
             total: total
         })
