@@ -120,6 +120,7 @@ function build() {
 
   // logger.info('Graph built');
   graphCache.data = { graph, nodesById, connectorsById, settings };
+  return graphCache.data
 }
 
 export default build;
