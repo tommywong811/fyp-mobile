@@ -18,7 +18,10 @@ import MapTiles from '../mapTiles/MapTiles';
 const {width} = Dimensions.get('window');
 import Icon from 'react-native-vector-icons/AntDesign';
 import * as Base from 'native-base';
+import { api } from '../../../backend'
 import realm from '../../../backend/Realm/realm';
+import { searchShortestPath } from '../../../backend/api/search/searchShortestPath';
+
 /**
  * childrenView: 
  */
@@ -48,18 +51,38 @@ class Navigator extends React.Component{
         });
     }
 
-    _onChangeCurrentSearchKeyword(keyword) {
+    _onChangeCurrentLocationText(text) {
         this.setState({
-            currentSearchKeyword: keyword,
+            currentLocation: text
         })
-        if(keyword == '') return;
-        let res = realm.objects('nodes').filtered(`name CONTAINS[c] '${keyword}' AND unsearchable != true`)
-        alert(JSON.stringify(Array.from(res), null, 2))
+    }
+
+    _onChangeCurrentSearchKeyword() {
+        // this.setState({
+        //     currentSearchKeyword: keyword,
+        // })
+        // if(this.state.searchInput=='' || this.state.currentLocation=='') {
+        //     alert('No input is entered')
+        //     return;
+        // };
+        // let fromNode = realm.objects('nodes').filtered(`name CONTAINS[c] '${this.state.searchInput}' AND unsearchable != true`)
+        // let toNode = realm.objects('nodes').filtered(`name CONTAINS[c] '${this.state.currentLocation}' AND unsearchable != true`)
+        let fromNode = Array.from(realm.objects('nodes').filtered(`name CONTAINS[c] '${5017}' AND unsearchable != true`))
+        let toNode = Array.from(realm.objects('nodes').filtered(`name CONTAINS[c] '${5018}' AND unsearchable != true`))
+        // alert(JSON.stringify(Array.from(fromNode), null, 2))
+        let fromId = fromNode[0]['_id'];
+        let toId = toNode[0]['_id'];
+        let fromBuildingId = Array.from(realm.objects('floors').filtered(`_id = '${fromNode[0].floorId}'`))[0].buildingId
+        let toBuildingId = Array.from(realm.objects('floors').filtered(`_id = '${toNode[0].floorId}'`))[0].buildingId
+        let res = searchShortestPath(fromId, toId)
+        this.props.change_floor(fromNode[0].floorId,fromBuildingId)
+        // alert(JSON.stringify(res,null,2))
     }
 
     _resetCurrentSearchKeyword() {
         this.setState({
             currentSearchKeyword: '',
+            currentLocation: ''
         });
     }
 
@@ -169,14 +192,19 @@ class Navigator extends React.Component{
                         <Button light onPress={()=>this.drawer.openDrawer()}>
                             <Base.Icon name='arrow-forward' />
                         </Button>
-                        <SearchBar searchInput={searchInput} onChangeText={(input)=> this._onChangeSearchText(input)}/>
-                        <Button light onPress={()=> this._onChangeCurrentSearchKeyword(searchInput)}>
-                            <Icon size={30} name='enter' />
-                        </Button>
+                        <View style={{width: '100%', flexDirection: 'row'}}>
+                            <View>
+                                <SearchBar searchInput={searchInput} placeholder="Where are you?" onChangeText={(input)=> this._onChangeCurrentLocationText(input)}/>
+                                <SearchBar searchInput={searchInput} placeholder="Where are you going?" onChangeText={(input)=> this._onChangeSearchText(input)}/>
+                            </View>
+                            <Button light onPress={()=> this._onChangeCurrentSearchKeyword(searchInput)}>
+                                <Icon size={30} name='enter' />
+                            </Button>
+                        </View>
                     </View>
                     {/* {this.props.children} */}
                     <MapTiles 
-                        searchKeyword={currentSearchKeyword}
+                        searchKeyword={this.state.currentSearchKeyword}
                         resetCurrentSearchKeyword={() => this._resetCurrentSearchKeyword()}
                     ></MapTiles>
                 </DrawerLayout>
@@ -253,7 +281,8 @@ const styles = StyleSheet.create({
         borderWidth: 0.5,
         borderColor:'black',
         margin:10,
-      }, text1:{
+      }, 
+      text1:{
           
       } 
 })

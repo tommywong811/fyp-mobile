@@ -19,7 +19,7 @@ export default class SearchBar extends Component<Props> {
             // </View>
             //{<View style={{flexDirection: 'row', marginHorizontal: 20, marginVertical: 10}}>}
                 <TextInput 
-                    placeholder="Where are you going?" 
+                    placeholder={this.props.placeholder}
                     placeholderTextColor='grey'
                     fontSize={17}
                     onChangeText={Text => this.props.onChangeText(Text)}
