@@ -31,6 +31,7 @@ class MapTiles extends React.Component{
         this._initialPinchHandler();
         this._onPanHandlerStateChange = this._onPanHandlerStateChange.bind(this);
         this._onPinchHandlerStateChange = this._onPinchHandlerStateChange.bind(this);
+        console.log(this.props.nodes)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -228,6 +229,7 @@ function mapStateToProps(state){
     ),
     currFloor: state.floorReducer.currentFloor._id,
     zoomLevel: 0,
+    nodes: state.nodesReducer.data,
     cache: cacheReducer(getFloorDimension(
         state.floorReducer.currentFloor.startX,
         state.floorReducer.currentFloor.startY,
