@@ -6,7 +6,6 @@ import com.facebook.react.ReactApplication;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.swmansion.reanimated.ReanimatedPackage;
 import com.rnfs.RNFSPackage;
-import com.airbnb.android.react.maps.MapsPackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import io.realm.react.RealmReactPackage;
 import com.rnziparchive.RNZipArchivePackage;
@@ -35,7 +34,6 @@ public class MainApplication extends Application implements ReactApplication {
             new VectorIconsPackage(),
             new ReanimatedPackage(),
             new RNFSPackage(),
-            new MapsPackage(),
             new RNGestureHandlerPackage(),
             new RealmReactPackage(),
             new RNZipArchivePackage(),
