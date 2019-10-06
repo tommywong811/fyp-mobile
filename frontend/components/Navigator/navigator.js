@@ -18,6 +18,7 @@ import MapTiles from '../mapTiles/MapTiles';
 const {width} = Dimensions.get('window');
 import Icon from 'react-native-vector-icons/AntDesign';
 import * as Base from 'native-base';
+import realm from '../../../backend/Realm/realm';
 /**
  * childrenView: 
  */
@@ -51,6 +52,9 @@ class Navigator extends React.Component{
         this.setState({
             currentSearchKeyword: keyword,
         })
+        if(keyword == '') return;
+        let res = realm.objects('nodes').filtered(`name CONTAINS[c] '${keyword}' AND unsearchable != true`)
+        alert(JSON.stringify(Array.from(res).split(0,10), null, 2))
     }
 
     _resetCurrentSearchKeyword() {
