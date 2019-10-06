@@ -54,7 +54,7 @@ class Navigator extends React.Component{
         })
         if(keyword == '') return;
         let res = realm.objects('nodes').filtered(`name CONTAINS[c] '${keyword}' AND unsearchable != true`)
-        alert(JSON.stringify(Array.from(res).split(0,10), null, 2))
+        alert(JSON.stringify(Array.from(res), null, 2))
     }
 
     _resetCurrentSearchKeyword() {
