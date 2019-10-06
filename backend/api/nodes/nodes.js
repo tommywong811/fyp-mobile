@@ -5,6 +5,7 @@ import { findNodeById } from "./findNodeById";
 import { findNodesByKeyword } from "./findNodesByKeyword";
 import { findNodesWithinBox } from "./findNodesWithinBox";
 import { findNodeNearCoordinates } from "./findNodeNearCoordinates";
+import { findNodesWithName } from "./findNodesWithName";
 
 const findNodesByKeywordSchema = object().shape({
     name: string().required()
@@ -20,10 +21,11 @@ const findNodesWithinBoxSchema = object().shape({
     includePoints: boolean()
 })
 
-const findNodeNearCoordinatesSchema = object().shape({
+const findNodesWithNameSchema = object().shape({
+    name: string().required(),
     floorId: string().required(),
     nearCoordinates: array().of(number()).min(2).max(2).required()
-})
+}) 
 
 function nodes(payload) {
     if (findNodeByIdSchema.isValidSync(payload)) {
@@ -39,7 +41,8 @@ function nodes(payload) {
         return findNodesWithinBox(floorId, boxCoordinates, includePoints);
     }
     else {
-        throw new Error('Invalid payload');
+        // throw new Error('Invalid payload');
+        return findNodesWithName();
     }
 }
 

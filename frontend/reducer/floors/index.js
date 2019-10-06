@@ -9,9 +9,8 @@ import {
     CHANGE_SUMY
 } from './actionList'
 
-
 initialState = {
-    data: api.floors().data,
+    // data: api.floors().data,
     currentFloor: api.floors().data[0],
     currX: 0,
     currY: 0,
@@ -39,7 +38,7 @@ function changeFloor(data, payload, currentFloor){
     return currentFloor;
 }
 
-export default floorReducer = (state = initialState, action) => {
+export default floorReducer = (state = initialState, action) => {console.log(initialState)
     switch(action.type){
         case CHANGE_BUILDING:
             return {
