@@ -30,8 +30,9 @@ async function downloadDatabase(progressHandler) {
     .fetch('GET', url, {
         // headers
     })
-    .progress(progressHandler)
-    .then(() => unzip(archiveFile, archiveExtractTarget));
+    .progress(progressHandler);
+
+    await unzip(archiveFile, archiveExtractTarget);
 
     // validating downloaded files
     await validateDownloadFiles();

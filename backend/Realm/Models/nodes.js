@@ -10,7 +10,11 @@ NodesModel.schema = {
         floorId: 'string',
         tagIds: 'string?[]',
         connectorId: 'string?',
-        name: 'string?',
+        name: {
+            type: 'string',
+            indexed: true,
+            optional: true,
+        },
         keywords: 'string?[]',
         image: 'string?', // ObjectId
         url: 'string?',

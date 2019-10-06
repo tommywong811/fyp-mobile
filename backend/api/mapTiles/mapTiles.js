@@ -1,7 +1,6 @@
 import { object, string, number } from "yup";
 
-import { findMapTiles, findMapTilesPerFloor } from "./findMapTiles";
-
+import { findMapTiles } from "./findMapTiles";
 
 let schema = object().shape({
     floorId: string().required(),

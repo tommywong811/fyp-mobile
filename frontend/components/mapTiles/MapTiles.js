@@ -19,8 +19,7 @@ import ReactNativeZoomableView from '@dudigital/react-native-zoomable-view/src/R
 
 const NOT_Found = 'NOT FOUND'; 
 class MapTiles extends React.Component{
-    panRef = React.createRef();
-    pinchRef = React.createRef();
+
     constructor(props){
         super(props);
         this._initialCache = this._initialCache.bind(this);
@@ -32,7 +31,22 @@ class MapTiles extends React.Component{
         this._initialPinchHandler();
         this._onPanHandlerStateChange = this._onPanHandlerStateChange.bind(this);
         this._onPinchHandlerStateChange = this._onPinchHandlerStateChange.bind(this);
-        //console.log(this.props.cache);
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.searchKeyword != this.props.searchKeyword && nextProps.searchKeyword) {
+            this.setMapOffset(-100, -100);
+        }
+
+    }
+
+    setMapOffset(x, y) {
+        this._lastOffset.x = x;
+        this._lastOffset.y = y;
+        this._translateX.setOffset(this._lastOffset.x);
+        this._translateX.setValue(0);
+        this._translateY.setOffset(this._lastOffset.y);
+        this._translateY.setValue(0);
     }
 
     _initialCache(){
@@ -93,12 +107,10 @@ class MapTiles extends React.Component{
 
     _onPanHandlerStateChange(event){
         if (event.nativeEvent.oldState === State.ACTIVE) {
-          this._lastOffset.x += event.nativeEvent.translationX;
-          this._lastOffset.y += event.nativeEvent.translationY;
-          this._translateX.setOffset(this._lastOffset.x);
-          this._translateX.setValue(0);
-          this._translateY.setOffset(this._lastOffset.y);
-          this._translateY.setValue(0);
+            this._lastOffset.x += event.nativeEvent.translationX;
+            this._lastOffset.y += event.nativeEvent.translationY;
+            this.setMapOffset(this._lastOffset.x, this._lastOffset.y)
+            this.props.resetCurrentSearchKeyword(); // only change the navigator currentSearchKeyword but not searchInput in searchBar
         }
     }
 

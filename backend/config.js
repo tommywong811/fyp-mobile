@@ -60,8 +60,8 @@ const config = {
             archiveExtractTarget: docDir
         },
         url: {
-            database: 'http://10.89.226.226:5000/database.zip',
-            metadata: 'http://10.89.226.226:5000/meta.json',
+            database: 'http://192.168.1.77:5000/database.zip',
+            metadata: 'http://192.168.1.77:5000/meta.json',
         }
     }
 }

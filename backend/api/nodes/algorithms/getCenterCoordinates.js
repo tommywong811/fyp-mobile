@@ -1,9 +1,9 @@
 'use strict';
 
+import { validateGeoLocs } from "./validate";
+
 function getCenterCoordinates(geoLocs) {
-  if (!geoLocs || !geoLocs.coordinates || !geoLocs.coordinates[0] || !geoLocs.coordinates[0][0]) {
-    throw new Error('Invalid geoLocs format');
-  }
+  validateGeoLocs(geoLocs);
 
   const firstInnerPolygon = geoLocs.coordinates[0][0];
   let sumX = 0;

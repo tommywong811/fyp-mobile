@@ -10,7 +10,10 @@ EdgesModel.schema = {
         toNodeId: 'string',
         weightType: 'string', // enum: ['nodeDistance', 'max', 'number']
         weight: 'double?',
-        floorId: 'string',
+        floorId: {
+            type: 'string',
+            indexed: true,
+        },
     }
 }
 

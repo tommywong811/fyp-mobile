@@ -1,5 +1,7 @@
 'use strict';
 
+import { validatePoint, validatePolygon } from "./validate";
+
 // Modified from https://stackoverflow.com/a/15308571
 
 function sub(v1, v2) {
@@ -10,10 +12,15 @@ function crossProduct(v1, v2) {
   return v1[0] * v2[1] - v1[1] * v2[0];
 }
 
+/**
+ * Determine whether a point is inside a polygon or on its edges
+ * @param {Array<Number>} point 
+ * @param {Array<Array<Number>>} polygon 
+ * @returns {Boolean}
+ */
 function pointInPolygon(point, polygon) {
-  if (polygon.length < 3) {
-    throw new Error('Polygon must have at least 3 vertices');
-  }
+  validatePoint(point);
+  validatePolygon(polygon);
 
   let sign = 0;
 

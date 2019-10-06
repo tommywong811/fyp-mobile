@@ -4,6 +4,7 @@ import {View, Text, StyleSheet, TextInput, TouchableOpacity, Button} from 'react
 
 type Props = {};
 export default class SearchBar extends Component<Props> {
+
     render() {
         return (
             // <View style={styles.container}>
@@ -21,6 +22,7 @@ export default class SearchBar extends Component<Props> {
                     placeholder="Where are you going?" 
                     placeholderTextColor='grey'
                     fontSize={17}
+                    onChangeText={Text => this.props.onChangeText(Text)}
                     style={{ borderWidth: 1, borderColor: '#f2f2e1', 
                     backgroundColor: 'white', borderTopRightRadius: 10, 
                     borderBottomRightRadius: 10, height: 48, flex:1, padding: 5}}

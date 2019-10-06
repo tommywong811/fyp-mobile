@@ -14,6 +14,7 @@ import {
 } from '../../reducer/floors/actionList';
 import { Button } from 'native-base';
 import SearchBar from '../searchBar/searchBar';
+import MapTiles from '../mapTiles/MapTiles';
 const {width} = Dimensions.get('window');
 import Icon from 'react-native-vector-icons/AntDesign';
 import * as Base from 'native-base';
@@ -32,6 +33,32 @@ class Navigator extends React.Component{
             allFloorIds : this._getAllFloors()
         }
     }
+
+    componentWillMount() {
+        this.setState({
+            searchInput: '',
+            currentSearchKeyword: '',
+        })
+    }
+
+    _onChangeSearchText(text) {
+        this.setState({
+            searchInput: text,
+        });
+    }
+
+    _onChangeCurrentSearchKeyword(keyword) {
+        this.setState({
+            currentSearchKeyword: keyword,
+        })
+    }
+
+    _resetCurrentSearchKeyword() {
+        this.setState({
+            currentSearchKeyword: '',
+        });
+    }
+
     //get all unique building name
     _getUniqueBuildingId(data){
         let tempData = data.map(item => item.buildingId);
@@ -119,6 +146,11 @@ class Navigator extends React.Component{
     }
 
     render(){
+        const {
+            searchInput,
+            currentSearchKeyword,
+        } = this.state;console.log(searchInput)
+
         return(
             <View style={{flex:6, zIndex: 1}}>
                 <DrawerLayout
@@ -133,12 +165,16 @@ class Navigator extends React.Component{
                         <Button light onPress={()=>this.drawer.openDrawer()}>
                             <Base.Icon name='arrow-forward' />
                         </Button>
-                        <SearchBar />
-                        <Button light>
+                        <SearchBar searchInput={searchInput} onChangeText={(input)=> this._onChangeSearchText(input)}/>
+                        <Button light onPress={()=> this._onChangeCurrentSearchKeyword(searchInput)}>
                             <Icon size={30} name='enter' />
                         </Button>
                     </View>
-                    {this.props.children}
+                    {/* {this.props.children} */}
+                    <MapTiles 
+                        searchKeyword={currentSearchKeyword}
+                        resetCurrentSearchKeyword={() => this._resetCurrentSearchKeyword()}
+                    ></MapTiles>
                 </DrawerLayout>
             </View>
         );

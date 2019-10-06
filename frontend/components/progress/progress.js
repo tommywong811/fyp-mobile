@@ -1,7 +1,6 @@
 import React from 'react';
 import { db, api } from '../../../backend';
 import * as Progress from 'react-native-progress';
-import MapTiles from '../mapTiles/MapTiles';
 import Navigator from '../Navigator/navigator';
 
 export default class ProgressBar extends React.Component{
@@ -50,7 +49,6 @@ export default class ProgressBar extends React.Component{
         }else{
             return (
                 <Navigator>
-                        <MapTiles />
                 </Navigator>
             );
         }

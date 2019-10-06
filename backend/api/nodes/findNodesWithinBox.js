@@ -5,8 +5,8 @@ import pick from "lodash.pick";
 import config from "../../config";
 import realm from "../../Realm/realm";
 import { toResponse } from "../../Realm/Transform/transform";
-import { pointInsideBox } from "./algorithms/pointInsideBox";
-import { polygonInsideBox } from "./algorithms/polygonInsideBox";
+import { pointInBox } from "./algorithms/pointInBox";
+import { polygonInBox } from "./algorithms/polygonInBox";
 import { transformNodeResponse } from "./transformNodeResponse";
 
 function findNodesWithinBox(floorId, boxCoordinates, includePoints = false) {
@@ -18,8 +18,8 @@ function findNodesWithinBox(floorId, boxCoordinates, includePoints = false) {
     .filtered(`floorId = "${floorId}"`)
     .map(o => toResponse(o, config.db.nodes.name))
     .filter(o => (
-        ( o.polygonCoordinates && polygonInsideBox(o.polygonCoordinates, boxCoordinates) ) ||
-        ( includePoints && this.coordinates && pointInsideBox(this.coordinates, boxCoordinates) )
+        ( o.polygonCoordinates && polygonInBox(o.polygonCoordinates, boxCoordinates) ) ||
+        ( includePoints && this.coordinates && pointInBox(this.coordinates, boxCoordinates) )
     ))
     .slice(0, MAX_NODES_RETURN_LIMIT);
 

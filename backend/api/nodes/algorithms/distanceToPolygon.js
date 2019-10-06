@@ -1,7 +1,9 @@
 'use strict'
 
-// ref: https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
 import { pointInPolygon } from "./pointInPolygon";
+import { validatePoint, validatePolygon } from "./validate";
+
+// ref: https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
 
 function _square(x) {
     return x * x;
@@ -30,15 +32,9 @@ function _distToSegment(p, a, b) {
 }
 
 function distanceToPolygon(point, polygon) {
-    if (!point || !point[0]) {
-        throw new Error('Invalid point format');
-    }
-    if (!polygon || !polygon[0] || !polygon[0][0]) {
-        throw new Error('Invalid polygon format');
-    }
-    if (polygon.length < 3) {
-        throw new Error('Polygon must have at least 3 vertices');
-    }
+    validatePoint(point);
+    validatePolygon(polygon);
+    
     if (pointInPolygon(point, polygon)) {
         return 0;
     }
