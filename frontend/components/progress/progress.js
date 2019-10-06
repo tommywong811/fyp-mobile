@@ -43,7 +43,7 @@ export default class ProgressBar extends React.Component{
     _renderProgress(){
         if(!this.state.finished){
             return <Progress.Circle progress={this.state.written/this.state.total} endAndgle={1} size={60}
-            showsText={this.state.written/this.state.total}
+            showsText={true}
             style={{justifyContent: 'center', alignItems: 'center'}}
             textStyle={{justifyContent: 'center', alignItems: 'center'}}/>
         }else{
