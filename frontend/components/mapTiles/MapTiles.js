@@ -35,7 +35,7 @@ class MapTiles extends React.Component{
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.searchKeyword != this.props.searchKeyword && nextProps.searchKeyword) {
-            this.setMapOffset(-100, -100);
+            this.setMapOffset(-100, -100); // sample, TO DO : search the maptile and change the map offset
         }
 
     }
