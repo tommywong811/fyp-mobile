@@ -1,1 +1,1 @@
-export const CHANGE_NODE = 'CHANGE_NODE';
+export const FIND_NODE = 'FIND_NODE';

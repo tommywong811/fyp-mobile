@@ -21,6 +21,7 @@ import * as Base from 'native-base';
 import { api } from '../../../backend'
 import realm from '../../../backend/Realm/realm';
 import { searchShortestPath } from '../../../backend/api/search/searchShortestPath';
+import { FIND_NODE } from '../../reducer/nodes/actionList';
 
 /**
  * childrenView: 
@@ -82,8 +83,8 @@ class Navigator extends React.Component{
     }
 
     _searchRoom() {
-        let roomNode = api.nodes({name: this.state.searchInput})['data'][0]
-        let floor = api.floors({id: roomNode.floorId})
+        this.props.find_node(this.state.searchInput)
+        let floor = api.floors({id: this.props.currentNode.floorId})
         this.props.change_floor(floor._id, floor.buildingId)
     }
 
@@ -227,7 +228,8 @@ function mapStateToProps(state){
         currFloor: state.floorReducer.currentFloor._id,
         currBuilding: state.floorReducer.currentFloor.buildingId,
         allFloors: state.floorReducer.data,
-        zoomLevel: 0
+        zoomLevel: 0,
+        currentNode: state.nodesReducer.currentNode
     };
 }
 
@@ -235,7 +237,8 @@ function mapDispatchToProps(dispatch){
     return {
         change_floor: (floor, buildingId) => 
             dispatch({type: CHANGE_FLOOR, payload: {floor: floor, buildingId: buildingId}}),
-        change_building: (floor) => dispatch({type: CHANGE_BUILDING, payload: {buildingId: floor}})
+        change_building: (floor) => dispatch({type: CHANGE_BUILDING, payload: {buildingId: floor}}),
+        find_node: (name)=>dispatch({type: FIND_NODE, payload: {name: name}})
     };
 }
 

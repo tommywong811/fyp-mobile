@@ -1,5 +1,5 @@
 import {api} from '../../../backend'
-import { CHANGE_NODE } from './actionList'
+import { FIND_NODE } from './actionList'
 
 
 let initialState = {
@@ -7,17 +7,16 @@ let initialState = {
     currentNode: null
 }
 
-function changeNode(data, payload, currentNode) {
-    if(payload.nodeId == currentNode._id) return currentNode
-    return data.find(e=>e._id=payload.nodeId);
+function findNode(payload) {
+    return api.nodes({name: payload.name})['data'][0]
 }
 
 export default nodesReducer = (state = initialState, action) => {
     switch(action.type){
-        case CHANGE_NODE:
+        case FIND_NODE:
             return {
                 ...state,
-                currentNode: changeNode(state.data, action.payload, state.currentNode)
+                currentNode: findNode(action.payload)
             }
         default:
             return state;
