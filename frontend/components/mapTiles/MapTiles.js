@@ -16,6 +16,7 @@ import {
     State 
 } from 'react-native-gesture-handler';
 import ReactNativeZoomableView from '@dudigital/react-native-zoomable-view/src/ReactNativeZoomableView';
+import {findNodeNearCoordinates} from '../../../backend/api/nodes/findNodeNearCoordinates';
 
 const MAP_TILE_WIDTH = 200;
 const MAP_TILE_HEIGHT = 200;
@@ -33,7 +34,12 @@ class MapTiles extends React.Component{
         this._initialPinchHandler();
         this._onPanHandlerStateChange = this._onPanHandlerStateChange.bind(this);
         this._onPinchHandlerStateChange = this._onPinchHandlerStateChange.bind(this);
-        console.log(this.props.nodes)
+    }
+
+    componentWillMount() {console.log(this.props.nodes)
+        this.setState({
+            'nodesInFloor': this.props.nodes.filter((node) => node.floorId === this.props.currFloor),
+        });
     }
 
     componentWillReceiveProps(nextProps) {
@@ -43,6 +49,12 @@ class MapTiles extends React.Component{
             // alert(`${x} ${y}`)
             // alert(JSON.stringify(nextProps.currentNode, null, 2))
             this.setMapOffset(-x, -y); //still experimenting with the correct offset
+        }
+
+        if(nextProps.currFloor != this.props.currFloor) {
+            this.setState({
+                'nodesInFloor': this.props.nodes.filter((node) => node.floorId === this.props.currFloor),
+            })
         }
 
     }
@@ -143,9 +155,11 @@ class MapTiles extends React.Component{
                 (row, rowIndex) => (
                     <View style={{flexDirection: 'row'}} key={rowIndex}>
                         {row.map(
-                            (item, index) => <Image source={{uri: dirToUri(item.dir)}}
-                            key={`${rowIndex} ${index}`}
-                            style={{width:80, height:80}}/>
+                            (item, index) => <View>
+                                <Image source={{uri: dirToUri(item.dir)}}
+                                    key={`${rowIndex} ${index}`}
+                                    style={{width:80, height:80}}/>
+                                </View>
                         )}
                     </View>
                 )
@@ -153,7 +167,51 @@ class MapTiles extends React.Component{
         );
     }
 
+    _renderAllNodes() {
+        // console.log(this.state.nodesInFloor.length)
+        // console.log(mapTileSize * this.props.cache.length)
+        // console.log(this.state.nodesInFloor)
+        // console.log(this.props.offSetX)
+        return (
+            <View
+                style={[{
+                    flex: 1,
+                    position: 'absolute',
+                    left: 0,
+                    top: 0,
+                    width: mapTileSize * this.props.cache.length,
+                    height: mapTileSize * this.props.cache[0].length,
+            }]}>
+                {this.state.nodesInFloor.map((node, key)=>{
+                    if (node.centerCoordinates) {
+                        return(
+                            <View
+                                key = {key}
+                                style={[{
+                                    flex: 1,
+                                    position: 'absolute',
+                                    top:  (node.centerCoordinates[1] - this.props.offSetY) /  logicTileSize * 80,
+                                    left: (node.centerCoordinates[0] - this.props.offSetX) / logicTileSize * 80 + 70,
+                                }]}>
+                                <Text
+                                    style={[{
+                                        fontSize: 3,
+                                    }]}
+                                >
+                                    {node.name}
+                                </Text>
+                            </View>
+                        )
+                    }
+                    return (<View></View>)
+                })
+                }
+            </View>
+        )
+    }
+
     render(){
+
         return(
             <PanGestureHandler
             ref={this.panRef}
@@ -174,9 +232,12 @@ class MapTiles extends React.Component{
                                 transform:[
                                     {translateX: this._translateX},
                                     {translateY: this._translateY},
-                                ]
-                        }, ]}>
+                                ],
+                                position: 'relative'
+                                },
+                        ]}>
                             {this._renderAllMapTile()}
+                            {this._renderAllNodes()}
                         </Animated.View>
                     </ReactNativeZoomableView>
                 </Animated.View>
@@ -187,13 +248,13 @@ class MapTiles extends React.Component{
 
 function cacheReducer(dim, zoomLevel, currFloor){
     var cache = new Array(height);
-    const left = dim.left;
-    const top = dim.top;
-    const width = dim.width;
-    const height = dim.height;
+    const left = dim.left;  // starting coordinate
+    const top = dim.top;    // starting coordinate
+    const width = dim.width;    // number of tile in x
+    const height = dim.height;  // number of tile in y
     for(i = 0; i < height; i++){
         cache[i] = new Array(width + 1);
-    } 
+    };
     for(i = 0; i < height; i++){
         for(j = 0; j < width + 1; j++){
             cache[i][j] = {

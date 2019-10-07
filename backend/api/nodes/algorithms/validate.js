@@ -1,5 +1,6 @@
 'use strict';
 
+
 function validatePoint(point) {
     if (!point || !Number.isFinite(point[0]) || point.length !== 2) {
         throw new Error('Invalid point format');
