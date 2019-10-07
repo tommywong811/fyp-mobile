@@ -10,7 +10,8 @@ import {
 } from 'react-native';
 import { 
     CHANGE_FLOOR, 
-    CHANGE_BUILDING
+    CHANGE_BUILDING,
+    CHANGE_NODE
 } from '../../reducer/floors/actionList';
 import { Button } from 'native-base';
 import SearchBar from '../searchBar/searchBar';
@@ -21,7 +22,6 @@ import * as Base from 'native-base';
 import { api } from '../../../backend'
 import realm from '../../../backend/Realm/realm';
 import { searchShortestPath } from '../../../backend/api/search/searchShortestPath';
-import { FIND_NODE } from '../../reducer/nodes/actionList';
 
 /**
  * childrenView: 
@@ -47,8 +47,7 @@ class Navigator extends React.Component{
     }
     componentWillReceiveProps(nextProps) {
         if (nextProps.currentNode != this.props.currentNode) {  // for _searchRoom function after find_node
-            let floor = api.floors({id: nextProps.currentNode.floorId})
-            this.props.change_floor(floor._id, floor.buildingId)
+            this.props.change_floor(nextProps.currFloor, nextProps.currentBuilding)
         }
     }
 
@@ -88,7 +87,7 @@ class Navigator extends React.Component{
     }
 
     _searchRoom() {
-        this.props.find_node(this.state.searchInput)
+        this.props.change_node(this.state.searchInput)
     }
 
     _resetCurrentSearchKeyword() {
@@ -232,7 +231,8 @@ function mapStateToProps(state){
         currBuilding: state.floorReducer.currentFloor.buildingId,
         allFloors: state.floorReducer.data,
         zoomLevel: 0,
-        currentNode: state.nodesReducer.currentNode
+        currentNode: state.floorReducer.currentNode,
+        currentBuilding: state.floorReducer.currentBuilding
     };
 }
 
@@ -241,7 +241,7 @@ function mapDispatchToProps(dispatch){
         change_floor: (floor, buildingId) => 
             dispatch({type: CHANGE_FLOOR, payload: {floor: floor, buildingId: buildingId}}),
         change_building: (floor) => dispatch({type: CHANGE_BUILDING, payload: {buildingId: floor}}),
-        find_node: (name)=>dispatch({type: FIND_NODE, payload: {name: name}})
+        change_node: (name)=>dispatch({type: CHANGE_NODE, payload: {name: name}})
     };
 }
 

@@ -17,6 +17,8 @@ import {
 } from 'react-native-gesture-handler';
 import ReactNativeZoomableView from '@dudigital/react-native-zoomable-view/src/ReactNativeZoomableView';
 
+const MAP_TILE_WIDTH = 200;
+const MAP_TILE_HEIGHT = 200;
 const NOT_Found = 'NOT FOUND'; 
 class MapTiles extends React.Component{
 
@@ -35,8 +37,12 @@ class MapTiles extends React.Component{
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.searchKeyword != this.props.searchKeyword && nextProps.searchKeyword) {
-            this.setMapOffset(-100, -100); // sample, TO DO : search the maptile and change the map offset
+        if (nextProps.currentNode != this.props.currentNode && nextProps.currentNode) {
+            let x = parseInt(nextProps.currentNode.coordinates[0]/MAP_TILE_WIDTH) == -0 ? 0 : parseInt(nextProps.currentNode.coordinates[0]/MAP_TILE_WIDTH)*MAP_TILE_WIDTH
+            let y = parseInt(nextProps.currentNode.coordinates[1]/MAP_TILE_HEIGHT) == -0 ? 0 : parseInt(nextProps.currentNode.coordinates[1]/MAP_TILE_HEIGHT)*MAP_TILE_HEIGHT
+            // alert(`${x} ${y}`)
+            // alert(JSON.stringify(nextProps.currentNode, null, 2))
+            this.setMapOffset(-x, -y); //still experimenting with the correct offset
         }
 
     }
@@ -235,7 +241,8 @@ function mapStateToProps(state){
         state.floorReducer.currentFloor.startY,
         state.floorReducer.currentFloor.mapWidth,
         state.floorReducer.currentFloor.mapHeight
-    ), 0, state.floorReducer.currentFloor._id)
+    ), 0, state.floorReducer.currentFloor._id),
+    currentNode: state.floorReducer.currentNode
  });
 }
 
