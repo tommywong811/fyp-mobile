@@ -25,7 +25,8 @@ function validatePolygon(polygon) {
 }
 
 function validateGeoLocs(geoLocs) {
-    if (!geoLocs || !geoLocs.coordinates || !geoLocs.coordinates[0] || !Number.isFinite(geoLocs.coordinates[0][0])) {
+    if (!geoLocs || !geoLocs.coordinates || !geoLocs.coordinates[0]) {
+    // if (!geoLocs || !geoLocs.coordinates || !geoLocs.coordinates[0] || !Number.isFinite(geoLocs.coordinates[0][0])) {
         throw new Error('Invalid geoLocs format');
     }
 }
