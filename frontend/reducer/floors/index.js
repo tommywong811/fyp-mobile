@@ -6,7 +6,8 @@ import {
     CHANGE_CURRX,
     CHANGE_CURRY,
     CHANGE_SUMX,
-    CHANGE_SUMY
+    CHANGE_SUMY,
+    CHANGE_NODE
 } from './actionList'
 
 let initialState = {
@@ -16,6 +17,9 @@ let initialState = {
     currY: 0,
     sumX: 0,
     sumY: 0,
+    suggestedNodes: [],
+    currentNode: null,
+    currentBuilding: null
 }
 
 function changeBuilding(data, payload, currentFloor){
@@ -36,6 +40,16 @@ function changeFloor(data, payload, currentFloor){
         }
     }
     return currentFloor;
+}
+
+function changeNode(payload) {
+    let node = api.nodes({name: payload.name})['data'][0]
+    let floor = api.floors({id: node.floorId})
+    return {
+        currentNode: node,
+        currentFloor: floor,
+        currentBuilding: api.buildings({id: floor.buildingId})
+    }
 }
 
 export default floorReducer = (state = initialState, action) => {
@@ -69,6 +83,11 @@ export default floorReducer = (state = initialState, action) => {
             return {
                 ...state,
                 sumY: action.payload.sumY
+            }
+        case CHANGE_NODE:
+            return {
+                ...state,
+                ...changeNode(action.payload)
             }
         default:
             return state;
