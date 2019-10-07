@@ -33,7 +33,6 @@ class Navigator extends React.Component{
         this._renderDrawer = this._renderDrawer.bind(this);
         this._allBuildings = this._getUniqueBuildingId(this.props.allFloors);
         this._getAllFloors = this._getAllFloors.bind(this);
-        //console.log(this.props);
         this.state = {
             allFloorIds : this._getAllFloors()
         }
@@ -45,6 +44,12 @@ class Navigator extends React.Component{
             currentSearchKeyword: '',
             currentLocation: ''
         })
+    }
+    componentWillReceiveProps(nextProps) {
+        if (nextProps.currentNode != this.props.currentNode) {  // for _searchRoom function after find_node
+            let floor = api.floors({id: nextProps.currentNode.floorId})
+            this.props.change_floor(floor._id, floor.buildingId)
+        }
     }
 
     _onChangeSearchText(text) {
@@ -84,8 +89,6 @@ class Navigator extends React.Component{
 
     _searchRoom() {
         this.props.find_node(this.state.searchInput)
-        let floor = api.floors({id: this.props.currentNode.floorId})
-        this.props.change_floor(floor._id, floor.buildingId)
     }
 
     _resetCurrentSearchKeyword() {
