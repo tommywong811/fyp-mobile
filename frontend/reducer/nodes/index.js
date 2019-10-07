@@ -1,7 +1,7 @@
 import {api} from '../../../backend'
 
 
-initialState = {
+let initialState = {
     data: api.nodes().data,
 }
 
