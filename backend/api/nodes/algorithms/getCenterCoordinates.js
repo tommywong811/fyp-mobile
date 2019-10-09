@@ -1,9 +1,10 @@
 'use strict';
 
 import { validateGeoLocs } from "./validate";
+import { isObject } from "util";
 
 function getCenterCoordinates(geoLocs) {
-  geoLocs = JSON.parse(geoLocs); // geoLocs is not a string in the data, need to Parse
+  geoLocs = isObject(geoLocs) ? geoLocs : JSON.parse(geoLocs); // geoLocs is not a string in the data, need to Parse
   validateGeoLocs(geoLocs);
 
   const firstInnerPolygon = geoLocs.coordinates[0][0];
