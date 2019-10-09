@@ -53,7 +53,7 @@ class MapTiles extends React.Component{
 
         if(nextProps.currFloor != this.props.currFloor) {
             this.setState({
-                'nodesInFloor': this.props.nodes.filter((node) => node.floorId === this.props.currFloor),
+                'nodesInFloor': this.props.nodes.filter((node) => node.floorId === nextProps.currFloor),
             })
         }
 
