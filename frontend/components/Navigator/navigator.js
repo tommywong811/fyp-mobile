@@ -7,6 +7,7 @@ import {
     StyleSheet,
     Dimensions,
     ScrollView,
+    Keyboard,
 } from 'react-native';
 import { 
     CHANGE_FLOOR, 
@@ -87,7 +88,8 @@ class Navigator extends React.Component{
     }
 
     _searchRoom() {
-        this.props.change_node(this.state.searchInput)
+        Keyboard.dismiss()
+        this.props.change_node(this.state.searchInput);
     }
 
     _resetCurrentSearchKeyword() {
