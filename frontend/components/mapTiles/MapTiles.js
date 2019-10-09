@@ -7,7 +7,7 @@ import {
     Text
 } from 'react-native';
 import NotFoundZoom0 from '../../asset/notFoundZoom0';
-import { getFloorDimension, dirToUri } from '../../plugins/MapTiles';
+import { getFloorDimension, dirToUri, getNodeOffsetForEachFloor } from '../../plugins/MapTiles';
 import {mapTileSize, logicTileSize} from './config';
 import { api } from '../../../backend';
 import { 
@@ -36,9 +36,10 @@ class MapTiles extends React.Component{
         this._onPinchHandlerStateChange = this._onPinchHandlerStateChange.bind(this);
     }
 
-    componentWillMount() {console.log(this.props.nodes)
+    componentWillMount() {
         this.setState({
             'nodesInFloor': this.props.nodes.filter((node) => node.floorId === this.props.currFloor),
+            'nodeOffset': getNodeOffsetForEachFloor(this.props.currFloor),
         });
     }
 
@@ -54,6 +55,7 @@ class MapTiles extends React.Component{
         if(nextProps.currFloor != this.props.currFloor) {
             this.setState({
                 'nodesInFloor': this.props.nodes.filter((node) => node.floorId === nextProps.currFloor),
+                'nodeOffset': getNodeOffsetForEachFloor(nextProps.currFloor),
             })
         }
 
@@ -168,10 +170,6 @@ class MapTiles extends React.Component{
     }
 
     _renderAllNodes() {
-        // console.log(this.state.nodesInFloor.length)
-        // console.log(mapTileSize * this.props.cache.length)
-        // console.log(this.state.nodesInFloor)
-        // console.log(this.props.offSetX)
         return (
             <View
                 style={[{
@@ -183,6 +181,7 @@ class MapTiles extends React.Component{
                     height: mapTileSize * this.props.cache[0].length,
             }]}>
                 {this.state.nodesInFloor.map((node, key)=>{
+                    
                     if (node.centerCoordinates) {
                         return(
                             <View
@@ -190,8 +189,8 @@ class MapTiles extends React.Component{
                                 style={[{
                                     flex: 1,
                                     position: 'absolute',
-                                    top:  (node.centerCoordinates[1] - this.props.offSetY) /  logicTileSize * 80,
-                                    left: (node.centerCoordinates[0] - this.props.offSetX) / logicTileSize * 80 + 70,
+                                    top:  (node.centerCoordinates[1] - this.props.offSetY) /  logicTileSize * 80 + this.state.nodeOffset.y,
+                                    left: (node.centerCoordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x,
                                 }]}>
                                 <Text
                                     style={[{

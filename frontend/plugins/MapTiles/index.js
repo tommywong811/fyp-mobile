@@ -169,3 +169,128 @@ export function getDefualtView(left, top, numOfRow, numOfCol, floorId, zoomLevel
         }
     }
 }
+
+export function getNodeOffsetForEachFloor(floorId) {
+    switch(floorId) {
+        // Academic Building
+        case '1':
+        case '5':
+        case '6':
+            return {
+                'x': 70,
+                'y': 0,
+            };
+        case '2':
+            return {
+                'x': 35,
+                'y': 70,
+            };
+        case '3':
+            return {
+                'x': 65,
+                'y': 30
+            }
+        case '4':
+            return {
+                'x': 70,
+                'y': 20,
+            }
+
+        // CYT
+        case 'CYT2':
+        case 'CYT3':
+        case 'CYT4':
+        case 'CYT5':
+        case 'CYT6':
+            return {
+                'x': 50,
+                'y': 60,
+            };
+        case 'CYT1':
+            return {
+                'x': 70,
+                'y': 60,
+            }
+
+        // IAS
+        case 'IAS1':
+            return {
+                'x': 35,
+                'y': 40,
+            };
+        case 'IAS2':
+            return {
+                'x': 35,
+                'y': 45,
+            };
+        case 'IAS3':
+            return {
+                'x': 38,
+                'y': 40,
+            };
+        case 'IAS4':
+            return {
+                'x': 40,
+                'y': 45,
+            };
+        case 'IAS5':
+            return {
+                'x': 60,
+                'y': 45,
+            };
+        case 'IASG':
+            return {
+                'x': 75,
+                'y': 25,
+            };
+
+        // LSK
+        case 'LSK1':
+            return {
+                'x': 60,
+                'y': 80,
+            };
+        case 'LSK2':
+            return {
+                'x': 60,
+                'y': 0,
+            };
+        case 'LSK3':
+            return {
+                'x': 50,
+                'y': 70,
+            };
+        case 'LSK4':
+            return {
+                'x': 70,
+                'y': 70,
+            };
+        case 'LSK5':
+            return {
+                'x': 55,
+                'y': 60,
+            };
+        case 'LSK6':
+            return {
+                'x': 55,
+                'y': 50,
+            };
+
+        // University Center
+        case 'UC1':
+            return {
+                'x': 50,
+                'y': 40,
+            }
+        case 'UCG':
+            return {
+                'x': 45,
+                'y': 45,
+            }
+        default:
+            return {
+                'x': 0,
+                'y': 0,
+            }
+    }
+}
