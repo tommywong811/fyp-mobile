@@ -5,3 +5,5 @@ export const CHANGE_CURRY = 'CHANGE_CURRY';
 export const CHANGE_SUMX = 'CHANGE_SUMX';
 export const CHANGE_SUMY = 'CHANGE_SUMY';
 export const CHANGE_NODE = 'CHANGE_NODE';
+export const UPDATE_FLOOR_DATA = 'UPDATE_FLOOR_DATA';
+export const UPDATE_CURRENT_FLOOR = 'UPDATE_CURRENT_FLOOR';

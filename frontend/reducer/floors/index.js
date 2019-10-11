@@ -7,7 +7,9 @@ import {
     CHANGE_CURRY,
     CHANGE_SUMX,
     CHANGE_SUMY,
-    CHANGE_NODE
+    CHANGE_NODE,
+    UPDATE_FLOOR_DATA,
+    UPDATE_CURRENT_FLOOR
 } from './actionList'
 
 let initialState = {
@@ -54,6 +56,16 @@ function changeNode(payload) {
 
 export default floorReducer = (state = initialState, action) => {
     switch(action.type){
+        case UPDATE_FLOOR_DATA:
+            return {
+                ...state,
+                data: action.payload.data
+            };
+        case UPDATE_CURRENT_FLOOR:
+            return {
+                ...state,
+                currentFloor: action.payload.currentFloor
+            };
         case CHANGE_BUILDING:
             return {
                 ...state,
