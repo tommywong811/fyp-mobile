@@ -4,7 +4,8 @@ import {
     Image,
     Animated,
     View,
-    Text
+    Text,
+    Dimensions
 } from 'react-native';
 import NotFoundZoom0 from '../../asset/notFoundZoom0';
 import { getFloorDimension, dirToUri, getNodeOffsetForEachFloor } from '../../plugins/MapTiles';
@@ -21,6 +22,9 @@ import {findNodeNearCoordinates} from '../../../backend/api/nodes/findNodeNearCo
 const MAP_TILE_WIDTH = 200;
 const MAP_TILE_HEIGHT = 200;
 const NOT_Found = 'NOT FOUND'; 
+const screenSizeX = Dimensions.get('window').width;
+const screenSizeY = Dimensions.get('window').height;
+
 class MapTiles extends React.Component{
 
     constructor(props){
@@ -34,6 +38,7 @@ class MapTiles extends React.Component{
         this._initialPinchHandler();
         this._onPanHandlerStateChange = this._onPanHandlerStateChange.bind(this);
         this._onPinchHandlerStateChange = this._onPinchHandlerStateChange.bind(this);
+
     }
 
     componentWillMount() {
@@ -41,13 +46,22 @@ class MapTiles extends React.Component{
             'nodesInFloor': this.props.nodes.filter((node) => node.floorId === this.props.currFloor),
             'nodeOffset': getNodeOffsetForEachFloor(this.props.currFloor),
         });
+
     }
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.currentNode != this.props.currentNode && nextProps.currentNode) {
-            let x = parseInt(nextProps.currentNode.coordinates[0]/MAP_TILE_WIDTH) == -0 ? 0 : parseInt(nextProps.currentNode.coordinates[0]/MAP_TILE_WIDTH)*MAP_TILE_WIDTH
-            let y = parseInt(nextProps.currentNode.coordinates[1]/MAP_TILE_HEIGHT) == -0 ? 0 : parseInt(nextProps.currentNode.coordinates[1]/MAP_TILE_HEIGHT)*MAP_TILE_HEIGHT
-            // alert(`${x} ${y}`)
+            // console.log(this.props.floors)
+            const nodeOffset = getNodeOffsetForEachFloor(nextProps.currentNode.floorId);
+
+            const {
+                startX,
+                startY,
+            } = nextProps.floors.find((floor) => floor._id === nextProps.currentNode.floorId);
+
+            let x = (nextProps.currentNode.centerCoordinates[0] - startX) /  logicTileSize * 80 + nodeOffset.x - screenSizeX / 2;
+            let y = (nextProps.currentNode.centerCoordinates[1] - startY) /  logicTileSize * 80 + nodeOffset.y - screenSizeY / 2;
+            alert(`${nextProps.currentNode.centerCoordinates[1]} ${startY}`)
             // alert(JSON.stringify(nextProps.currentNode, null, 2))
             this.setMapOffset(-x, -y); //still experimenting with the correct offset
         }
@@ -202,7 +216,7 @@ class MapTiles extends React.Component{
                             </View>
                         )
                     }
-                    return (<View></View>)
+                    return (<View key={key}></View>)
                 })
                 }
             </View>
@@ -210,7 +224,6 @@ class MapTiles extends React.Component{
     }
 
     render(){
-
         return(
             <PanGestureHandler
             ref={this.panRef}
@@ -232,7 +245,8 @@ class MapTiles extends React.Component{
                                     {translateX: this._translateX},
                                     {translateY: this._translateY},
                                 ],
-                                position: 'relative'
+                                position: 'relative',
+                                flex: 1,
                                 },
                         ]}>
                             {this._renderAllMapTile()}
@@ -296,6 +310,7 @@ function mapStateToProps(state){
     currFloor: state.floorReducer.currentFloor._id,
     zoomLevel: 0,
     nodes: state.nodesReducer.data,
+    floors: state.floorReducer.data,
     cache: cacheReducer(getFloorDimension(
         state.floorReducer.currentFloor.startX,
         state.floorReducer.currentFloor.startY,
