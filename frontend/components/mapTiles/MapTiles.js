@@ -61,8 +61,6 @@ class MapTiles extends React.Component{
 
             let x = (nextProps.currentNode.centerCoordinates[0] - startX) /  logicTileSize * 80 + nodeOffset.x - screenSizeX / 2;
             let y = (nextProps.currentNode.centerCoordinates[1] - startY) /  logicTileSize * 80 + nodeOffset.y - screenSizeY / 2;
-            alert(`${nextProps.currentNode.centerCoordinates[1]} ${startY}`)
-            // alert(JSON.stringify(nextProps.currentNode, null, 2))
             this.setMapOffset(-x, -y); //still experimenting with the correct offset
         }
 
@@ -218,6 +216,22 @@ class MapTiles extends React.Component{
                     }
                     return (<View key={key}></View>)
                 })
+                }
+
+                {this.props.currentNode &&
+                    <View
+                        style={[{
+                            flex: 1,
+                            position: 'absolute',
+                            top:  (this.props.currentNode.centerCoordinates[1] - this.props.offSetY) /  logicTileSize * 80 + this.state.nodeOffset.y,
+                            left: (this.props.currentNode.centerCoordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x,
+                            backgroundColor: 'red',
+                            borderBottomColor: 'red',
+                            borderRadius: 1,
+                            width: 2,
+                            height: 2,
+                        }]}>
+                    </View>
                 }
             </View>
         )
