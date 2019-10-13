@@ -5,16 +5,17 @@ import {
     Animated,
     View,
     Text,
-    Dimensions
+    Dimensions,
 } from 'react-native';
 import NotFoundZoom0 from '../../asset/notFoundZoom0';
-import { getFloorDimension, dirToUri, getNodeOffsetForEachFloor } from '../../plugins/MapTiles';
+import { getFloorDimension, dirToUri, getNodeOffsetForEachFloor, getNodeImageByTagId, getNodeImageByConnectorId } from '../../plugins/MapTiles';
 import {mapTileSize, logicTileSize} from './config';
 import { api } from '../../../backend';
 import { 
     PanGestureHandler, 
     PinchGestureHandler,
-    State 
+    State,
+    TouchableOpacity,
 } from 'react-native-gesture-handler';
 import ReactNativeZoomableView from '@dudigital/react-native-zoomable-view/src/ReactNativeZoomableView';
 import {findNodeNearCoordinates} from '../../../backend/api/nodes/findNodeNearCoordinates';
@@ -182,6 +183,8 @@ class MapTiles extends React.Component{
     }
 
     _renderAllNodes() {
+        let nodeName = null;
+
         return (
             <View
                 style={[{
@@ -193,26 +196,72 @@ class MapTiles extends React.Component{
                     height: mapTileSize * this.props.cache[0].length,
             }]}>
                 {this.state.nodesInFloor.map((node, key)=>{
-                    
                     if (node.centerCoordinates) {
-                        return(
-                            <View
-                                key = {key}
-                                style={[{
-                                    flex: 1,
-                                    position: 'absolute',
-                                    top:  (node.centerCoordinates[1] - this.props.offSetY) /  logicTileSize * 80 + this.state.nodeOffset.y,
-                                    left: (node.centerCoordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x,
-                                }]}>
-                                <Text
+                        nodeName = node.name;
+                        if (nodeName.includes('ROOM')) {
+                            return(
+                                <View
+                                    key = {key}
                                     style={[{
-                                        fontSize: 3,
-                                    }]}
-                                >
-                                    {node.name}
-                                </Text>
-                            </View>
-                        )
+                                        flex: 1,
+                                        position: 'absolute',
+                                        top:  (node.centerCoordinates[1] - this.props.offSetY) /  logicTileSize * 80 + this.state.nodeOffset.y,
+                                        left: (node.centerCoordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x,
+                                    }]}>
+                                    <Text
+                                        style={[{
+                                            fontSize: 3,
+                                        }]}
+                                    >
+                                        {node.name.split('ROOM ')[1]}
+                                    </Text>
+                                </View>
+                            )
+                        } else if (node.connectorId && getNodeImageByConnectorId(node.connectorId)) {
+                            return(
+                                <View
+                                    key = {key}
+                                    style={[{
+                                        flex: 1,
+                                        position: 'absolute',
+                                        top:  (node.centerCoordinates[1] - this.props.offSetY) /  logicTileSize * 80 + this.state.nodeOffset.y,
+                                        left: (node.centerCoordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x + 2,
+                                    }]}>
+                                    <TouchableOpacity onPress={()=>{
+                                        alert(node.name)
+                                    }
+                                    }>
+                                        <Image
+                                            source={getNodeImageByConnectorId(node.connectorId)}
+                                            style={[{height: 5, width: 5}]}
+                                        >
+                                        </Image>
+                                    </TouchableOpacity>
+                                </View>
+                            )
+                        } else if (node.tagIds && node.tagIds.length > 0 && getNodeImageByTagId(node.tagIds[0])) {
+                            return(
+                                <View
+                                    key = {key}
+                                    style={[{
+                                        flex: 1,
+                                        position: 'absolute',
+                                        top:  (node.centerCoordinates[1] - this.props.offSetY) /  logicTileSize * 80 + this.state.nodeOffset.y,
+                                        left: (node.centerCoordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x + 2,
+                                    }]}>
+                                    <TouchableOpacity onPress={()=>{
+                                        alert(node.name)
+                                    }
+                                    }>
+                                        <Image
+                                            source={getNodeImageByTagId(node.tagIds[0])}
+                                            style={[{height: 5, width: 5}]}
+                                        >
+                                        </Image>
+                                    </TouchableOpacity>
+                                </View>
+                            )
+                        }
                     }
                     return (<View key={key}></View>)
                 })
