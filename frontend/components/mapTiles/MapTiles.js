@@ -158,7 +158,7 @@ class MapTiles extends React.Component{
                     <View style={{flexDirection: 'row'}} key={rowIndex}>
                         {row.map(
                             (item, index) => <View>
-                                <Image source={{uri: dirToUri(item.dir)}}
+                                <Image source={{uri: `asset:/image/mapTiles/${item.dir}`}}
                                     key={`${rowIndex} ${index}`}
                                     style={{width:80, height:80}}/>
                                 </View>

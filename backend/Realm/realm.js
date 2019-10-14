@@ -11,8 +11,9 @@ import NodesModel from "./Models/nodes";
 import SettingsModel from "./Models/settings";
 // import SuggestionsModel from "./Models/suggestions";
 import TagsModel from "./Models/tags";
+const data = require('../../frontend/asset/data.json')
 
-export default new Realm({
+let realm = new Realm({
     schema: [
         BuildingsModel,
         ConnectorsModel,
@@ -28,3 +29,24 @@ export default new Realm({
         TagsModel
     ]
 })
+
+export default realm
+
+export async function createDB(){
+    try {
+        console.log("Creating DB");
+        console.log("db path:" + realm.path);
+        let db_names = Object.keys(data)
+        realm.write(() => {
+            for (let name in db_names) {
+                data[db_names[name]].forEach((doc, index)=>{
+                    console.log(`${db_names[name]} ${index}`);
+                    realm.create(db_names[name], doc, true)
+                })
+            }
+        });
+    } catch (error) {
+        console.log(error)
+        console.log("Error on creation");
+    }
+};

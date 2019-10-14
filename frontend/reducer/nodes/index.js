@@ -1,5 +1,5 @@
 import {api} from '../../../backend'
-import { FIND_NODE } from './actionList'
+import { FIND_NODE, UPDATE_NODE_DATA } from './actionList'
 
 
 let initialState = {
@@ -13,6 +13,11 @@ function findNode(payload) {
 
 export default nodesReducer = (state = initialState, action) => {
     switch(action.type){
+        case UPDATE_NODE_DATA:
+            return {
+                ...state,
+                data: action.payload.data
+            };
         case FIND_NODE:
             return {
                 ...state,

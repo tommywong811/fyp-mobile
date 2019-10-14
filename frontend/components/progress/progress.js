@@ -4,6 +4,8 @@ import { db, api } from '../../../backend';
 import * as Progress from 'react-native-progress';
 import Navigator from '../Navigator/navigator';
 import { UPDATE_FLOOR_DATA, UPDATE_CURRENT_FLOOR } from '../../reducer/floors/actionList';
+import { UPDATE_NODE_DATA } from '../../reducer/nodes/actionList'
+import { createDB } from '../../../backend/Realm/realm';
 
 class ProgressBar extends React.Component{
     constructor(props){
@@ -33,16 +35,16 @@ class ProgressBar extends React.Component{
         })
     }
 
-    componentDidMount(){
-        try{api.meta()}
+    async componentDidMount(){
+        try{
+            api.meta()
+        }
         catch(error){
-            db.downloadDatabase(this._addProgressHandler)
-            .then(() => db.loadDatabase(this._addProgressHandler))
-            .then(() => {
-                this.props.update_floor_data(api.floors().data)
-                this.props.update_current_floor(api.floors().data[0])
-                this.setState({ finished: true })
-            })
+            await createDB()
+            this.props.update_floor_data(api.floors().data)
+            this.props.update_current_floor(api.floors().data[0])
+            this.props.update_node_data(api.nodes().data)
+            this.setState({ finished: true })
         }
 
     }
@@ -66,13 +68,15 @@ class ProgressBar extends React.Component{
     }
 }
 
-function mapDispatchToProps(dispatch){
+function mapDispatchToProps(dispatch) {
     return {
         update_floor_data: (data) => 
             dispatch({type: UPDATE_FLOOR_DATA, payload: {data: data}}),
         update_current_floor: (currentFloor) => 
-            dispatch({type: UPDATE_CURRENT_FLOOR, payload: {currentFloor: currentFloor}})
+            dispatch({type: UPDATE_CURRENT_FLOOR, payload: {currentFloor: currentFloor}}),
+        update_node_data: (data) =>
+            dispatch({type: UPDATE_NODE_DATA, payload: {data:data}})
     };
 }
 
-export default connect(mapDispatchToProps)(ProgressBar);
+export default connect(null, mapDispatchToProps)(ProgressBar);
