@@ -294,3 +294,32 @@ export function getNodeOffsetForEachFloor(floorId) {
             }
     }
 }
+
+export function getNodeImageByConnectorId(connectorId) {
+    if (connectorId.includes('LIFT')) {
+        return require('../../../res/tags/lift.png');
+    } else if (connectorId.includes('STAIR')) {
+        return require('../../../res/tags/stair.png');
+    } else if (connectorId.includes('ESCALATOR')) {
+        return require('../../../res/tags/escalator.png');
+    } else {
+        return false;
+    }
+}
+
+export function getNodeImageByTagId(tagId) {
+    switch(tagId) {
+        case 'restaurant':
+            return require('../../../res/tags/restaurant.png');
+        case 'femaleToilet':
+            return require('../../../res/tags/femaleToilet.png');
+        case 'maleToilet':
+            return require('../../../res/tags/maleToilet.png');
+        case 'ATM':
+            return require('../../../res/tags/atm.png');
+        case 'drinkingFountain': 
+            return require('../../../res/tags/drinkingFountain.png');
+        default:
+            return false;
+    }
+}

@@ -4,16 +4,18 @@ import {
     Image,
     Animated,
     View,
-    Text
+    Text,
+    Dimensions,
 } from 'react-native';
 import NotFoundZoom0 from '../../asset/notFoundZoom0';
-import { getFloorDimension, dirToUri, getNodeOffsetForEachFloor } from '../../plugins/MapTiles';
+import { getFloorDimension, dirToUri, getNodeOffsetForEachFloor, getNodeImageByTagId, getNodeImageByConnectorId } from '../../plugins/MapTiles';
 import {mapTileSize, logicTileSize} from './config';
 import { api } from '../../../backend';
 import { 
     PanGestureHandler, 
     PinchGestureHandler,
-    State 
+    State,
+    TouchableOpacity,
 } from 'react-native-gesture-handler';
 import ReactNativeZoomableView from '@dudigital/react-native-zoomable-view/src/ReactNativeZoomableView';
 import {findNodeNearCoordinates} from '../../../backend/api/nodes/findNodeNearCoordinates';
@@ -21,6 +23,9 @@ import {findNodeNearCoordinates} from '../../../backend/api/nodes/findNodeNearCo
 const MAP_TILE_WIDTH = 200;
 const MAP_TILE_HEIGHT = 200;
 const NOT_Found = 'NOT FOUND'; 
+const screenSizeX = Dimensions.get('window').width;
+const screenSizeY = Dimensions.get('window').height;
+
 class MapTiles extends React.Component{
 
     constructor(props){
@@ -34,6 +39,7 @@ class MapTiles extends React.Component{
         this._initialPinchHandler();
         this._onPanHandlerStateChange = this._onPanHandlerStateChange.bind(this);
         this._onPinchHandlerStateChange = this._onPinchHandlerStateChange.bind(this);
+
     }
 
     componentWillMount() {
@@ -41,14 +47,21 @@ class MapTiles extends React.Component{
             'nodesInFloor': this.props.nodes.filter((node) => node.floorId === this.props.currFloor),
             'nodeOffset': getNodeOffsetForEachFloor(this.props.currFloor),
         });
+
     }
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.currentNode != this.props.currentNode && nextProps.currentNode) {
-            let x = parseInt(nextProps.currentNode.coordinates[0]/MAP_TILE_WIDTH) == -0 ? 0 : parseInt(nextProps.currentNode.coordinates[0]/MAP_TILE_WIDTH)*MAP_TILE_WIDTH
-            let y = parseInt(nextProps.currentNode.coordinates[1]/MAP_TILE_HEIGHT) == -0 ? 0 : parseInt(nextProps.currentNode.coordinates[1]/MAP_TILE_HEIGHT)*MAP_TILE_HEIGHT
-            // alert(`${x} ${y}`)
-            // alert(JSON.stringify(nextProps.currentNode, null, 2))
+            // console.log(this.props.floors)
+            const nodeOffset = getNodeOffsetForEachFloor(nextProps.currentNode.floorId);
+
+            const {
+                startX,
+                startY,
+            } = nextProps.floors.find((floor) => floor._id === nextProps.currentNode.floorId);
+
+            let x = (nextProps.currentNode.centerCoordinates[0] - startX) /  logicTileSize * 80 + nodeOffset.x - screenSizeX / 2;
+            let y = (nextProps.currentNode.centerCoordinates[1] - startY) /  logicTileSize * 80 + nodeOffset.y - screenSizeY / 2;
             this.setMapOffset(-x, -y); //still experimenting with the correct offset
         }
 
@@ -170,6 +183,8 @@ class MapTiles extends React.Component{
     }
 
     _renderAllNodes() {
+        let nodeName = null;
+
         return (
             <View
                 style={[{
@@ -181,36 +196,97 @@ class MapTiles extends React.Component{
                     height: mapTileSize * this.props.cache[0].length,
             }]}>
                 {this.state.nodesInFloor.map((node, key)=>{
-                    
                     if (node.centerCoordinates) {
-                        return(
-                            <View
-                                key = {key}
-                                style={[{
-                                    flex: 1,
-                                    position: 'absolute',
-                                    top:  (node.centerCoordinates[1] - this.props.offSetY) /  logicTileSize * 80 + this.state.nodeOffset.y,
-                                    left: (node.centerCoordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x,
-                                }]}>
-                                <Text
+                        nodeName = node.name;
+                        if (nodeName.includes('ROOM')) {
+                            return(
+                                <View
+                                    key = {key}
                                     style={[{
-                                        fontSize: 3,
-                                    }]}
-                                >
-                                    {node.name}
-                                </Text>
-                            </View>
-                        )
+                                        flex: 1,
+                                        position: 'absolute',
+                                        top:  (node.centerCoordinates[1] - this.props.offSetY) /  logicTileSize * 80 + this.state.nodeOffset.y,
+                                        left: (node.centerCoordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x,
+                                    }]}>
+                                    <Text
+                                        style={[{
+                                            fontSize: 3,
+                                        }]}
+                                    >
+                                        {node.name.split('ROOM ')[1]}
+                                    </Text>
+                                </View>
+                            )
+                        } else if (node.connectorId && getNodeImageByConnectorId(node.connectorId)) {
+                            return(
+                                <View
+                                    key = {key}
+                                    style={[{
+                                        flex: 1,
+                                        position: 'absolute',
+                                        top:  (node.centerCoordinates[1] - this.props.offSetY) /  logicTileSize * 80 + this.state.nodeOffset.y,
+                                        left: (node.centerCoordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x + 2,
+                                    }]}>
+                                    <TouchableOpacity onPress={()=>{
+                                        alert(node.name)
+                                    }
+                                    }>
+                                        <Image
+                                            source={getNodeImageByConnectorId(node.connectorId)}
+                                            style={[{height: 5, width: 5}]}
+                                        >
+                                        </Image>
+                                    </TouchableOpacity>
+                                </View>
+                            )
+                        } else if (node.tagIds && node.tagIds.length > 0 && getNodeImageByTagId(node.tagIds[0])) {
+                            return(
+                                <View
+                                    key = {key}
+                                    style={[{
+                                        flex: 1,
+                                        position: 'absolute',
+                                        top:  (node.centerCoordinates[1] - this.props.offSetY) /  logicTileSize * 80 + this.state.nodeOffset.y,
+                                        left: (node.centerCoordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x + 2,
+                                    }]}>
+                                    <TouchableOpacity onPress={()=>{
+                                        alert(node.name)
+                                    }
+                                    }>
+                                        <Image
+                                            source={getNodeImageByTagId(node.tagIds[0])}
+                                            style={[{height: 5, width: 5}]}
+                                        >
+                                        </Image>
+                                    </TouchableOpacity>
+                                </View>
+                            )
+                        }
                     }
-                    return (<View></View>)
+                    return (<View key={key}></View>)
                 })
+                }
+
+                {this.props.currentNode &&
+                    <View
+                        style={[{
+                            flex: 1,
+                            position: 'absolute',
+                            top:  (this.props.currentNode.centerCoordinates[1] - this.props.offSetY) /  logicTileSize * 80 + this.state.nodeOffset.y,
+                            left: (this.props.currentNode.centerCoordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x,
+                            backgroundColor: 'red',
+                            borderBottomColor: 'red',
+                            borderRadius: 1,
+                            width: 2,
+                            height: 2,
+                        }]}>
+                    </View>
                 }
             </View>
         )
     }
 
     render(){
-
         return(
             <PanGestureHandler
             ref={this.panRef}
@@ -232,7 +308,8 @@ class MapTiles extends React.Component{
                                     {translateX: this._translateX},
                                     {translateY: this._translateY},
                                 ],
-                                position: 'relative'
+                                position: 'relative',
+                                flex: 1,
                                 },
                         ]}>
                             {this._renderAllMapTile()}
@@ -296,6 +373,7 @@ function mapStateToProps(state){
     currFloor: state.floorReducer.currentFloor._id,
     zoomLevel: 0,
     nodes: state.nodesReducer.data,
+    floors: state.floorReducer.data,
     cache: cacheReducer(getFloorDimension(
         state.floorReducer.currentFloor.startX,
         state.floorReducer.currentFloor.startY,
