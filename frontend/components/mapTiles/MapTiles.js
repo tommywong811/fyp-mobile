@@ -263,7 +263,24 @@ class MapTiles extends React.Component{
                             )
                         }
                     }
-                    return (<View key={key}></View>)
+                    return (
+                        <View
+                            key = {key}
+                            style={[{
+                                flex: 1,
+                                position: 'absolute',
+                                top:  (node.centerCoordinates[1] - this.props.offSetY) /  logicTileSize * 80 + this.state.nodeOffset.y,
+                                left: (node.centerCoordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x,
+                            }]}>
+                            <Text
+                                style={[{
+                                    fontSize: 3,
+                                }]}
+                            >
+                                {node.name}
+                            </Text>
+                        </View>
+                    )
                 })
                 }
 
