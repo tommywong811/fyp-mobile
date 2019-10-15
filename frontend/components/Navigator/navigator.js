@@ -8,6 +8,7 @@ import {
     Dimensions,
     ScrollView,
     Keyboard,
+    ActivityIndicator,
 } from 'react-native';
 import { 
     CHANGE_FLOOR, 
@@ -43,12 +44,22 @@ class Navigator extends React.Component{
         this.setState({
             searchInput: '',
             currentSearchKeyword: '',
-            currentLocation: ''
+            currentLocation: '',
+            isLoading: false,
         })
     }
     componentWillReceiveProps(nextProps) {
         if (nextProps.currentNode != this.props.currentNode) {  // for _searchRoom function after find_node
-            this.props.change_floor(nextProps.currFloor, nextProps.currentBuilding)
+            this.props.change_floor(nextProps.currFloor, nextProps.currentBuilding);
+            this.setState({
+                isLoading: false,
+            });
+        }
+
+        if (nextProps.currFloor != this.props.currFloor) { // finish loading floor
+            this.setState({
+                isLoading: false,
+            })
         }
     }
 
@@ -89,6 +100,9 @@ class Navigator extends React.Component{
 
     _searchRoom() {
         Keyboard.dismiss();
+        this.setState({
+            isLoading: true,
+        })
         setTimeout(()=>{  // only setTimeout can make the Keyboard dismiss before the change node finished
             this.props.change_node(this.state.searchInput);
         }, 100);
@@ -140,7 +154,9 @@ class Navigator extends React.Component{
                         type='clear'
                         onPress={()=>{
                             if(item !== this.props.currBuilding){
-                                this.props.change_building(item);
+                                setTimeout(()=>{ // to let the menu close
+                                    this.props.change_building(item);
+                                }, 100);
                             }
                             this.drawer.closeDrawer();
                         }}
@@ -155,7 +171,12 @@ class Navigator extends React.Component{
                         type='clear'
                         onPress={()=>{
                             if(item._id !== this.props.currFloor){
-                                this.props.change_floor(item._id, item.buildingId);
+                                setTimeout(()=>{ // to let the menu close
+                                    this.props.change_floor(item._id, item.buildingId);
+                                }, 100)
+                                this.setState({
+                                    isLoading: true,
+                                })
                             }
                             this.drawer.closeDrawer();
                         }}    
@@ -191,6 +212,7 @@ class Navigator extends React.Component{
         const {
             searchInput,
             currentSearchKeyword,
+            isLoading,
         } = this.state;
 
         return(
@@ -223,6 +245,9 @@ class Navigator extends React.Component{
                         resetCurrentSearchKeyword={() => this._resetCurrentSearchKeyword()}
                     ></MapTiles>
                 </DrawerLayout>
+                <View style={{position: 'absolute', flex: 1, justifyContent: 'center', top: 0, left: 0, right: 0, bottom: 0}}>
+                    <ActivityIndicator size="large" color="#0000ff" animating={isLoading}></ActivityIndicator>
+                </View>
             </View>
         );
     }
