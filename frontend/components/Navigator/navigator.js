@@ -88,8 +88,10 @@ class Navigator extends React.Component{
     }
 
     _searchRoom() {
-        Keyboard.dismiss()
-        this.props.change_node(this.state.searchInput);
+        Keyboard.dismiss();
+        setTimeout(()=>{  // only setTimeout can make the Keyboard dismiss before the change node finished
+            this.props.change_node(this.state.searchInput);
+        }, 100);
     }
 
     _resetCurrentSearchKeyword() {
@@ -189,7 +191,7 @@ class Navigator extends React.Component{
         const {
             searchInput,
             currentSearchKeyword,
-        } = this.state;console.log(searchInput)
+        } = this.state;
 
         return(
             <View style={{flex:6, zIndex: 1}}>
@@ -205,14 +207,14 @@ class Navigator extends React.Component{
                         <Button light onPress={()=>this.drawer.openDrawer()}>
                             <Base.Icon name='arrow-forward' />
                         </Button>
-                        <View style={{width: '100%', flexDirection: 'row'}}>
-                            <View>
+                        <View>
+                            <View style={{width: 250, flexDirection:'row'}}>
                                 {/* <SearchBar searchInput={searchInput} placeholder="Where are you?" onChangeText={(input)=> this._onChangeCurrentLocationText(input)}/> */}
                                 <SearchBar searchInput={searchInput} placeholder="Where are you going?" onChangeText={(input)=> this._onChangeSearchText(input)}/>
+                                <Button light onPress={()=>this._searchRoom()}>
+                                    <Icon size={30} name='enter' />
+                                </Button>
                             </View>
-                            <Button light onPress={()=> this._searchRoom()}>
-                                <Icon size={30} name='enter' />
-                            </Button>
                         </View>
                     </View>
                     {/* {this.props.children} */}
