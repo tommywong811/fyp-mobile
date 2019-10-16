@@ -195,6 +195,47 @@ export function getNodeOffsetForEachFloor(floorId) {
                 'x': 70,
                 'y': 20,
             }
+        case 'G':
+            return {
+                'x': 35,
+                'y': 50,
+            }
+
+        case 'LG1':
+            return {
+                'x': 70,
+                'y': 60,
+            }
+
+        case 'LG2':
+            return {
+                'x': 70,
+                'y': 60,
+            }
+
+        case 'LG3':
+            return {
+                'x': 70,
+                'y': 5,
+            }
+
+        case 'LG4':
+            return {
+                'x': 20,
+                'y': 60,
+            }
+
+        case 'LG5':
+            return {
+                'x': 25,
+                'y': 75,
+            }
+
+        case 'LG7':
+            return {
+                'x': 5,
+                'y': 20,
+            }
 
         // CYT
         case 'CYT2':
@@ -202,6 +243,8 @@ export function getNodeOffsetForEachFloor(floorId) {
         case 'CYT4':
         case 'CYT5':
         case 'CYT6':
+        case 'CYTG':
+        case 'CYTUG':
             return {
                 'x': 50,
                 'y': 60,
@@ -210,6 +253,11 @@ export function getNodeOffsetForEachFloor(floorId) {
             return {
                 'x': 70,
                 'y': 60,
+            }
+        case 'CYT7':
+            return {
+                'x': 55,
+                'y': 65,
             }
 
         // IAS

@@ -201,7 +201,7 @@ class MapTiles extends React.Component{
                                     }>
                                         <Image
                                             source={getNodeImageByConnectorId(node.connectorId)}
-                                            style={[{height: 5, width: 5}]}
+                                            style={[{height: 8, width: 8}]}
                                         >
                                         </Image>
                                     </TouchableOpacity>
@@ -223,7 +223,7 @@ class MapTiles extends React.Component{
                                     }>
                                         <Image
                                             source={getNodeImageByTagId(node.tagIds[0])}
-                                            style={[{height: 5, width: 5}]}
+                                            style={[{height: 8, width: 8}]}
                                         >
                                         </Image>
                                     </TouchableOpacity>
