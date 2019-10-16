@@ -30,9 +30,13 @@ class MapTiles extends React.Component{
         this._renderAllMapTile = this._renderAllMapTile.bind(this);
         this._onPanMoveHandler = this._onPanMoveHandler.bind(this)
         this._onPanEndHandler = this._onPanEndHandler.bind(this)
+        this._isSearchRoomInProgress= false;
         this.state = {
-            pan: new Animated.ValueXY(),
-            gestureOffset: { x: 0, y: 0 },
+            pan: new Animated.ValueXY({
+                x: -80,
+                y: 0,
+            }),
+            gestureOffset: { x: -80, y: 0 },
             zoom: 1
         };
     }
@@ -47,24 +51,29 @@ class MapTiles extends React.Component{
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.currentNode != this.props.currentNode && nextProps.currentNode) {
-            // console.log(this.props.floors)
-            const nodeOffset = getNodeOffsetForEachFloor(nextProps.currentNode.floorId);
-
-            const {
-                startX,
-                startY,
-            } = nextProps.floors.find((floor) => floor._id === nextProps.currentNode.floorId);
-
-            let x = (nextProps.currentNode.centerCoordinates[0] - startX) /  logicTileSize * 80 + nodeOffset.x - screenSizeX / 2
-            let y = (nextProps.currentNode.centerCoordinates[1] - startY) /  logicTileSize * 80 + nodeOffset.y - screenSizeY / 2;
-            this.setMapOffset(-x, y);
+            this._isSearchRoomInProgress = true; // to run setMapOffset after floor change
         }
 
         if(nextProps.currFloor != this.props.currFloor) {
+            const nodeOffset = getNodeOffsetForEachFloor(nextProps.currFloor);
             this.setState({
                 'nodesInFloor': this.props.nodes.filter((node) => node.floorId === nextProps.currFloor),
-                'nodeOffset': getNodeOffsetForEachFloor(nextProps.currFloor),
+                'nodeOffset': nodeOffset,
             })
+
+            if (this._isSearchRoomInProgress) { // for search room
+                const {
+                    startX,
+                    startY,
+                } = nextProps.floors.find((floor) => floor._id === nextProps.currFloor);
+    
+                let x = (nextProps.currentNode.centerCoordinates[0] - startX) /  logicTileSize * 80 + nodeOffset.x - screenSizeX / 2
+                let y = (nextProps.currentNode.centerCoordinates[1] - startY) /  logicTileSize * 80 + nodeOffset.y - screenSizeY / 2;
+                this.setMapOffset(-x, y);
+                this._isSearchRoomInProgress = false;
+            } else { // for switch floor
+                    this.setMapOffset(-80 - nodeOffset.x,  0);
+            }
         }
 
     }
@@ -265,6 +274,8 @@ class MapTiles extends React.Component{
     _onPanEndHandler(evt, gestureState) {
         this.state.gestureOffset.x += gestureState.dx;
         this.state.gestureOffset.y += gestureState.dy;
+        console.log(this.state.gestureOffset.x)
+        console.log(this.state.gestureOffset.y)
     }
 
     _onPanMoveHandler(evt, gestureState) {
