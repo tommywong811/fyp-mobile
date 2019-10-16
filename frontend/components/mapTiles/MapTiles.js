@@ -55,9 +55,9 @@ class MapTiles extends React.Component{
                 startY,
             } = nextProps.floors.find((floor) => floor._id === nextProps.currentNode.floorId);
 
-            let x = (nextProps.currentNode.centerCoordinates[0] - startX) /  logicTileSize * 80 + nodeOffset.x - screenSizeX / 2;
+            let x = (nextProps.currentNode.centerCoordinates[0] - startX) /  logicTileSize * 80 + nodeOffset.x - screenSizeX / 2
             let y = (nextProps.currentNode.centerCoordinates[1] - startY) /  logicTileSize * 80 + nodeOffset.y - screenSizeY / 2;
-            this.setMapOffset(-x, -y); //still experimenting with the correct offset
+            this.setMapOffset(-x, y);
         }
 
         if(nextProps.currFloor != this.props.currFloor) {
@@ -70,12 +70,17 @@ class MapTiles extends React.Component{
     }
 
     setMapOffset(x, y) {
-        this._lastOffset.x = x;
-        this._lastOffset.y = y;
-        this._translateX.setOffset(this._lastOffset.x);
-        this._translateX.setValue(0);
-        this._translateY.setOffset(this._lastOffset.y);
-        this._translateY.setValue(0);
+        this.setState({
+            gestureOffset: {
+                x: x,
+                y: y
+            }
+        });
+
+        this.state.pan.setValue({
+            x: x,
+            y: y
+        });
     }
 
     _initialCache(){
