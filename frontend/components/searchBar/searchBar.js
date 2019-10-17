@@ -26,6 +26,7 @@ export default class SearchBar extends Component<Props> {
                     style={{ borderWidth: 1, borderColor: '#f2f2e1', 
                     backgroundColor: 'white', borderTopRightRadius: 10, 
                     borderBottomRightRadius: 10, height: 48, flex:1, padding: 5}}
+                    value={this.props.searchInput}
                 />
                 /*{ <TouchableOpacity>
                     <View style={{ height: 50, backgroundColor: '#eaeaea' }}>

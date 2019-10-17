@@ -9,6 +9,7 @@ import {
     ScrollView,
     Keyboard,
     ActivityIndicator,
+    TouchableOpacity,
 } from 'react-native';
 import { 
     CHANGE_FLOOR, 
@@ -36,7 +37,7 @@ class Navigator extends React.Component{
         this._allBuildings = this._getUniqueBuildingId(this.props.allFloors);
         this._getAllFloors = this._getAllFloors.bind(this);
         this.state = {
-            allFloorIds : this._getAllFloors()
+            allFloorIds : this._getAllFloors(),
         }
     }
 
@@ -46,6 +47,7 @@ class Navigator extends React.Component{
             currentSearchKeyword: '',
             currentLocation: '',
             isLoading: false,
+            suggestionList: [],
         })
     }
     componentWillReceiveProps(nextProps) {
@@ -67,12 +69,25 @@ class Navigator extends React.Component{
         this.setState({
             searchInput: text,
         });
+        if(text != "" || text != " ") {
+            var nodes = api.nodes({name: text}).data;
+            this.setState({
+                suggestionList: nodes
+            })
+        }
     }
 
     _onChangeCurrentLocationText(text) {
         this.setState({
             currentLocation: text
         })
+    }
+
+    _onPressSuggestion(name) {
+        this.setState({
+            searchInput: name, 
+            suggestionList: []
+        }, this._searchRoom())
     }
 
     _onChangeCurrentSearchKeyword() {
@@ -130,7 +145,6 @@ class Navigator extends React.Component{
     _getAllFloors(){
         return this.props.allFloors.filter((item) => item.buildingId === this.props.currBuilding)
     }
-
     _buildingnameToString(name){
         switch(name){
             case 'academicBuilding': return 'Academic Building';
@@ -188,7 +202,7 @@ class Navigator extends React.Component{
             </View>
         );
     }
-
+    
     _renderRightBar = () => {
         return (
         <View style={{width: width/9, zIndex:1, position:'absolute', left: width*8/9, backgroundColor:'white'}}>
@@ -208,6 +222,7 @@ class Navigator extends React.Component{
         </View>)
     }
 
+
     render(){
         const {
             searchInput,
@@ -215,6 +230,21 @@ class Navigator extends React.Component{
             isLoading,
         } = this.state;
 
+        var suggestions = this.state.suggestionList.map(node => {
+            return (
+                <TouchableOpacity
+                    onPress={() => this._onPressSuggestion(node.name)}
+                    style={{backgroundColor: 'white'}}
+                >
+                        <Text
+                            style={{padding: 10}}
+                        >
+                            {node.name}
+                        </Text>
+                </TouchableOpacity>
+            )
+
+        })
         return(
             <View style={{flex:6, zIndex: 1}}>
                 <DrawerLayout
@@ -225,7 +255,7 @@ class Navigator extends React.Component{
                     drawerBackgroundColor="#ddd"
                     renderNavigationView={this._renderDrawer}
                 >
-                    <View style={{position:'absolute',zIndex:1, flexDirection:'row'}}>
+                    <View style={{width: '100%', zIndex:1, flexDirection:'row'}}>
                         <Button light onPress={()=>this.drawer.openDrawer()}>
                             <Base.Icon name='arrow-forward' />
                         </Button>
@@ -236,6 +266,14 @@ class Navigator extends React.Component{
                                 <Button light onPress={()=>this._searchRoom()}>
                                     <Icon size={30} name='enter' />
                                 </Button>
+                            </View>
+                            <View style={{maxHeight: 200}}>
+                                <ScrollView 
+                                    keyboardShouldPersistTaps={true}
+                                    style={{zIndex:2}}
+                                >
+                                        {suggestions}
+                                </ScrollView>
                             </View>
                         </View>
                     </View>
