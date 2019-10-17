@@ -12,16 +12,11 @@ import { getFloorDimension, dirToUri, getNodeOffsetForEachFloor, getNodeImageByT
 import {mapTileSize, logicTileSize} from './config';
 import { api } from '../../../backend';
 import { 
-    PanGestureHandler, 
-    PinchGestureHandler,
-    State,
     TouchableOpacity,
 } from 'react-native-gesture-handler';
 import ReactNativeZoomableView from '@dudigital/react-native-zoomable-view/src/ReactNativeZoomableView';
 import {findNodeNearCoordinates} from '../../../backend/api/nodes/findNodeNearCoordinates';
 
-const MAP_TILE_WIDTH = 200;
-const MAP_TILE_HEIGHT = 200;
 const NOT_Found = 'NOT FOUND'; 
 const screenSizeX = Dimensions.get('window').width;
 const screenSizeY = Dimensions.get('window').height;
@@ -33,13 +28,17 @@ class MapTiles extends React.Component{
         this._initialCache = this._initialCache.bind(this);
         this._initialCache();
         this._renderAllMapTile = this._renderAllMapTile.bind(this);
-        this._initialPanHandler = this._initialPanHandler.bind(this);
-        this._initialPanHandler();
-        this._initialPinchHandler = this._initialPinchHandler.bind(this);
-        this._initialPinchHandler();
-        this._onPanHandlerStateChange = this._onPanHandlerStateChange.bind(this);
-        this._onPinchHandlerStateChange = this._onPinchHandlerStateChange.bind(this);
-
+        this._onPanMoveHandler = this._onPanMoveHandler.bind(this)
+        this._onPanEndHandler = this._onPanEndHandler.bind(this)
+        this._isSearchRoomInProgress= false;
+        this.state = {
+            pan: new Animated.ValueXY({
+                x: -80,
+                y: 0,
+            }),
+            gestureOffset: { x: -80, y: 0 },
+            zoom: 1
+        };
     }
 
     componentWillMount() {
@@ -52,35 +51,45 @@ class MapTiles extends React.Component{
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.currentNode != this.props.currentNode && nextProps.currentNode) {
-            // console.log(this.props.floors)
-            const nodeOffset = getNodeOffsetForEachFloor(nextProps.currentNode.floorId);
-
-            const {
-                startX,
-                startY,
-            } = nextProps.floors.find((floor) => floor._id === nextProps.currentNode.floorId);
-
-            let x = (nextProps.currentNode.centerCoordinates[0] - startX) /  logicTileSize * 80 + nodeOffset.x - screenSizeX / 2;
-            let y = (nextProps.currentNode.centerCoordinates[1] - startY) /  logicTileSize * 80 + nodeOffset.y - screenSizeY / 2;
-            this.setMapOffset(-x, -y); //still experimenting with the correct offset
+            this._isSearchRoomInProgress = true; // to run setMapOffset after floor change
         }
 
         if(nextProps.currFloor != this.props.currFloor) {
+            const nodeOffset = getNodeOffsetForEachFloor(nextProps.currFloor);
             this.setState({
                 'nodesInFloor': this.props.nodes.filter((node) => node.floorId === nextProps.currFloor),
-                'nodeOffset': getNodeOffsetForEachFloor(nextProps.currFloor),
+                'nodeOffset': nodeOffset,
             })
+
+            if (this._isSearchRoomInProgress) { // for search room
+                const {
+                    startX,
+                    startY,
+                } = nextProps.floors.find((floor) => floor._id === nextProps.currFloor);
+    
+                let x = (nextProps.currentNode.centerCoordinates[0] - startX) /  logicTileSize * 80 + nodeOffset.x - screenSizeX / 2
+                let y = (nextProps.currentNode.centerCoordinates[1] - startY) /  logicTileSize * 80 + nodeOffset.y - screenSizeY / 2;
+                this.setMapOffset(-x, y);
+                this._isSearchRoomInProgress = false;
+            } else { // for switch floor
+                    this.setMapOffset(-80 - nodeOffset.x,  0);
+            }
         }
 
     }
 
     setMapOffset(x, y) {
-        this._lastOffset.x = x;
-        this._lastOffset.y = y;
-        this._translateX.setOffset(this._lastOffset.x);
-        this._translateX.setValue(0);
-        this._translateY.setOffset(this._lastOffset.y);
-        this._translateY.setValue(0);
+        this.setState({
+            gestureOffset: {
+                x: x,
+                y: y
+            }
+        });
+
+        this.state.pan.setValue({
+            x: x,
+            y: y
+        });
     }
 
     _initialCache(){
@@ -107,47 +116,6 @@ class MapTiles extends React.Component{
         }
     }
 
-    _initialPanHandler(){
-        this._translateX = new Animated.Value(0);
-        this._translateY = new Animated.Value(0);
-        this._lastOffset = { x: 0, y: 0 };
-        this._onGestureEvent = Animated.event(
-            [ { nativeEvent: {
-                  translationX: this._translateX,
-                  translationY: this._translateY,
-                } } ], 
-                { useNativeDriver: { USE_NATIVE_DRIVER: true } }
-        );
-    }
-
-    _initialPinchHandler(){
-        this._baseScale = new Animated.Value(1);
-        this._pinchScale = new Animated.Value(1);
-        this._scale = Animated.multiply(this._baseScale, this._pinchScale);
-        this._lastScale = 1;
-        this._onPinchGestrueEvent = Animated.event(
-            [{nativeEvent: {scale: this._pinchScale}}],
-            { useNativeDriver: { USE_NATIVE_DRIVER: true }}
-        )
-    }
-
-    _onPinchHandlerStateChange(event){
-        if(event.nativeEvent.oldState === State.ACTIVE){
-            this._lastScale *= event.nativeEvent.scale;
-            this._baseScale.setValue(this._lastScale);
-            this._pinchScale.setValue(1);
-        }
-    }
-
-    _onPanHandlerStateChange(event){
-        if (event.nativeEvent.oldState === State.ACTIVE) {
-            this._lastOffset.x += event.nativeEvent.translationX;
-            this._lastOffset.y += event.nativeEvent.translationY;
-            this.setMapOffset(this._lastOffset.x, this._lastOffset.y)
-            this.props.resetCurrentSearchKeyword(); // only change the navigator currentSearchKeyword but not searchInput in searchBar
-        }
-    }
-
     _renderByDir(item){
         return(
             <Image 
@@ -170,7 +138,7 @@ class MapTiles extends React.Component{
                 (row, rowIndex) => (
                     <View style={{flexDirection: 'row'}} key={rowIndex}>
                         {row.map(
-                            (item, index) => <View>
+                            (item, index) => <View key={index}>
                                 <Image source={{uri: `asset:/image/mapTiles/${item.dir}`}}
                                     key={`${rowIndex} ${index}`}
                                     style={{width:80, height:80}}/>
@@ -233,7 +201,7 @@ class MapTiles extends React.Component{
                                     }>
                                         <Image
                                             source={getNodeImageByConnectorId(node.connectorId)}
-                                            style={[{height: 5, width: 5}]}
+                                            style={[{height: 8, width: 8}]}
                                         >
                                         </Image>
                                     </TouchableOpacity>
@@ -255,7 +223,7 @@ class MapTiles extends React.Component{
                                     }>
                                         <Image
                                             source={getNodeImageByTagId(node.tagIds[0])}
-                                            style={[{height: 5, width: 5}]}
+                                            style={[{height: 8, width: 8}]}
                                         >
                                         </Image>
                                     </TouchableOpacity>
@@ -303,38 +271,45 @@ class MapTiles extends React.Component{
         )
     }
 
+    _onPanEndHandler(evt, gestureState) {
+        this.state.gestureOffset.x += gestureState.dx;
+        this.state.gestureOffset.y += gestureState.dy;
+        console.log(this.state.gestureOffset.x)
+        console.log(this.state.gestureOffset.y)
+    }
+
+    _onPanMoveHandler(evt, gestureState) {
+        if(gestureState.numberActiveTouches == 1) {
+            this.state.pan.setValue({
+                x: this.state.gestureOffset.x + gestureState.dx,
+                y: this.state.gestureOffset.y + gestureState.dy
+            });
+        }
+    }
+
     render(){
+        let { pan } = this.state;
+        let [translateX, translateY] = [pan.x, pan.y];
+        let imageStyle = {transform: [{translateX}, {translateY}, {scale: this.state.zoom}]};
         return(
-            <PanGestureHandler
-            ref={this.panRef}
-            maxPointers={1}
-            onGestureEvent={this._onGestureEvent}
-            onHandlerStateChange={this._onPanHandlerStateChange}>
-                <Animated.View style={{flex:1}}>
-                    <ReactNativeZoomableView
-                    maxZoom={1.5}
-                    minZoom={0.5}
-                    zoomStep={0.5}
-                    initialZoom={1}
-                    bindToBorders={true}
-                    onZoomAfter={this.logOutZoomState}
-                    >
-                        <Animated.View
-                            style={[{
-                                transform:[
-                                    {translateX: this._translateX},
-                                    {translateY: this._translateY},
-                                ],
-                                position: 'relative',
-                                flex: 1,
-                                },
-                        ]}>
-                            {this._renderAllMapTile()}
-                            {this._renderAllNodes()}
-                        </Animated.View>
-                    </ReactNativeZoomableView>
+            <ReactNativeZoomableView
+                style={{flex:1}}
+                maxZoom={1.5}
+                minZoom={0.5}
+                zoomStep={0.5}
+                initialZoom={1}
+                bindToBorders={true}
+                onZoomAfter={this.logOutZoomState}
+                onPanResponderMove={this._onPanMoveHandler}
+                onPanResponderEnd={this._onPanEndHandler}
+            >
+                <Animated.View
+                    style={imageStyle} 
+                >
+                    {this._renderAllMapTile()}
+                    {this._renderAllNodes()}
                 </Animated.View>
-            </PanGestureHandler>
+            </ReactNativeZoomableView>
         )
     }
 }  
@@ -388,7 +363,6 @@ function mapStateToProps(state){
         state.floorReducer.currentFloor.mapHeight
     ),
     currFloor: state.floorReducer.currentFloor._id,
-    zoomLevel: 0,
     nodes: state.nodesReducer.data,
     floors: state.floorReducer.data,
     cache: cacheReducer(getFloorDimension(
