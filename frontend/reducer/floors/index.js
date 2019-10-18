@@ -23,7 +23,7 @@ let initialState = {
     suggestedNodes: [],
     currentNode: null,
     currentBuilding: null,
-    renderLoadingPage: true,
+    renderLoadingPage: false,
 }
 
 function changeBuilding(data, payload, currentFloor){

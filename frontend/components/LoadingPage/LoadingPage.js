@@ -28,8 +28,8 @@ class loadingPage extends React.Component{
         setTimeout(()=>{
             this.setState({
                 renderChildren: true,
-            })
-        }, 10)
+            });
+        }, 100)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -46,15 +46,13 @@ class loadingPage extends React.Component{
                 this.setState({
                     renderChildren: true,
                 })
-            }, 10)
+            }, 100)
             this.props.rendered_loading_page();
         }
     }
     
-    component
 
     render(){
-        console.log(this.state.renderChildren)
         if(this.state.renderChildren) {
             return this.props.children;
         }
