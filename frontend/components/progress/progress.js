@@ -19,7 +19,7 @@ class ProgressBar extends React.Component{
         super(props);
         this._renderProgress = this._renderProgress.bind(this);
         this._addProgressHandler = this._addProgressHandler.bind(this);
-        try{
+        try{api.meta(); 
             this.state = {
                 finished: true,
                 written: 0,
@@ -42,19 +42,19 @@ class ProgressBar extends React.Component{
         })
     }
 
-    componentDidMount(){
-        setTimeout(()=>{
-            try{
-                api.meta()
-            }
-            catch(error){
-                createDB()
-                this.props.update_floor_data(api.floors().data)
-                this.props.update_current_floor(api.floors().data[0])
-                this.props.update_node_data(api.nodes().data)
-                this.setState({ finished: true })
-            }
-        }, 50)
+    async componentDidMount(){
+        const sleep = () => new Promise(resolve => setTimeout(resolve, 50))  // to allow load spinner render first
+        await sleep();
+        try{
+            api.meta()
+        }
+        catch(error){
+            await createDB()
+            this.props.update_floor_data(api.floors().data)
+            this.props.update_current_floor(api.floors().data[0])
+            this.props.update_node_data(api.nodes().data)
+            this.setState({ finished: true })
+        }
 
     }
 
