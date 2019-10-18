@@ -271,18 +271,17 @@ class MapTiles extends React.Component{
         )
     }
 
-    _onPanEndHandler(evt, gestureState) {
-        this.state.gestureOffset.x += gestureState.dx;
-        this.state.gestureOffset.y += gestureState.dy;
-        console.log(this.state.gestureOffset.x)
-        console.log(this.state.gestureOffset.y)
+    _onPanEndHandler(evt, gestureState, zoomableViewEventObject) {
+        this.state.gestureOffset.x += (gestureState.dx / zoomableViewEventObject.zoomLevel);
+        this.state.gestureOffset.y += (gestureState.dy / zoomableViewEventObject.zoomLevel);
     }
 
-    _onPanMoveHandler(evt, gestureState) {
+    _onPanMoveHandler(evt, gestureState, zoomableViewEventObject) {
+        // console.log('zoomableViewEventObject', zoomableViewEventObject);
         if(gestureState.numberActiveTouches == 1) {
             this.state.pan.setValue({
-                x: this.state.gestureOffset.x + gestureState.dx,
-                y: this.state.gestureOffset.y + gestureState.dy
+                x: (this.state.gestureOffset.x + gestureState.dx / zoomableViewEventObject.zoomLevel) - zoomableViewEventObject.offsetX,
+                y: (this.state.gestureOffset.y + gestureState.dy / zoomableViewEventObject.zoomLevel) - zoomableViewEventObject.offsetY
             });
         }
     }

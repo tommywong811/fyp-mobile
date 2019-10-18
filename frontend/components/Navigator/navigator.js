@@ -224,11 +224,12 @@ class Navigator extends React.Component{
             isLoading,
         } = this.state;
 
-        var suggestions = this.state.suggestionList.map(node => {
+        var suggestions = this.state.suggestionList.map((node, index) => {
             return (
                 <TouchableOpacity
                     onPress={() => this._onPressSuggestion(node.name)}
                     style={{backgroundColor: 'white'}}
+                    key={index}
                 >
                         <Text
                             style={{padding: 10}}
