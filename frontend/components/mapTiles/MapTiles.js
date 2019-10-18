@@ -178,7 +178,7 @@ class MapTiles extends React.Component{
                                     }]}>
                                     <Text
                                         style={[{
-                                            fontSize: 3,
+                                            fontSize: 6,
                                         }]}
                                     >
                                         {node.name.split('ROOM ')[1]}
@@ -201,7 +201,7 @@ class MapTiles extends React.Component{
                                     }>
                                         <Image
                                             source={getNodeImageByConnectorId(node.connectorId)}
-                                            style={[{height: 8, width: 8}]}
+                                            style={[{height: 10, width: 10}]}
                                         >
                                         </Image>
                                     </TouchableOpacity>
@@ -223,7 +223,7 @@ class MapTiles extends React.Component{
                                     }>
                                         <Image
                                             source={getNodeImageByTagId(node.tagIds[0])}
-                                            style={[{height: 8, width: 8}]}
+                                            style={[{height: 10, width: 10}]}
                                         >
                                         </Image>
                                     </TouchableOpacity>
@@ -242,7 +242,7 @@ class MapTiles extends React.Component{
                             }]}>
                             <Text
                                 style={[{
-                                    fontSize: 3,
+                                    fontSize: 6,
                                 }]}
                             >
                                 {node.name}
@@ -257,14 +257,13 @@ class MapTiles extends React.Component{
                         style={[{
                             flex: 1,
                             position: 'absolute',
-                            top:  (this.props.currentNode.centerCoordinates[1] - this.props.offSetY) /  logicTileSize * 80 + this.state.nodeOffset.y,
+                            top:  (this.props.currentNode.centerCoordinates[1] - this.props.offSetY) /  logicTileSize * 80 + this.state.nodeOffset.y -10,
                             left: (this.props.currentNode.centerCoordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x,
-                            backgroundColor: 'red',
-                            borderBottomColor: 'red',
-                            borderRadius: 1,
-                            width: 2,
-                            height: 2,
                         }]}>
+                        <Image source={require('../../../res/tags/pin.png')}
+                            style={{width: 4, height: 9}}>
+
+                        </Image>
                     </View>
                 }
             </View>
