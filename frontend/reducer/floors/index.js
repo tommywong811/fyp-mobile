@@ -9,7 +9,8 @@ import {
     CHANGE_SUMY,
     CHANGE_NODE,
     UPDATE_FLOOR_DATA,
-    UPDATE_CURRENT_FLOOR
+    UPDATE_CURRENT_FLOOR,
+    RENDER_LOADING_PAGE,
 } from './actionList'
 
 let initialState = {
@@ -21,7 +22,8 @@ let initialState = {
     sumY: 0,
     suggestedNodes: [],
     currentNode: null,
-    currentBuilding: null
+    currentBuilding: null,
+    renderLoadingPage: true,
 }
 
 function changeBuilding(data, payload, currentFloor){
@@ -100,6 +102,12 @@ export default floorReducer = (state = initialState, action) => {
             return {
                 ...state,
                 ...changeNode(action.payload)
+            }
+
+        case RENDER_LOADING_PAGE:
+            return {
+                ...state,
+                'renderLoadingPage': action.payload,
             }
         default:
             return state;

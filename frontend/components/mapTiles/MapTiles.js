@@ -371,7 +371,7 @@ function mapStateToProps(state){
         state.floorReducer.currentFloor.mapWidth,
         state.floorReducer.currentFloor.mapHeight
     ), 0, state.floorReducer.currentFloor._id),
-    currentNode: state.floorReducer.currentNode
+    currentNode: state.floorReducer.currentNode,
  });
 }
 

@@ -1,24 +1,25 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
+import LoadingPage from '../LoadingPage/LoadingPage';
 import {  
     Text, 
     View, 
     StyleSheet,
     Dimensions,
     ScrollView,
-    Keyboard,
     ActivityIndicator,
     TouchableOpacity,
 } from 'react-native';
 import { 
     CHANGE_FLOOR, 
     CHANGE_BUILDING,
-    CHANGE_NODE
+    CHANGE_NODE,
+    RENDER_LOADING_PAGE,
 } from '../../reducer/floors/actionList';
 import { Button } from 'native-base';
 import SearchBar from '../searchBar/searchBar';
-import MapTiles from '../mapTiles/MapTiles';
+import MapTiles from '../mapTiles/MapTiles'
 const {width} = Dimensions.get('window');
 import Icon from 'react-native-vector-icons/AntDesign';
 import * as Base from 'native-base';
@@ -29,6 +30,8 @@ import { searchShortestPath } from '../../../backend/api/search/searchShortestPa
 /**
  * childrenView: 
  */
+
+
 class Navigator extends React.Component{
 
     constructor(props){
@@ -50,18 +53,13 @@ class Navigator extends React.Component{
             suggestionList: [],
         })
     }
+
     componentWillReceiveProps(nextProps) {
         if (nextProps.currentNode != this.props.currentNode) {  // for _searchRoom function after find_node
             this.props.change_floor(nextProps.currFloor, nextProps.currentBuilding);
             this.setState({
                 isLoading: false,
             });
-        }
-
-        if (nextProps.currFloor != this.props.currFloor) { // finish loading floor
-            this.setState({
-                isLoading: false,
-            })
         }
     }
 
@@ -114,7 +112,6 @@ class Navigator extends React.Component{
     }
 
     _searchRoom() {
-        Keyboard.dismiss();
         this.setState({
             isLoading: true,
         })
@@ -168,9 +165,8 @@ class Navigator extends React.Component{
                         type='clear'
                         onPress={()=>{
                             if(item !== this.props.currBuilding){
-                                setTimeout(()=>{ // to let the menu close
-                                    this.props.change_building(item);
-                                }, 100);
+                                this.props.render_loading_page();
+                                this.props.change_building(item);
                             }
                             this.drawer.closeDrawer();
                         }}
@@ -186,11 +182,9 @@ class Navigator extends React.Component{
                         onPress={()=>{
                             if(item._id !== this.props.currFloor){
                                 setTimeout(()=>{ // to let the menu close
+                                    this.props.render_loading_page();
                                     this.props.change_floor(item._id, item.buildingId);
                                 }, 100)
-                                this.setState({
-                                    isLoading: true,
-                                })
                             }
                             this.drawer.closeDrawer();
                         }}    
@@ -246,47 +240,49 @@ class Navigator extends React.Component{
 
         })
         return(
-            <View style={{flex:6, zIndex: 1}}>
-                <DrawerLayout
-                    ref={drawer => {this.drawer=drawer}}
-                    drawerWidth={width * 1 / 2}
-                    drawerPosition={DrawerLayout.positions.Left}
-                    drawerType='front'
-                    drawerBackgroundColor="#ddd"
-                    renderNavigationView={this._renderDrawer}
-                >
-                    <View style={{width: '100%', zIndex:1, flexDirection:'row'}}>
-                        <Button light onPress={()=>this.drawer.openDrawer()}>
-                            <Base.Icon name='arrow-forward' />
-                        </Button>
-                        <View>
-                            <View style={{width: 250, flexDirection:'row'}}>
-                                {/* <SearchBar searchInput={searchInput} placeholder="Where are you?" onChangeText={(input)=> this._onChangeCurrentLocationText(input)}/> */}
-                                <SearchBar searchInput={searchInput} placeholder="Where are you going?" onChangeText={(input)=> this._onChangeSearchText(input)}/>
-                                <Button light onPress={()=>this._searchRoom()}>
-                                    <Icon size={30} name='enter' />
-                                </Button>
-                            </View>
-                            <View style={{maxHeight: 200}}>
-                                <ScrollView 
-                                    keyboardShouldPersistTaps={true}
-                                    style={{zIndex:2}}
-                                >
-                                        {suggestions}
-                                </ScrollView>
+                <View style={{flex:6, zIndex: 1}}>
+                    <DrawerLayout
+                        ref={drawer => {this.drawer=drawer}}
+                        drawerWidth={width * 1 / 2}
+                        drawerPosition={DrawerLayout.positions.Left}
+                        drawerType='front'
+                        drawerBackgroundColor="#ddd"
+                        renderNavigationView={this._renderDrawer}
+                    >
+                        <View style={{width: '100%', zIndex:1, flexDirection:'row'}}>
+                            <Button light onPress={()=>this.drawer.openDrawer()}>
+                                <Base.Icon name='arrow-forward' />
+                            </Button>
+                            <View>
+                                <View style={{width: 250, flexDirection:'row'}}>
+                                    {/* <SearchBar searchInput={searchInput} placeholder="Where are you?" onChangeText={(input)=> this._onChangeCurrentLocationText(input)}/> */}
+                                    <SearchBar searchInput={searchInput} placeholder="Where are you going?" onChangeText={(input)=> this._onChangeSearchText(input)}/>
+                                    <Button light onPress={()=>this._searchRoom()}>
+                                        <Icon size={30} name='enter' />
+                                    </Button>
+                                </View>
+                                <View style={{maxHeight: 200}}>
+                                    <ScrollView 
+                                        keyboardShouldPersistTaps="always"
+                                        style={{zIndex:2}}
+                                    >
+                                            {suggestions}
+                                    </ScrollView>
+                                </View>
                             </View>
                         </View>
+                        {/* {this.props.children} */}
+                        <LoadingPage text="Loading Map Tiles">
+                            <MapTiles 
+                                searchKeyword={this.state.currentSearchKeyword}
+                                resetCurrentSearchKeyword={() => this._resetCurrentSearchKeyword()}
+                            ></MapTiles>
+                        </LoadingPage>
+                    </DrawerLayout>
+                    <View style={{position: 'absolute', flex: 1, justifyContent: 'center', top: 0, left: 0, right: 0, bottom: 0}}>
+                        <ActivityIndicator size="large" color="#0000ff" animating={isLoading}></ActivityIndicator>
                     </View>
-                    {/* {this.props.children} */}
-                    <MapTiles 
-                        searchKeyword={this.state.currentSearchKeyword}
-                        resetCurrentSearchKeyword={() => this._resetCurrentSearchKeyword()}
-                    ></MapTiles>
-                </DrawerLayout>
-                <View style={{position: 'absolute', flex: 1, justifyContent: 'center', top: 0, left: 0, right: 0, bottom: 0}}>
-                    <ActivityIndicator size="large" color="#0000ff" animating={isLoading}></ActivityIndicator>
                 </View>
-            </View>
         );
     }
 }
@@ -308,7 +304,8 @@ function mapDispatchToProps(dispatch){
         change_floor: (floor, buildingId) => 
             dispatch({type: CHANGE_FLOOR, payload: {floor: floor, buildingId: buildingId}}),
         change_building: (floor) => dispatch({type: CHANGE_BUILDING, payload: {buildingId: floor}}),
-        change_node: (name)=>dispatch({type: CHANGE_NODE, payload: {name: name}})
+        change_node: (name)=>dispatch({type: CHANGE_NODE, payload: {name: name}}),
+        render_loading_page: () => dispatch({type: RENDER_LOADING_PAGE, payload: true}),
     };
 }
 
