@@ -72,6 +72,10 @@ class Navigator extends React.Component{
             this.setState({
                 suggestionList: nodes
             })
+        } else {
+            this.setState({
+                suggestionList: []
+            })
         }
     }
 
