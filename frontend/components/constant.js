@@ -1,0 +1,1 @@
+export const LOGO_IMAGE = require('../../res/tags/escalator.png');
