@@ -19,13 +19,13 @@ class ProgressBar extends React.Component{
         super(props);
         this._renderProgress = this._renderProgress.bind(this);
         this._addProgressHandler = this._addProgressHandler.bind(this);
-        try{console.log('meta1');api.meta();
+        try{
             this.state = {
                 finished: true,
                 written: 0,
                 total: 1,
             }}
-        catch(error){console.log('error')
+        catch(error){
             this.state = {
                 finished: false,
                 written: 0,
