@@ -6,6 +6,7 @@ import {
     View,
     Text,
     Dimensions,
+    Platform
 } from 'react-native';
 import NotFoundZoom0 from '../../asset/notFoundZoom0';
 import { getFloorDimension, dirToUri, getNodeOffsetForEachFloor, getNodeImageByTagId, getNodeImageByConnectorId } from '../../plugins/MapTiles';
@@ -139,7 +140,7 @@ class MapTiles extends React.Component{
                     <View style={{flexDirection: 'row'}} key={rowIndex}>
                         {row.map(
                             (item, index) => <View key={index}>
-                                <Image source={{uri: `asset:/image/mapTiles/${item.dir}`}}
+                                <Image source={{uri: Platform.OS === 'android' ? `asset:/image/mapTiles/${item.dir}` : `${item.dir.split('.')[0]}`}}
                                     key={`${rowIndex} ${index}`}
                                     style={{width:80, height:80}}/>
                                 </View>
