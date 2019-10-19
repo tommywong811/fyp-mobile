@@ -47,6 +47,14 @@ function changeFloor(data, payload, currentFloor){
 }
 
 function changeNode(payload) {
+    if(payload.currentNode) {
+        let floor = api.floors({id: payload.currentNode.floorId})
+        return {
+            currentNode: payload.currentNode,
+            currentFloor: floor,
+            currentBuilding: floor.buildingId
+        }
+    }
     let node = api.nodes({name: payload.name})['data'][0]
     let floor = api.floors({id: node.floorId})
     return {
