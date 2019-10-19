@@ -10,6 +10,7 @@ import {
     ScrollView,
     ActivityIndicator,
     TouchableOpacity,
+    Keyboard,
 } from 'react-native';
 import { 
     CHANGE_FLOOR, 
@@ -119,6 +120,7 @@ class Navigator extends React.Component{
         this.setState({
             isLoading: true,
         })
+        Keyboard.dismiss();
         setTimeout(()=>{  // only setTimeout can make the Keyboard dismiss before the change node finished
             this.props.change_node(this.state.searchInput);
         }, 100);
