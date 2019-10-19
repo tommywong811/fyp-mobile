@@ -27,6 +27,7 @@ import * as Base from 'native-base';
 import { api } from '../../../backend'
 import realm from '../../../backend/Realm/realm';
 import { searchShortestPath } from '../../../backend/api/search/searchShortestPath';
+import _ from 'lodash'
 
 /**
  * childrenView: 
@@ -40,6 +41,8 @@ class Navigator extends React.Component{
         this._renderDrawer = this._renderDrawer.bind(this);
         this._allBuildings = this._getUniqueBuildingId(this.props.allFloors);
         this._getAllFloors = this._getAllFloors.bind(this);
+        this.isInputting = false;
+        this.delay_execution = null;
         this.state = {
             allFloorIds : this._getAllFloors(),
         }
@@ -52,6 +55,7 @@ class Navigator extends React.Component{
             currentLocation: '',
             isLoading: false,
             suggestionList: [],
+            currentNode: null
         })
     }
 
@@ -65,11 +69,17 @@ class Navigator extends React.Component{
     }
 
     _onChangeSearchText(text) {
+        this.isInputting = true;
+        console.log('search', text);
         this.setState({
             searchInput: text,
         });
-        if(text != "" || text != " ") {
+        if(text !== '' && text !== ' ') {
             var nodes = api.nodes({name: text}).data;
+            this.isInputting = false;
+            nodes.forEach(e=>{
+                e.buildingName = this._buildingnameToString(this.props.allFloors.find(floor=>floor._id == e.floorId)['buildingId'])
+            })
             this.setState({
                 suggestionList: nodes
             })
@@ -86,44 +96,21 @@ class Navigator extends React.Component{
         })
     }
 
-    _onPressSuggestion(name) {
+    _onPressSuggestion(node) {
         this.setState({
-            searchInput: name, 
+            searchInput: node.name, 
             suggestionList: []
-        }, this._searchRoom())
+        }, this._searchRoom(node))
     }
 
-    _onChangeCurrentSearchKeyword() {
-        // this.setState({
-        //     currentSearchKeyword: keyword,
-        // })
-        // if(this.state.searchInput=='' || this.state.currentLocation=='') {
-        //     alert('No input is entered')
-        //     return;
-        // };
-        // alert(JSON.stringify(api.nodes({name: this.state.searchInput}), null, 2))
-        // let fromNode = realm.objects('nodes').filtered(`name CONTAINS[c] '${this.state.searchInput}' AND unsearchable != true`)
-        // let toNode = realm.objects('nodes').filtered(`name CONTAINS[c] '${this.state.currentLocation}' AND unsearchable != true`)
-        // let fromNode = Array.from(realm.objects('nodes').filtered(`name CONTAINS[c] '${5017}' AND unsearchable != true`))
-        // let toNode = Array.from(realm.objects('nodes').filtered(`name CONTAINS[c] '${5018}' AND unsearchable != true`))
-        // // alert(JSON.stringify(Array.from(fromNode), null, 2))
-        // let fromId = fromNode[0]['_id'];
-        // let toId = toNode[0]['_id'];
-        // let fromBuildingId = Array.from(realm.objects('floors').filtered(`_id = '${fromNode[0].floorId}'`))[0].buildingId
-        // let toBuildingId = Array.from(realm.objects('floors').filtered(`_id = '${toNode[0].floorId}'`))[0].buildingId
-        // let res = searchShortestPath(fromId, toId)
-        // this.props.change_floor(fromNode[0].floorId,fromBuildingId)
-        // alert(JSON.stringify(res,null,2))
-    }
-
-    _searchRoom() {
+    _searchRoom(currentNode = null) {
         this.setState({
             isLoading: true,
             suggestionList: [], // suggestion dropdown dismiss after search button press
         })
         Keyboard.dismiss();
         setTimeout(()=>{  // only setTimeout can make the Keyboard dismiss before the change node finished
-            this.props.change_node(this.state.searchInput);
+            this.props.change_node(this.state.searchInput, currentNode);
         }, 100);
     }
 
@@ -234,14 +221,14 @@ class Navigator extends React.Component{
         var suggestions = this.state.suggestionList.map((node, index) => {
             return (
                 <TouchableOpacity
-                    onPress={() => this._onPressSuggestion(node.name)}
+                    onPress={() => this._onPressSuggestion(node)}
                     style={{backgroundColor: 'white'}}
                     key={index}
                 >
                         <Text
                             style={{padding: 10}}
                         >
-                            {node.name}
+                            {node.name}, {node.buildingName}
                         </Text>
                 </TouchableOpacity>
             )
@@ -312,7 +299,7 @@ function mapDispatchToProps(dispatch){
         change_floor: (floor, buildingId) => 
             dispatch({type: CHANGE_FLOOR, payload: {floor: floor, buildingId: buildingId}}),
         change_building: (floor) => dispatch({type: CHANGE_BUILDING, payload: {buildingId: floor}}),
-        change_node: (name)=>dispatch({type: CHANGE_NODE, payload: {name: name}}),
+        change_node: (name, currentNode=null)=>dispatch({type: CHANGE_NODE, payload: {name: name, currentNode:currentNode}}),
         render_loading_page: () => dispatch({type: RENDER_LOADING_PAGE, payload: true}),
     };
 }
