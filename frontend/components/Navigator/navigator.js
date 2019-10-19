@@ -264,11 +264,14 @@ class Navigator extends React.Component{
                             </View>
                         </View>
                         {/* {this.props.children} */}
-                        <LoadingPage text="Loading Map Tiles">
+                        <LoadingPage text="Loading...">
                             <MapTiles 
                                 searchKeyword={this.state.currentSearchKeyword}
                                 resetCurrentSearchKeyword={() => this._resetCurrentSearchKeyword()}
                             ></MapTiles>
+                            <View>
+                                <Text style={{textAlign: 'center', fontSize: 20, fontWeight: 'bold', color: '#5e9cff'}}>{this._buildingnameToString(this.props.currBuilding)} - {this.props.currFloor}</Text>
+                            </View>
                         </LoadingPage>
                     </DrawerLayout>
                     <View style={{position: 'absolute', flex: 1, justifyContent: 'center', top: 0, left: 0, right: 0, bottom: 0}}>
