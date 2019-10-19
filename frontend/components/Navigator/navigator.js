@@ -119,6 +119,7 @@ class Navigator extends React.Component{
     _searchRoom() {
         this.setState({
             isLoading: true,
+            suggestionList: [], // suggestion dropdown dismiss after search button press
         })
         Keyboard.dismiss();
         setTimeout(()=>{  // only setTimeout can make the Keyboard dismiss before the change node finished
