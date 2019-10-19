@@ -230,7 +230,7 @@ class Navigator extends React.Component{
                         <Text
                             style={{padding: 10}}
                         >
-                            {node.name}, {node.buildingName}
+                            {node.name}, {node.floorId}, {node.buildingName}
                         </Text>
                 </TouchableOpacity>
             )
