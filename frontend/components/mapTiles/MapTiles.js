@@ -55,7 +55,7 @@ class MapTiles extends React.Component{
             this._isSearchRoomInProgress = true; // to run setMapOffset after floor change
         }
 
-        if(nextProps.currFloor != this.props.currFloor) {
+        if(nextProps.currFloor != this.props.currFloor || this._isSearchRoomInProgress) {
             const nodeOffset = getNodeOffsetForEachFloor(nextProps.currFloor);
             this.setState({
                 'nodesInFloor': this.props.nodes.filter((node) => node.floorId === nextProps.currFloor),
