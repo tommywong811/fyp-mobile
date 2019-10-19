@@ -151,10 +151,11 @@ class Navigator extends React.Component{
         return(
             <View>
                 <ScrollView scrollEventThrottle={16}>
-                <Text h1>Buildings</Text>
+                <Text style={styles.drawerSubSection}>Buildings</Text>
                 <View style={styles.lineStyle} />
                 {this._allBuildings.map(item => 
                     <Button transparent
+                        style={styles.drawerItems}
                         key={item}
                         type='clear'
                         onPress={()=>{
@@ -168,9 +169,10 @@ class Navigator extends React.Component{
                         <Text>{this._buildingnameToString(item)}</Text>
                     </Button>)}
                 <View style={styles.lineStyle} />
-                <Text h2>Floors</Text>
+                <Text style={styles.drawerSubSection}>Floors</Text>
                 {this._getAllFloors().map(item => 
                     <Button transparent
+                        style={styles.drawerItems}
                         key={item._id}
                         type='clear'
                         onPress={()=>{
@@ -357,5 +359,13 @@ const styles = StyleSheet.create({
       }, 
       text1:{
           
-      } 
+      },
+      drawerSubSection: {
+          fontSize: 18,
+          paddingLeft: 5,
+      },
+      drawerItems: {
+          paddingLeft: 10,
+          minWidth: 40,
+      }
 })
