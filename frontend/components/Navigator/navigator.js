@@ -12,6 +12,7 @@ import {
     ActivityIndicator,
     TouchableOpacity,
     Keyboard,
+    TouchableWithoutFeedback,
 } from 'react-native';
 import { 
     CHANGE_FLOOR, 
@@ -249,6 +250,7 @@ class Navigator extends React.Component{
 
         })
         return(
+            <TouchableWithoutFeedback onPress={() => {Keyboard.dismiss(); this.setState({suggestionList: []})}}>
                 <View style={{flex:6, zIndex: 1}}>
                     <DrawerLayout
                         ref={drawer => {this.drawer=drawer}}
@@ -295,6 +297,8 @@ class Navigator extends React.Component{
                         <ActivityIndicator size="large" color="#0000ff" animating={isLoading}></ActivityIndicator>
                     </View>
                 </View>
+
+            </TouchableWithoutFeedback>
         );
     }
 }
