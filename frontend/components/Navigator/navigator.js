@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 import LoadingPage from '../LoadingPage/LoadingPage';
-import { AsyncStorage } from "react-native";
+import AsyncStorage from '@react-native-community/async-storage';
 import {  
     Text, 
     View, 

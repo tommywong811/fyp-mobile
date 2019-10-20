@@ -13,7 +13,7 @@ import {
     RENDER_LOADING_PAGE,
 } from './actionList'
 
-import { AsyncStorage } from "react-native";
+import AsyncStorage from '@react-native-community/async-storage';
 
 let initialState = {
     data: api.floors().data,
