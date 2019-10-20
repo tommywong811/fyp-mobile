@@ -47,7 +47,12 @@ class MapTiles extends React.Component{
             'nodesInFloor': this.props.nodes.filter((node) => node.floorId === this.props.currFloor),
             'nodeOffset': getNodeOffsetForEachFloor(this.props.currFloor),
         });
+    }
 
+    componentDidMount() {
+        if (!this.props.currentNode && this.props.currBuilding === 'academicBuilding') {   // the first maptile present in the app
+            this.setMapOffset(-440, -300)
+        }
     }
 
     componentWillReceiveProps(nextProps) {
@@ -286,10 +291,16 @@ class MapTiles extends React.Component{
         }
     }
 
+    _onZoomAfter(evt, gestureState, zoomableViewEventObject) {
+        this.setState({
+            zoom: zoomableViewEventObject.zoomLevel,
+        })
+    }
+
     render(){
         let { pan } = this.state;
         let [translateX, translateY] = [pan.x, pan.y];
-        let imageStyle = {transform: [{translateX}, {translateY}, {scale: this.state.zoom}]};
+        let imageStyle = {transform: [{translateX}, {translateY}]};
         return(
             <ReactNativeZoomableView
                 style={{flex:1}}
@@ -301,6 +312,8 @@ class MapTiles extends React.Component{
                 onZoomAfter={this.logOutZoomState}
                 onPanResponderMove={this._onPanMoveHandler}
                 onPanResponderEnd={this._onPanEndHandler}
+                onZoomAfter={this._onZoomAfter.bind(this)}
+                onDoubleTapAfter={this._onZoomAfter.bind(this)}
             >
                 <Animated.View
                     style={imageStyle} 
@@ -362,6 +375,7 @@ function mapStateToProps(state){
         state.floorReducer.currentFloor.mapHeight
     ),
     currFloor: state.floorReducer.currentFloor._id,
+    currBuilding: state.floorReducer.currentFloor.buildingId,
     nodes: state.nodesReducer.data,
     floors: state.floorReducer.data,
     cache: cacheReducer(getFloorDimension(
