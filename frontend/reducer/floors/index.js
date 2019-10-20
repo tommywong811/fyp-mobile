@@ -13,6 +13,8 @@ import {
     RENDER_LOADING_PAGE,
 } from './actionList'
 
+import { AsyncStorage } from "react-native";
+
 let initialState = {
     data: api.floors().data,
     currentFloor: api.floors().data[0],
@@ -47,21 +49,41 @@ function changeFloor(data, payload, currentFloor){
 }
 
 function changeNode(payload) {
+    let result = null;
     if(payload.currentNode) {
         let floor = api.floors({id: payload.currentNode.floorId})
-        return {
+        result =  {
             currentNode: payload.currentNode,
             currentFloor: floor,
             currentBuilding: floor.buildingId
         }
+    } else {
+        let node = api.nodes({name: payload.name})['data'][0];
+        let floor = api.floors({id: node.floorId});
+        result = {
+            currentNode: node,
+            currentFloor: floor,
+            currentBuilding: api.buildings({id: floor.buildingId}),
+        }
     }
-    let node = api.nodes({name: payload.name})['data'][0]
-    let floor = api.floors({id: node.floorId})
-    return {
-        currentNode: node,
-        currentFloor: floor,
-        currentBuilding: api.buildings({id: floor.buildingId})
-    }
+    
+    (async () => {   // store the recent searched node to cache
+        // cache format: {data: [...suggestions]}
+        let cache = await AsyncStorage.getItem('suggestions');
+        if (cache) {    // save the suggestion cache
+            let cacheData = JSON.parse(cache).data;
+            if (cacheData.length > 4) {
+                cacheData.shift();
+            }
+            cacheData.unshift(result.currentNode);
+            await AsyncStorage.setItem('suggestions', JSON.stringify({data: cacheData}));
+        } else {
+            await AsyncStorage.setItem('suggestions', JSON.stringify({data: [result.currentNode]}));
+        }
+    })();
+
+    return result;
+
 }
 
 export default floorReducer = (state = initialState, action) => {

@@ -23,6 +23,7 @@ export default class SearchBar extends Component<Props> {
                     placeholderTextColor='grey'
                     fontSize={17}
                     onChangeText={Text => this.props.onChangeText(Text)}
+                    onFocus={() => this.props.onFocus(this.props.searchInput)}
                     style={{ borderWidth: 1, borderColor: '#f2f2e1', 
                     backgroundColor: 'white', borderTopRightRadius: 10, 
                     borderBottomRightRadius: 10, height: 48, flex:1, padding: 5}}

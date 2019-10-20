@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import DrawerLayout from 'react-native-gesture-handler/DrawerLayout';
 import LoadingPage from '../LoadingPage/LoadingPage';
+import { AsyncStorage } from "react-native";
 import {  
     Text, 
     View, 
@@ -68,9 +69,22 @@ class Navigator extends React.Component{
         }
     }
 
+    async setCacheToSuggestionList() {
+        let suggestionCache = await AsyncStorage.getItem('suggestions')
+        let suggestionCacheData = JSON.parse(suggestionCache).data
+        this.setState({
+            suggestionList: suggestionCacheData,
+        });
+    }
+
+    _onFocusSearchBar(text) {
+        if (!text) {
+            this.setCacheToSuggestionList();
+        }
+    }
+
     _onChangeSearchText(text) {
         this.isInputting = true;
-        console.log('search', text);
         this.setState({
             searchInput: text,
         });
@@ -84,9 +98,7 @@ class Navigator extends React.Component{
                 suggestionList: nodes
             })
         } else {
-            this.setState({
-                suggestionList: []
-            })
+            this.setCacheToSuggestionList();
         }
     }
 
@@ -253,7 +265,7 @@ class Navigator extends React.Component{
                             <View>
                                 <View style={{width: 250, flexDirection:'row'}}>
                                     {/* <SearchBar searchInput={searchInput} placeholder="Where are you?" onChangeText={(input)=> this._onChangeCurrentLocationText(input)}/> */}
-                                    <SearchBar searchInput={searchInput} placeholder="Where are you going?" onChangeText={(input)=> this._onChangeSearchText(input)}/>
+                                    <SearchBar searchInput={searchInput} placeholder="Where are you going?" onChangeText={(input)=> this._onChangeSearchText(input)} onFocus={() => this._onFocusSearchBar()}/>
                                     <Button light onPress={()=>this._searchRoom()}>
                                         <Icon size={30} name='enter' />
                                     </Button>
