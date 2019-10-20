@@ -72,10 +72,12 @@ class Navigator extends React.Component{
 
     async setCacheToSuggestionList() {
         let suggestionCache = await AsyncStorage.getItem('suggestions')
-        let suggestionCacheData = JSON.parse(suggestionCache).data
-        this.setState({
-            suggestionList: suggestionCacheData,
-        });
+        if (suggestionCache) {
+            let suggestionCacheData = JSON.parse(suggestionCache).data
+            this.setState({
+                suggestionList: suggestionCacheData,
+            });
+        }
     }
 
     _onFocusSearchBar(text) {
