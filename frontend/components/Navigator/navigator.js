@@ -251,7 +251,7 @@ class Navigator extends React.Component{
 
         })
         return(
-            <View style={{flex:6, zIndex: 1}} onPress={() => {Keyboard.dismiss(); this.setState({suggestionList: []})}}>
+            <View style={{flex:6, zIndex: 1}} onPress={() => { console.log(231);this.setState({suggestionList: []})}}>
                 <DrawerLayout
                     ref={drawer => {this.drawer=drawer}}
                     drawerWidth={width * 1 / 2}
@@ -285,6 +285,7 @@ class Navigator extends React.Component{
                     {/* {this.props.children} */}
                     <LoadingPage text="Loading...">
                         <MapTiles 
+                            onCloseSuggestionList={()=> this.setState({suggestionList: []})}
                             searchKeyword={this.state.currentSearchKeyword}
                             resetCurrentSearchKeyword={() => this._resetCurrentSearchKeyword()}
                         ></MapTiles>

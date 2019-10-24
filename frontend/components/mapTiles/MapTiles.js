@@ -6,7 +6,8 @@ import {
     View,
     Text,
     Dimensions,
-    Platform
+    Platform,
+    Keyboard,
 } from 'react-native';
 import NotFoundZoom0 from '../../asset/notFoundZoom0';
 import { getFloorDimension, dirToUri, getNodeOffsetForEachFloor, getNodeImageByTagId, getNodeImageByConnectorId } from '../../plugins/MapTiles';
@@ -276,11 +277,13 @@ class MapTiles extends React.Component{
         )
     }
 
-    _onPanEndHandler(evt, gestureState, zoomableViewEventObject) {
+    _onPanEndHandler(evt, gestureState, zoomableViewEventObject) {  
+        Keyboard.dismiss();
+        this.props.onCloseSuggestionList();
         this.state.gestureOffset.x += (gestureState.dx / zoomableViewEventObject.zoomLevel);
         this.state.gestureOffset.y += (gestureState.dy / zoomableViewEventObject.zoomLevel);
     }
-
+    
     _onPanMoveHandler(evt, gestureState, zoomableViewEventObject) {
         // console.log('zoomableViewEventObject', zoomableViewEventObject);
         if(gestureState.numberActiveTouches == 1) {
@@ -292,6 +295,8 @@ class MapTiles extends React.Component{
     }
 
     _onZoomAfter(evt, gestureState, zoomableViewEventObject) {
+        Keyboard.dismiss();
+        this.props.onCloseSuggestionList();
         this.setState({
             zoom: zoomableViewEventObject.zoomLevel,
         })
