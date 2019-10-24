@@ -12,7 +12,6 @@ import {
     ActivityIndicator,
     TouchableOpacity,
     Keyboard,
-    TouchableWithoutFeedback,
 } from 'react-native';
 import { 
     CHANGE_FLOOR, 
@@ -252,55 +251,53 @@ class Navigator extends React.Component{
 
         })
         return(
-            <TouchableWithoutFeedback onPress={() => {Keyboard.dismiss(); this.setState({suggestionList: []})}}>
-                <View style={{flex:6, zIndex: 1}}>
-                    <DrawerLayout
-                        ref={drawer => {this.drawer=drawer}}
-                        drawerWidth={width * 1 / 2}
-                        drawerPosition={DrawerLayout.positions.Left}
-                        drawerType='front'
-                        drawerBackgroundColor="#ddd"
-                        renderNavigationView={this._renderDrawer}
-                    >
-                        <View style={{width: '100%', zIndex:1, flexDirection:'row'}}>
-                            <Button light onPress={()=>this.drawer.openDrawer()}>
-                                <Base.Icon name='arrow-forward' />
-                            </Button>
-                            <View>
-                                <View style={{width: 250, flexDirection:'row'}}>
-                                    {/* <SearchBar searchInput={searchInput} placeholder="Where are you?" onChangeText={(input)=> this._onChangeCurrentLocationText(input)}/> */}
-                                    <SearchBar searchInput={searchInput} placeholder="Where are you going?" onChangeText={(input)=> this._onChangeSearchText(input)} onFocus={() => this._onFocusSearchBar()}/>
-                                    <Button light onPress={()=>this._searchRoom()}>
-                                        <Icon size={30} name='enter' />
-                                    </Button>
-                                </View>
-                                <View style={{maxHeight: 200}}>
-                                    <ScrollView 
-                                        keyboardShouldPersistTaps="always"
-                                        style={{zIndex:2}}
-                                    >
-                                            {suggestions}
-                                    </ScrollView>
-                                </View>
+            <View style={{flex:6, zIndex: 1}} onPress={() => {Keyboard.dismiss(); this.setState({suggestionList: []})}}>
+                <DrawerLayout
+                    ref={drawer => {this.drawer=drawer}}
+                    drawerWidth={width * 1 / 2}
+                    drawerPosition={DrawerLayout.positions.Left}
+                    drawerType='front'
+                    drawerBackgroundColor="#ddd"
+                    renderNavigationView={this._renderDrawer}
+                >
+                    <View style={{width: '100%', zIndex:1, flexDirection:'row'}}>
+                        <Button light onPress={()=>this.drawer.openDrawer()}>
+                            <Base.Icon name='arrow-forward' />
+                        </Button>
+                        <View>
+                            <View style={{width: 250, flexDirection:'row'}}>
+                                {/* <SearchBar searchInput={searchInput} placeholder="Where are you?" onChangeText={(input)=> this._onChangeCurrentLocationText(input)}/> */}
+                                <SearchBar searchInput={searchInput} placeholder="Where are you going?" onChangeText={(input)=> this._onChangeSearchText(input)} onFocus={() => this._onFocusSearchBar()}/>
+                                <Button light onPress={()=>this._searchRoom()}>
+                                    <Icon size={30} name='enter' />
+                                </Button>
+                            </View>
+                            <View style={{maxHeight: 200}}>
+                                <ScrollView 
+                                    keyboardShouldPersistTaps="always"
+                                    style={{zIndex:2}}
+                                >
+                                        {suggestions}
+                                </ScrollView>
                             </View>
                         </View>
-                        {/* {this.props.children} */}
-                        <LoadingPage text="Loading...">
-                            <MapTiles 
-                                searchKeyword={this.state.currentSearchKeyword}
-                                resetCurrentSearchKeyword={() => this._resetCurrentSearchKeyword()}
-                            ></MapTiles>
-                            <View>
-                                <Text style={{textAlign: 'center', fontSize: 20, fontWeight: 'bold', color: '#5e9cff'}}>{this._buildingnameToString(this.props.currBuilding)} - {this.props.currFloor}</Text>
-                            </View>
-                        </LoadingPage>
-                    </DrawerLayout>
-                    <View style={{position: 'absolute', flex: 1, justifyContent: 'center', top: 0, left: 0, right: 0, bottom: 0}}>
-                        <ActivityIndicator size="large" color="#0000ff" animating={isLoading}></ActivityIndicator>
                     </View>
+                    {/* {this.props.children} */}
+                    <LoadingPage text="Loading...">
+                        <MapTiles 
+                            searchKeyword={this.state.currentSearchKeyword}
+                            resetCurrentSearchKeyword={() => this._resetCurrentSearchKeyword()}
+                        ></MapTiles>
+                        <View>
+                            <Text style={{textAlign: 'center', fontSize: 20, fontWeight: 'bold', color: '#5e9cff'}}>{this._buildingnameToString(this.props.currBuilding)} - {this.props.currFloor}</Text>
+                        </View>
+                    </LoadingPage>
+                </DrawerLayout>
+                <View style={{position: 'absolute', flex: 1, justifyContent: 'center', top: 0, left: 0, right: 0, bottom: 0}}>
+                    <ActivityIndicator size="large" color="#0000ff" animating={isLoading}></ActivityIndicator>
                 </View>
+            </View>
 
-            </TouchableWithoutFeedback>
         );
     }
 }
