@@ -74,9 +74,9 @@ class MapTiles extends React.Component{
                     startY,
                 } = nextProps.floors.find((floor) => floor._id === nextProps.currFloor);
     
-                let x = (nextProps.currentNode.centerCoordinates[0] - startX) /  logicTileSize * 80 + nodeOffset.x - screenSizeX / 2
-                let y = (nextProps.currentNode.centerCoordinates[1] - startY) /  logicTileSize * 80 + nodeOffset.y - screenSizeY / 2;
-                this.setMapOffset(-x, y);
+                let x = (nextProps.currentNode.centerCoordinates[0] - startX) /  logicTileSize * 80 + nodeOffset.x - screenSizeX /2;
+                let y = (nextProps.currentNode.centerCoordinates[1] - startY) /  logicTileSize * 80 + nodeOffset.y - screenSizeY /2;
+                this.setMapOffset(-x, -y);
                 this._isSearchRoomInProgress = false;
             } else { // for switch floor
                     this.setMapOffset(-80 - nodeOffset.x,  0);
@@ -88,15 +88,16 @@ class MapTiles extends React.Component{
     setMapOffset(x, y) {
         this.setState({
             gestureOffset: {
-                x: x,
-                y: y
+                x: x - (this.state.zoom > 1 ? 105 : 0),
+                y: y - (this.state.zoom > 1 ? 170 : 0)
             }
         });
 
         this.state.pan.setValue({
-            x: x,
-            y: y
+            x: x - (this.state.zoom > 1 ? 105 : 0),
+            y: y - (this.state.zoom > 1 ? 170 : 0),
         });
+        this.forceUpdate();
     }
 
     _initialCache(){
@@ -167,8 +168,8 @@ class MapTiles extends React.Component{
                     position: 'absolute',
                     left: 0,
                     top: 0,
-                    width: mapTileSize * this.props.cache.length,
-                    height: mapTileSize * this.props.cache[0].length,
+                    width: 80 * this.props.cache[0].length,
+                    height: 80 * this.props.cache.length,
             }]}>
                 {this.state.nodesInFloor.map((node, key)=>{
                     if (node.centerCoordinates) {
@@ -260,18 +261,14 @@ class MapTiles extends React.Component{
                 }
 
                 {this.props.currentNode &&
-                    <View
-                        style={[{
-                            flex: 1,
-                            position: 'absolute',
-                            top:  (this.props.currentNode.centerCoordinates[1] - this.props.offSetY) /  logicTileSize * 80 + this.state.nodeOffset.y -10,
-                            left: (this.props.currentNode.centerCoordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x,
-                        }]}>
-                        <Image source={require('../../../res/tags/pin.png')}
-                            style={{width: 4, height: 9}}>
-
-                        </Image>
-                    </View>
+                    <Image source={require('../../../res/tags/pin.png')}
+                        style={{width: 4, height: 9,
+                                flex: 1,
+                                position: 'absolute',
+                                top:  (this.props.currentNode.centerCoordinates[1] - this.props.offSetY) /  logicTileSize * 80 + this.state.nodeOffset.y -10,
+                                left: (this.props.currentNode.centerCoordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x,
+                            }}>
+                    </Image>
                 }
             </View>
         )
@@ -288,8 +285,8 @@ class MapTiles extends React.Component{
         // console.log('zoomableViewEventObject', zoomableViewEventObject);
         if(gestureState.numberActiveTouches == 1) {
             this.state.pan.setValue({
-                x: (this.state.gestureOffset.x + gestureState.dx / zoomableViewEventObject.zoomLevel) - zoomableViewEventObject.offsetX,
-                y: (this.state.gestureOffset.y + gestureState.dy / zoomableViewEventObject.zoomLevel) - zoomableViewEventObject.offsetY
+                x: (this.state.gestureOffset.x + gestureState.dx / zoomableViewEventObject.zoomLevel),
+                y: (this.state.gestureOffset.y + gestureState.dy / zoomableViewEventObject.zoomLevel),
             });
         }
     }
@@ -305,7 +302,7 @@ class MapTiles extends React.Component{
     render(){
         let { pan } = this.state;
         let [translateX, translateY] = [pan.x, pan.y];
-        let imageStyle = {transform: [{translateX}, {translateY}]};
+        let imageStyle = {transform: [{translateX}, {translateY}], top:0, left:0, position: 'absolute'};
         return(
             <ReactNativeZoomableView
                 style={{flex:1}}
