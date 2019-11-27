@@ -46,6 +46,7 @@ class Navigator extends React.Component{
         this.delay_execution = null;
         this.state = {
             allFloorIds : this._getAllFloors(),
+            isBuilding: true
         }
     }
 
@@ -206,7 +207,109 @@ class Navigator extends React.Component{
             </View>
         );
     }
-    
+    _renderBuildings = () => {
+        return(
+            <View>
+                <ScrollView scrollEventThrottle={16}>
+                <Text style={styles.drawerSubSection}>Buildings</Text>
+                <View style={styles.lineStyle} />
+                {this._allBuildings.map(item =>{
+                    if(item !== this.props.currBuilding){
+                        return(
+                            <Button transparent
+                            style={styles.drawerItems}
+                            key={item}
+                            type='clear'
+                            onPress={()=>{
+                                if(item !== this.props.currBuilding){
+                                    this.props.render_loading_page();
+                                    this.props.change_building(item);
+                                }
+                                //this.drawer.closeDrawer();
+                                this.setState({isBuilding: false});
+                            }}
+                        >
+                            <Text>{this._buildingnameToString(item)}</Text>
+                        </Button>
+                        );
+                    }else{
+                        return(
+                        <Button info
+                            style={styles.drawerItems}
+                            key={item}
+                            type='clear'
+                            onPress={()=>{
+                                if(item !== this.props.currBuilding){
+                                    this.props.render_loading_page();
+                                    this.props.change_building(item);
+                                }
+                                //this.drawer.closeDrawer();
+                                this.setState({isBuilding: false});
+                            }}
+                        >
+                            <Text>{this._buildingnameToString(item)}</Text>
+                        </Button>
+                        );
+                    }
+                } 
+            )}
+                </ScrollView>
+            </View>);
+    }
+    _renderFloors = () => {
+        return(
+            <View>
+                <ScrollView scrollEventThrottle={16}>
+                    <Icon size={32} name='left' style={{flexDirection:"row"}} onPress={()=>{this.setState({isBuilding: true})}}>
+                        <Text style={styles.drawerSubSection}>Floors</Text>
+                    </Icon>
+
+                {this._getAllFloors().map(item => {
+                    if(item._id !== this.props.currFloor){
+                        return(
+                            <Button transparent
+                            style={styles.drawerItems}
+                            key={item._id}
+                            type='clear'
+                            onPress={()=>{
+                                if(item._id !== this.props.currFloor){
+                                    setTimeout(()=>{ // to let the menu close
+                                        this.props.render_loading_page();
+                                        this.props.change_floor(item._id, item.buildingId);
+                                    }, 100)
+                                }
+                                this.drawer.closeDrawer();
+                            }}    
+                            >
+                            <Text>{item._id}</Text>
+                            </Button>
+                        );
+                    }else{
+                        return(
+                            <Button info
+                            style={styles.drawerItems}
+                            key={item._id}
+                            type='clear'
+                            onPress={()=>{
+                                if(item._id !== this.props.currFloor){
+                                    setTimeout(()=>{ // to let the menu close
+                                        this.props.render_loading_page();
+                                        this.props.change_floor(item._id, item.buildingId);
+                                    }, 100)
+                                }
+                                this.drawer.closeDrawer();
+                            }}    
+                            >
+                            <Text>{item._id}</Text>
+                        </Button>
+                        )
+                    }
+                })
+                }
+                </ScrollView>
+            </View>
+        );
+    }
     _renderRightBar = () => {
         return (
         <View style={{width: width/9, zIndex:1, position:'absolute', left: width*8/9, backgroundColor:'white'}}>
@@ -250,6 +353,7 @@ class Navigator extends React.Component{
             )
 
         })
+        if(this.state.isBuilding)
         return(
             <View style={{flex:6, zIndex: 1}} onPress={() => { console.log(231);this.setState({suggestionList: []})}}>
                 <DrawerLayout
@@ -258,7 +362,7 @@ class Navigator extends React.Component{
                     drawerPosition={DrawerLayout.positions.Left}
                     drawerType='front'
                     drawerBackgroundColor="#ddd"
-                    renderNavigationView={this._renderDrawer}
+                    renderNavigationView={this._renderBuildings}
                 >
                     <View style={{width: '100%', zIndex:1, flexDirection:'row'}}>
                         <Button light onPress={()=>this.drawer.openDrawer()}>
@@ -300,6 +404,56 @@ class Navigator extends React.Component{
             </View>
 
         );
+        else
+            return(
+                <View style={{flex:6, zIndex: 1}} onPress={() => { console.log(231);this.setState({suggestionList: []})}}>
+                <DrawerLayout
+                    ref={drawer => {this.drawer=drawer}}
+                    drawerWidth={width * 1 / 2}
+                    drawerPosition={DrawerLayout.positions.Left}
+                    drawerType='front'
+                    drawerBackgroundColor="#ddd"
+                    renderNavigationView={this._renderFloors}
+                >
+                    <View style={{width: '100%', zIndex:1, flexDirection:'row'}}>
+                        <Button light onPress={()=>this.drawer.openDrawer()}>
+                            <Base.Icon name='arrow-forward' />
+                        </Button>
+                        <View>
+                            <View style={{width: 250, flexDirection:'row'}}>
+                                {/* <SearchBar searchInput={searchInput} placeholder="Where are you?" onChangeText={(input)=> this._onChangeCurrentLocationText(input)}/> */}
+                                <SearchBar searchInput={searchInput} placeholder="Where are you going?" onChangeText={(input)=> this._onChangeSearchText(input)} onFocus={() => this._onFocusSearchBar()}/>
+                                <Button light onPress={()=>this._searchRoom()}>
+                                    <Icon size={30} name='enter' />
+                                </Button>
+                            </View>
+                            <View style={{maxHeight: 200}}>
+                                <ScrollView 
+                                    keyboardShouldPersistTaps="always"
+                                    style={{zIndex:2}}
+                                >
+                                        {suggestions}
+                                </ScrollView>
+                            </View>
+                        </View>
+                    </View>
+                    {/* {this.props.children} */}
+                    <LoadingPage text="Loading...">
+                        <MapTiles 
+                            onCloseSuggestionList={()=> this.setState({suggestionList: []})}
+                            searchKeyword={this.state.currentSearchKeyword}
+                            resetCurrentSearchKeyword={() => this._resetCurrentSearchKeyword()}
+                        ></MapTiles>
+                        <View>
+                            <Text style={{textAlign: 'center', fontSize: 20, fontWeight: 'bold', color: '#5e9cff'}}>{this._buildingnameToString(this.props.currBuilding)} - {this.props.currFloor}</Text>
+                        </View>
+                    </LoadingPage>
+                </DrawerLayout>
+                <View style={{position: 'absolute', flex: 1, justifyContent: 'center', top: 0, left: 0, right: 0, bottom: 0}}>
+                    <ActivityIndicator size="large" color="#0000ff" animating={isLoading}></ActivityIndicator>
+                </View>
+            </View>
+            );
     }
 }
 
@@ -385,6 +539,6 @@ const styles = StyleSheet.create({
       },
       drawerItems: {
           paddingLeft: 10,
-          minWidth: 40,
+          width: '100%',
       }
 })
