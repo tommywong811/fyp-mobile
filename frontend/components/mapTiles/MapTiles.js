@@ -342,6 +342,7 @@ function cacheReducer(dim, zoomLevel, currFloor, mapTileCache){
         for(i = 0; i < height; i++){
             cache[i] = new Array(width + 1);
         };
+        let mapTiles = api.mapTiles({floorId: currFloor});
         for(i = 0; i < height; i++){
             for(j = 0; j < width + 1; j++){
                 cache[i][j] = {
@@ -361,7 +362,8 @@ function cacheReducer(dim, zoomLevel, currFloor, mapTileCache){
                         y: cache[i][j].logicTop,
                         zoomLevel: cache[i][j].zoomLevel
                     })
-                }catch(error){
+                    cache[i][j].dir = mapTiles.find((r) => r.x === cache[i][j].logicLeft && r.y === cache[i][j].logicTop && r.zoomLevel === cache[i][j].zoomLevel).data
+                } catch(error){
                     cache[i][j].dir = NOT_Found;
                 }
             }
