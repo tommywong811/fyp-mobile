@@ -59,7 +59,7 @@ class loadingPage extends React.Component{
 
         return(
                 <View style={{flex: 1, flexDirection: 'column', backgroundColor: '#5e9cff', justifyContent:'center', alignItems:'center'}}>
-                    <Image style={{width: 100, height: 100, marginBottom: 20}} source={Logo}></Image>
+                    {/* <Image style={{width: 100, height: 100, marginBottom: 20}} source={Logo}></Image> */}
                     <ActivityIndicator size="large" color="#c9e6ff"></ActivityIndicator>
                     <Text style={{color: 'white', fontSize: 14, marginTop: 10}}>{this.props.text ? this.props.text : 'Loading'}</Text>
                 </View> 
