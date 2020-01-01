@@ -13,6 +13,10 @@ import NotFoundZoom0 from '../../asset/notFoundZoom0';
 import { getFloorDimension, dirToUri, getNodeOffsetForEachFloor, getNodeImageByTagId, getNodeImageByConnectorId } from '../../plugins/MapTiles';
 import {mapTileSize, logicTileSize} from './config';
 import { api } from '../../../backend';
+import store from '../../../store.js';
+import {
+    UPDATE_MAPTILE_CACHE
+} from '../../reducer/floors/actionList.js';
 import { 
     TouchableOpacity,
 } from 'react-native-gesture-handler';
@@ -328,40 +332,49 @@ class MapTiles extends React.Component{
     }
 }  
 
-function cacheReducer(dim, zoomLevel, currFloor){
-    var cache = new Array(height);
-    const left = dim.left;  // starting coordinate
-    const top = dim.top;    // starting coordinate
-    const width = dim.width;    // number of tile in x
-    const height = dim.height;  // number of tile in y
-    for(i = 0; i < height; i++){
-        cache[i] = new Array(width + 1);
-    };
-    for(i = 0; i < height; i++){
-        for(j = 0; j < width + 1; j++){
-            cache[i][j] = {
-                logicLeft: logicTileSize * j + left,
-                logicTop: logicTileSize * i + top,
-                left: mapTileSize * j,
-                top: mapTileSize * i,
-                dir: null,
-                zoomLevel: zoomLevel,
-                floorId: currFloor
-            } 
+function cacheReducer(dim, zoomLevel, currFloor, mapTileCache){
+    if(mapTileCache[currFloor] == undefined) {
+        var cache = new Array(height);
+        const left = dim.left;  // starting coordinate
+        const top = dim.top;    // starting coordinate
+        const width = dim.width;    // number of tile in x
+        const height = dim.height;  // number of tile in y
+        for(i = 0; i < height; i++){
+            cache[i] = new Array(width + 1);
+        };
+        for(i = 0; i < height; i++){
+            for(j = 0; j < width + 1; j++){
+                cache[i][j] = {
+                    logicLeft: logicTileSize * j + left,
+                    logicTop: logicTileSize * i + top,
+                    left: mapTileSize * j,
+                    top: mapTileSize * i,
+                    dir: null,
+                    zoomLevel: zoomLevel,
+                    floorId: currFloor
+                } 
 
-            try{
-                cache[i][j].dir = api.mapTiles({
-                    floorId: cache[i][j].floorId,
-                    x: cache[i][j].logicLeft,
-                    y: cache[i][j].logicTop,
-                    zoomLevel: cache[i][j].zoomLevel
-                })
-            }catch(error){
-                cache[i][j].dir = NOT_Found;
+                try{
+                    cache[i][j].dir = api.mapTiles({
+                        floorId: cache[i][j].floorId,
+                        x: cache[i][j].logicLeft,
+                        y: cache[i][j].logicTop,
+                        zoomLevel: cache[i][j].zoomLevel
+                    })
+                }catch(error){
+                    cache[i][j].dir = NOT_Found;
+                }
             }
         }
+        store.dispatch({
+            type: UPDATE_MAPTILE_CACHE,
+            payload: cache,
+        })
+        return cache;
+
+    } else {
+        return mapTileCache[currFloor]
     }
-    return cache;
 }
 
 function mapStateToProps(state){
@@ -385,7 +398,7 @@ function mapStateToProps(state){
         state.floorReducer.currentFloor.startY,
         state.floorReducer.currentFloor.mapWidth,
         state.floorReducer.currentFloor.mapHeight
-    ), 0, state.floorReducer.currentFloor._id),
+    ), 0, state.floorReducer.currentFloor._id, state.floorReducer.mapTileCache),
     currentNode: state.floorReducer.currentNode,
  });
 }

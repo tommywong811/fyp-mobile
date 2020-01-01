@@ -10,9 +10,8 @@ import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View, Image, Alert, Button, Animated} from 'react-native';
 import DownloadProgress from './frontend/components/progress/progress';
 import allReducer from './frontend/reducer/index';
-import { createStore } from 'redux';
+import store from './store.js';
 import { Provider } from 'react-redux';
-const store = createStore(allReducer);
 
 /**TEST IMPORT */
 
