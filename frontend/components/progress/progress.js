@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { db, api } from '../../../backend';
 import * as Progress from 'react-native-progress';
+import {SafeAreaView} from 'react-native';
 import {
     Image,
     View,
@@ -60,7 +61,8 @@ class ProgressBar extends React.Component{
 
     _renderProgress(){
         if(!this.state.finished){
-            return(
+            return( 
+                <SafeAreaView style={{flex: 1}}>
                     <View style={{flex: 6, zIndex:1, flexDirection: 'column', backgroundColor: '#5e9cff', justifyContent:'center', alignItems:'center'}}>
                         <Image style={{width: 100, height: 100, marginBottom: 20}} source={LOGO_IMAGE}></Image>
                         <ActivityIndicator size="large" color="#c9e6ff"></ActivityIndicator>
@@ -70,11 +72,14 @@ class ProgressBar extends React.Component{
                             textStyle={{justifyContent: 'center', alignItems: 'center'}}/> */}
                         <Text style={{color: 'white', fontSize: 14, marginTop: 10}}>{'Initialize data'}</Text>
                     </View> 
+                </SafeAreaView>
             );
         } else{
             return (
-                <Navigator>
-                </Navigator>
+                <SafeAreaView style={{flex: 1}}>
+                    <Navigator>
+                    </Navigator>
+                </SafeAreaView>
             );
         }
     }
