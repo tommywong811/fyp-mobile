@@ -354,18 +354,18 @@ function cacheReducer(dim, zoomLevel, currFloor, mapTileCache){
                     zoomLevel: zoomLevel,
                     floorId: currFloor
                 } 
-
-                try{
-                    cache[i][j].dir = api.mapTiles({
-                        floorId: cache[i][j].floorId,
-                        x: cache[i][j].logicLeft,
-                        y: cache[i][j].logicTop,
-                        zoomLevel: cache[i][j].zoomLevel
-                    })
-                    cache[i][j].dir = mapTiles.find((r) => r.x === cache[i][j].logicLeft && r.y === cache[i][j].logicTop && r.zoomLevel === cache[i][j].zoomLevel).data
-                } catch(error){
-                    cache[i][j].dir = NOT_Found;
-                }
+                cache[i][j].dir = mapTiles.find((r) => r.x === cache[i][j].logicLeft && r.y === cache[i][j].logicTop && r.zoomLevel === cache[i][j].zoomLevel).data
+                // try{
+                //     // cache[i][j].dir = api.mapTiles({
+                //     //     floorId: cache[i][j].floorId,
+                //     //     x: cache[i][j].logicLeft,
+                //     //     y: cache[i][j].logicTop,
+                //     //     zoomLevel: cache[i][j].zoomLevel
+                //     // })
+                    
+                // } catch(error){
+                //     cache[i][j].dir = NOT_Found;
+                // }
             }
         }
         store.dispatch({
