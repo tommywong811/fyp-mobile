@@ -209,6 +209,15 @@ class Navigator extends React.Component {
               </View>
               {this.state.expandedFloorId === item
                 ? this._getAllFloors(item).map(floor => {
+                  floor_ID = null;
+                  listToAddF = ['1','2','3','4','5','6','7','G']
+
+                  if(listToAddF.includes(floor._id)) {
+                    floor_ID = floor._id + '/F';
+                  }
+                  else {
+                    floor_ID = floor._id;
+                  }
                     return (
                       <Text
                         style={styles.drawerSubItems}
@@ -227,7 +236,7 @@ class Navigator extends React.Component {
                           this.drawer.closeDrawer();
                         }}
                       >
-                        {floor._id}
+                        {floor_ID}
                       </Text>
                     );
                   })
@@ -241,6 +250,16 @@ class Navigator extends React.Component {
 
   render() {
     const { searchInput, currentSearchKeyword, isLoading } = this.state;
+
+    floor_ID = null;
+    listToAddF = ['1','2','3','4','5','6','7','G']
+
+    if(listToAddF.includes(this.props.currFloor)) {
+      floor_ID = this.props.currFloor + '/F';
+    }
+    else {
+      floor_ID = this.props.currFloor;
+    }
 
     var suggestions = this.state.suggestionList.map((node, index) => {
       return (
@@ -327,6 +346,7 @@ class Navigator extends React.Component {
                 this._resetCurrentSearchKeyword()
               }
             ></MapTiles>
+
             <View>
               <Text
                 style={{
@@ -337,7 +357,7 @@ class Navigator extends React.Component {
                 }}
               >
                 {this._buildingnameToString(this.props.currBuilding)} -{" "}
-                {this.props.currFloor}
+                {floor_ID}
               </Text>
             </View>
           </LoadingPage>
