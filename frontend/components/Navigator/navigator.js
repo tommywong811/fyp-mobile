@@ -10,7 +10,8 @@ import {
   ScrollView,
   ActivityIndicator,
   TouchableOpacity,
-  Keyboard
+  Keyboard,
+  Platform,
 } from "react-native";
 import {
   CHANGE_FLOOR,
@@ -286,7 +287,7 @@ class Navigator extends React.Component {
         renderNavigationView={this._renderDrawer}
       >
         <Container>
-          <LoadingPage text="Loading...">
+          <LoadingPage text="Loading..." style={Platform.OS === 'android' ? {} : {position: 'relative'}} >
             <Item
               rounded
               style={{
@@ -324,7 +325,7 @@ class Navigator extends React.Component {
               />
               <Icon active name="search" style={{ color: "#003366" }}></Icon>
             </Item>
-            <View style={{ maxHeight: 200 }}>
+            <View style={Platform.OS === 'android' ? { maxHeight: 200} : {maxHeight: 200, position: 'absolute', zIndex:1, top: 50}}>
               <ScrollView
                 keyboardShouldPersistTaps="always"
                 style={{
