@@ -19,6 +19,7 @@ import {
   CHANGE_NODE,
   RENDER_LOADING_PAGE
 } from "../../reducer/floors/actionList";
+import {UPDATE_PATH} from "../../reducer/path/actionList";
 import {
   Button,
   Container,
@@ -141,6 +142,7 @@ class Navigator extends React.Component {
     setTimeout(() => {
       // only setTimeout can make the Keyboard dismiss before the change node finished
       this.props.change_node(this.state.searchInput, currentNode);
+      this.props.search_shortest_path('eYfKbAeafgj', currentNode._id, true, false)  // TO DO: set the fromTo through user input
     }, 100);
   }
 
@@ -393,6 +395,11 @@ function mapDispatchToProps(dispatch) {
         type: CHANGE_NODE,
         payload: { name: name, currentNode: currentNode }
       }),
+    search_shortest_path: (fromId, toId, noStairCase, noEscalator) =>{
+      dispatch({
+        type: UPDATE_PATH,
+        payload: { fromId: fromId, toId: toId, noStairCase: noStairCase, noEscalator: noEscalator}
+      })},
     render_loading_page: () =>
       dispatch({ type: RENDER_LOADING_PAGE, payload: true })
   };

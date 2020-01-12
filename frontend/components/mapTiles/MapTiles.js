@@ -51,6 +51,7 @@ class MapTiles extends React.Component{
         this.setState({
             'nodesInFloor': this.props.nodes.filter((node) => node.floorId === this.props.currFloor),
             'nodeOffset': getNodeOffsetForEachFloor(this.props.currFloor),
+            'pathInCurrFloor': [],
         });
     }
 
@@ -86,7 +87,12 @@ class MapTiles extends React.Component{
                     this.setMapOffset(-80 - nodeOffset.x,  0);
             }
         }
-
+        console.log(nextProps.shortestPath)
+        if (nextProps.shortestPath.data) {
+            this.setState({
+                'pathInCurrFloor': nextProps.shortestPath.data.filter((data) => data.floorId === nextProps.currFloor)
+            })
+        }
     }
 
     setMapOffset(x, y) {
@@ -278,6 +284,38 @@ class MapTiles extends React.Component{
         )
     }
 
+    _renderPath() {
+        const {pathInCurrFloor} = this.state;console.log(pathInCurrFloor)
+
+        return (
+            <View
+                style={[{
+                    flex: 1,
+                    position: 'absolute',
+                    left: 0,
+                    top: 0,
+                    width: 80 * this.props.cache[0].length,
+                    height: 80 * this.props.cache.length,
+            }]}>
+                {pathInCurrFloor.map((node, key)=>(
+                    <View
+                        key = {key}
+                        style={[{
+                            flex: 1,
+                            position: 'absolute',
+                            top:  (node.coordinates[1] - this.props.offSetY) /  logicTileSize * 80 + this.state.nodeOffset.y,
+                            left: (node.coordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x,
+                            width: 4,
+                            height: 4,
+                            backgroundColor: 'green',
+                            borderRadius: 2,
+                        }]}>
+                    </View>
+                ))}
+            </View>
+        );
+    }
+
     _onPanEndHandler(evt, gestureState, zoomableViewEventObject) {  
         Keyboard.dismiss();
         this.props.onCloseSuggestionList();
@@ -326,6 +364,7 @@ class MapTiles extends React.Component{
                 >
                     {this._renderAllMapTile()}
                     {this._renderAllNodes()}
+                    {this.props.shortestPath.data && this._renderPath()}
                 </Animated.View>
             </ReactNativeZoomableView>
         )
@@ -401,6 +440,7 @@ function mapStateToProps(state){
         state.floorReducer.currentFloor.mapHeight
     ), 0, state.floorReducer.currentFloor._id, state.floorReducer.mapTileCache),
     currentNode: state.floorReducer.currentNode,
+    shortestPath: state.pathReducer,
  });
 }
 
