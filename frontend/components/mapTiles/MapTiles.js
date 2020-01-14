@@ -9,6 +9,7 @@ import {
     Platform,
     Keyboard,
 } from 'react-native';
+import {Line, Svg} from 'react-native-svg'
 import NotFoundZoom0 from '../../asset/notFoundZoom0';
 import { getFloorDimension, dirToUri, getNodeOffsetForEachFloor, getNodeImageByTagId, getNodeImageByConnectorId } from '../../plugins/MapTiles';
 import {mapTileSize, logicTileSize} from './config';
@@ -285,8 +286,7 @@ class MapTiles extends React.Component{
     }
 
     _renderPath() {
-        const {pathInCurrFloor} = this.state;console.log(pathInCurrFloor)
-
+        const {pathInCurrFloor} = this.state;
         return (
             <View
                 style={[{
@@ -297,21 +297,26 @@ class MapTiles extends React.Component{
                     width: 80 * this.props.cache[0].length,
                     height: 80 * this.props.cache.length,
             }]}>
-                {pathInCurrFloor.map((node, key)=>(
-                    <View
-                        key = {key}
-                        style={[{
-                            flex: 1,
-                            position: 'absolute',
-                            top:  (node.coordinates[1] - this.props.offSetY) /  logicTileSize * 80 + this.state.nodeOffset.y,
-                            left: (node.coordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x,
-                            width: 4,
-                            height: 4,
-                            backgroundColor: 'green',
-                            borderRadius: 2,
-                        }]}>
-                    </View>
-                ))}
+                <Svg height={80 * this.props.cache.length} width={80 * this.props.cache[0].length}>
+                    {pathInCurrFloor.map((node, key)=>{
+                        if (key === pathInCurrFloor.length - 1) {  // last node can't be the starting point of the line
+                            return null
+                        }
+                        else {
+                            return(
+                                <Line
+                                    key = {key}
+                                    x1={(node.coordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x}
+                                    x2={(pathInCurrFloor[key + 1].coordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x}
+                                    y1={(node.coordinates[1] - this.props.offSetY) /  logicTileSize * 80 + this.state.nodeOffset.y}
+                                    y2={(pathInCurrFloor[key + 1].coordinates[1] - this.props.offSetY) /  logicTileSize * 80 + this.state.nodeOffset.y}
+                                    stroke="red"
+                                    strokeWidth="2"
+                                />
+                            )
+                        }
+                    })}
+                </Svg>
             </View>
         );
     }
