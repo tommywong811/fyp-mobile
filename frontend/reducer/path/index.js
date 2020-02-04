@@ -7,28 +7,32 @@ let initialState = {
     data: null,
     fromNodeId: null,
     toNodeId: null,
+    floors: [],
 }
 
 function serializedSearchPath(path) {
     return {
         ...path,
-        data: path.data.map((nodes) => transformNodeResponse(nodes)),
+        floors: [...new Set(path.data.map((nodes) => nodes.floorId))], // for the floor included in path in order 
+        data: path.data.map((nodes) => ({...nodes, centerCoordinates: [nodes.coordinates[0], nodes.coordinates[1]]})), // centerCoordinates = coordinates
     }
 }
 
 export default pathReducer = (state = initialState, action) => {
     switch(action.type){
         case UPDATE_PATH:
+            const shortest_path = serializedSearchPath(
+                searchShortestPath(
+                    action.payload.fromId,
+                    action.payload.toId,
+                    action.payload.noStairCase,
+                    action.payload.noEscalator
+                )
+            );
             return {
                 ...state,
-                data: serializedSearchPath(
-                        searchShortestPath(
-                            action.payload.fromId,
-                            action.payload.toId,
-                            action.payload.noStairCase,
-                            action.payload.noEscalator
-                        )
-                    ).data,
+                data: shortest_path.data,
+                floors: shortest_path.floors,
             };
         default:
             return state;

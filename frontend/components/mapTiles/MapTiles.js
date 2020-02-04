@@ -88,7 +88,6 @@ class MapTiles extends React.Component{
                     this.setMapOffset(-80 - nodeOffset.x,  0);
             }
         }
-        console.log(nextProps.shortestPath)
         if (nextProps.shortestPath.data) {
             this.setState({
                 'pathInCurrFloor': nextProps.shortestPath.data.filter((data) => data.floorId === nextProps.currFloor)
