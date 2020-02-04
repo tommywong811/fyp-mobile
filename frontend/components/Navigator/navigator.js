@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   Keyboard,
   Platform,
+  TouchableHighlight,
 } from "react-native";
 import {
   CHANGE_FLOOR,
@@ -62,9 +63,14 @@ class Navigator extends React.Component {
       currentSearchKeyword: "",
       currentLocation: "",
       isLoading: false,
-      suggestionList: [],
+      fromSuggestionList: [],
+      toSuggestionList: [],
       currentNode: null,
-      expandedFloorId: null
+      fromNode: null, 
+      toNode: null,
+      floorInPath: null,
+      expandedFloorId: null,
+      currentPathFloorIndex: null,
     });
   }
 
@@ -75,29 +81,38 @@ class Navigator extends React.Component {
       this.setState({
         isLoading: false
       });
+    } 
+    if (this.props.shortestPath.floors !== nextProps.shortestPath.floors) {
+      this.props.change_floor(nextProps.shortestPath.floors[0], null)
+      this.setState({
+        currentPathFloorIndex: 0,
+      })
     }
   }
 
-  async setCacheToSuggestionList() {
+  async setCacheToSuggestionList(isFrom) {
     let suggestionCache = await AsyncStorage.getItem("suggestions");
     if (suggestionCache) {
       let suggestionCacheData = JSON.parse(suggestionCache).data;
       this.setState({
-        suggestionList: suggestionCacheData
+        ...(isFrom ? {fromSuggestionList : suggestionCacheData} : {toSuggestionList : suggestionCacheData}),
       });
     }
   }
 
-  _onFocusSearchBar(text) {
+  _onFocusSearchBar(text, isFrom) {
     if (!text) {
-      this.setCacheToSuggestionList();
+      this.setCacheToSuggestionList(isFrom);
+      this.setState({
+        ...(isFrom ? {toSuggestionList : []} : {fromSuggestionList : []}),
+      })
     }
   }
 
-  _onChangeSearchText(text) {
+  _onChangeSearchText(text, isFrom) {
     this.isInputting = true;
     this.setState({
-      searchInput: text
+      ...(isFrom ? {fromSearchInput: text} : {toSearchInput: text})
     });
     if (text !== "" && text !== " ") {
       var nodes = api.nodes({ name: text }).data;
@@ -110,10 +125,10 @@ class Navigator extends React.Component {
         );
       });
       this.setState({
-        suggestionList: nodes
+        ...(isFrom ? {fromSuggestionList : nodes} : {toSuggestionList : nodes}),
       });
     } else {
-      this.setCacheToSuggestionList();
+      this.setCacheToSuggestionList(isFrom);
     }
   }
 
@@ -123,26 +138,37 @@ class Navigator extends React.Component {
     });
   }
 
-  _onPressSuggestion(node) {
+  _onPressSuggestion(node, isFrom) {
     this.setState(
       {
-        searchInput: node.name,
-        suggestionList: []
-      },
-      this._searchRoom(node)
+        ...(isFrom ? 
+          {fromSearchInput: node.name, fromNode: node} 
+          :
+          {toSearchInput : node.name, toNode: node}
+        ),
+        fromSuggestionList: [],
+        toSuggestionList: [],
+      }
     );
   }
 
-  _searchRoom(currentNode = null) {
+  _onPressSearchPath() {
+    this._searchRoom();
+  }
+
+  _searchRoom() {
     this.setState({
       isLoading: true,
-      suggestionList: [] // suggestion dropdown dismiss after search button press
+      fromSuggestionList: [],
+      toSuggestionList: [], // suggestion dropdown dismiss after search button press
     });
     Keyboard.dismiss();
     setTimeout(() => {
       // only setTimeout can make the Keyboard dismiss before the change node finished
-      this.props.change_node(this.state.searchInput, currentNode);
-      this.props.search_shortest_path('eYfKbAeafgj', currentNode._id, true, false)  // TO DO: set the fromTo through user input
+      this.props.change_node(this.state.fromSearchInput, this.state.fromNode);
+      if (this.state.fromSearchInput && this.state.toSearchInput) {
+        this.props.search_shortest_path(this.state.fromNode._id, this.state.toNode._id, true, false)  // TO DO: set the fromTo through user input
+      }
     }, 100);
   }
 
@@ -183,6 +209,28 @@ class Navigator extends React.Component {
       case "universityCenter":
         return "University Center";
     }
+  }
+
+  _onPressPathPreviousFloor() {
+    this.props.change_floor(this.props.shortestPath.floors[this.state.currentPathFloorIndex - 1], null)
+
+    const nextCurrNode = this.props.shortestPath.data.find(node =>  node.floorId === this.props.shortestPath.floors[this.state.currentPathFloorIndex - 1])
+    this.props.change_node(null, nextCurrNode) // change the current node to the starting point on the floor
+
+    this.setState({
+      currentPathFloorIndex: this.state.currentPathFloorIndex - 1,
+    })
+  }
+
+  _onPressPathNextFloor() {
+    this.props.change_floor(this.props.shortestPath.floors[this.state.currentPathFloorIndex + 1], null)
+
+    const nextCurrNode = this.props.shortestPath.data.find(node =>  node.floorId === this.props.shortestPath.floors[this.state.currentPathFloorIndex + 1])
+    this.props.change_node(null, nextCurrNode) // change the current node to the starting point on the floor
+
+    this.setState({
+      currentPathFloorIndex: this.state.currentPathFloorIndex + 1,
+    })
   }
 
   _renderDrawer() {
@@ -252,7 +300,7 @@ class Navigator extends React.Component {
   }
 
   render() {
-    const { searchInput, currentSearchKeyword, isLoading } = this.state;
+    const { fromSearchInput, toSearchInput, currentSearchKeyword, isLoading, fromNode, toNode, currentPathFloorIndex } = this.state;
 
     floor_ID = null;
     listToAddF = ['1','2','3','4','5','6','7','G']
@@ -264,10 +312,10 @@ class Navigator extends React.Component {
       floor_ID = this.props.currFloor;
     }
 
-    var suggestions = this.state.suggestionList.map((node, index) => {
+    var fromSuggestions = this.state.fromSuggestionList.map((node, index) => {
       return (
         <TouchableOpacity
-          onPress={() => this._onPressSuggestion(node)}
+          onPress={() => this._onPressSuggestion(node, true)}
           style={{ backgroundColor: "white" }}
           key={index}
         >
@@ -277,6 +325,21 @@ class Navigator extends React.Component {
         </TouchableOpacity>
       );
     });
+
+    var toSuggestions = this.state.toSuggestionList.map((node, index) => {
+      return (
+        <TouchableOpacity
+          onPress={() => this._onPressSuggestion(node, false)}
+          style={{ backgroundColor: "white" }}
+          key={index}
+        >
+          <Text style={{ padding: 10 }}>
+            {node.name}, {node.floorId}, {node.buildingName}
+          </Text>
+        </TouchableOpacity>
+      );
+    });
+
     return (
       <DrawerLayout
         ref={drawer => {
@@ -305,15 +368,15 @@ class Navigator extends React.Component {
               <Icon
                 active
                 name="md-menu"
-                style={{ color: "#003366" }}
+                style={{ color: "#003366", fontSize: 20}}
                 onPress={() => this.drawer.openDrawer()}
               ></Icon>
               <Input
-                placeholder="Where are you going?"
+                placeholder="From"
                 placeholderTextColor="#003366"
                 fontSize={17}
-                onChangeText={input => this._onChangeSearchText(input)}
-                onFocus={() => this._onFocusSearchBar()}
+                onChangeText={input => this._onChangeSearchText(input, true)}
+                onFocus={() => this._onFocusSearchBar(true)}
                 style={{
                   backgroundColor: "white",
                   borderColor: "transparent",
@@ -323,11 +386,10 @@ class Navigator extends React.Component {
                   height: 48,
                   padding: 10
                 }}
-                value={searchInput}
+                value={fromSearchInput}
               />
-              <Icon active name="search" style={{ color: "#003366" }}></Icon>
             </Item>
-            <View style={Platform.OS === 'android' ? { maxHeight: 200} : {maxHeight: 200, position: 'absolute', zIndex:1, top: 50}}>
+            <View style={Platform.OS === 'android' ? { maxHeight: 200} : {maxHeight: 200, position: 'absolute', zIndex:1000, top: 50}}>
               <ScrollView
                 keyboardShouldPersistTaps="always"
                 style={{
@@ -337,12 +399,61 @@ class Navigator extends React.Component {
                   marginTop: 10
                 }}
               >
-                {suggestions}
+                {fromSuggestions}
+              </ScrollView>
+            </View>
+            <Item
+              rounded
+              style={{
+                backgroundColor: "white",
+                borderColor: "#BCE0FD",
+                borderWidth: 2,
+                marginTop: 10,
+                marginLeft: 5,
+                marginRight: 5,
+                zIndex: 999
+              }}
+            >
+              <Input
+                placeholder="To"
+                placeholderTextColor="#003366"
+                fontSize={17}
+                onChangeText={input => this._onChangeSearchText(input, false)}
+                onFocus={() => this._onFocusSearchBar(false)}
+                style={{
+                  backgroundColor: "white",
+                  borderColor: "transparent",
+                  borderWidth: 1,
+                  backgroundColor: "transparent",
+                  borderRadius: 10,
+                  height: 48,
+                  padding: 10,
+                  paddingLeft: 40,
+                }}
+                value={toSearchInput}
+              />
+              {fromNode && toNode &&
+                <TouchableHighlight onPress={()=> this._onPressSearchPath()} underlayColor="white">
+                  <Icon active name="search" style={{ color: "#003366" }}></Icon>
+                </TouchableHighlight>
+              }
+            </Item>
+            <View style={Platform.OS === 'android' ? { maxHeight: 200} : {maxHeight: 200, position: 'absolute', zIndex:1000, top: 100}}>
+              <ScrollView
+                keyboardShouldPersistTaps="always"
+                style={{
+                  zIndex: 2,
+                  marginLeft: 15,
+                  marginRight: 15,
+                  marginTop: 10
+                }}
+              >
+                {toSuggestions}
               </ScrollView>
             </View>
             <MapTiles
               onCloseSuggestionList={() =>
-                this.setState({ suggestionList: [] })
+                this.setState({ fromSuggestionList: [], toSuggestionList: [] })
               }
               searchKeyword={this.state.currentSearchKeyword}
               resetCurrentSearchKeyword={() =>
@@ -363,6 +474,34 @@ class Navigator extends React.Component {
                 {floor_ID}
               </Text>
             </View>
+            <View
+              style={styles.pathFloorControlContainer}
+              >
+              {this.props.shortestPath.floors.length > 0 && currentPathFloorIndex > 0 &&
+                <TouchableHighlight
+                  style={styles.pathFloorLeftBtn}
+                  onPress={() => this._onPressPathPreviousFloor()}
+                >
+                  <Icon
+                  reverse
+                  name="ios-arrow-back"
+                  style={{fontSize: 20}}
+                  reverseColor='white'></Icon>
+                </TouchableHighlight>
+              }
+              {this.props.shortestPath.floors.length > 0 && currentPathFloorIndex + 1 < this.props.shortestPath.floors.length &&
+                <TouchableHighlight
+                  style={styles.pathFloorRightBtn}
+                  onPress={() => this._onPressPathNextFloor()}
+                  >
+                  <Icon
+                  reverse
+                  name="ios-arrow-forward"
+                  style={{fontSize: 20}}
+                  reverseColor="white"></Icon>
+                </TouchableHighlight>
+              }
+            </View>
           </LoadingPage>
         </Container>
       </DrawerLayout>
@@ -377,7 +516,8 @@ function mapStateToProps(state) {
     allFloors: state.floorReducer.data,
     zoomLevel: 0,
     currentNode: state.floorReducer.currentNode,
-    currentBuilding: state.floorReducer.currentBuilding
+    currentBuilding: state.floorReducer.currentBuilding,
+    shortestPath: state.pathReducer,
   };
 }
 
@@ -451,5 +591,39 @@ const styles = StyleSheet.create({
   },
   activeFloor: {
     color: "#BCE0FD"
+  },
+  pathFloorControlContainer: {
+    position: "absolute",
+    width: 100,
+    zIndex: 1000,
+    right: 10,
+    bottom: 100,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  pathFloorLeftBtn: { 
+    color: "#003366",
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "white", 
+    marginRight: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: "auto",
+
+  },
+  pathFloorRightBtn: { 
+    color: "#003366",
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "white", 
+    marginRight: "auto",
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "flex-end",
+    marginLeft: "auto",
+
   }
 });
