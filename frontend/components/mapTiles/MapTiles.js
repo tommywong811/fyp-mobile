@@ -180,6 +180,7 @@ class MapTiles extends React.Component{
                     top: 0,
                     width: 80 * this.props.cache[0].length,
                     height: 80 * this.props.cache.length,
+                    zIndex: 2,
             }]}>
                 {this.state.nodesInFloor.map((node, key)=>{
                     if (node.centerCoordinates) {
