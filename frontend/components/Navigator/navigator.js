@@ -91,6 +91,12 @@ class Navigator extends React.Component {
         currentPathFloorIndex: 0,
       })
     }
+
+    if (this.props.shortestPath.data !== nextProps.shortestPath.data) {
+      this.setState({
+        isLoading: false,
+      })
+    }
   }
 
   async setCacheToSuggestionList(isFrom) {
@@ -166,13 +172,13 @@ class Navigator extends React.Component {
       toSuggestionList: [], // suggestion dropdown dismiss after search button press
     });
     Keyboard.dismiss();
+
     setTimeout(() => {
-      // only setTimeout can make the Keyboard dismiss before the change node finished
       this.props.change_node(this.state.fromSearchInput, this.state.fromNode);
       if (this.state.fromSearchInput && this.state.toSearchInput) {
         this.props.search_shortest_path(this.state.fromNode._id, this.state.toNode._id, true, false)  // TO DO: set the fromTo through user input
       }
-    }, 100);
+    }, 1)
   }
 
   _resetCurrentSearchKeyword() {
@@ -513,6 +519,21 @@ class Navigator extends React.Component {
                 </TouchableHighlight>
               }
             </View>
+            {isLoading &&
+              <View
+                style={{flex: 1, 
+                        top: 0, 
+                        left: 0, 
+                        width: '100%',
+                        height: '100%',
+                        justifyContent: "center",
+                        alignItems: "center",
+                        zIndex: 100,
+                        position: "absolute",
+                        }}>
+                <ActivityIndicator size="large" color="#0000ff" ></ActivityIndicator>
+              </View>
+            }
           </LoadingPage>
         </Container>
       </DrawerLayout>
@@ -613,7 +634,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   pathFloorLeftBtn: { 
-    color: "#003366",
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -625,7 +645,6 @@ const styles = StyleSheet.create({
 
   },
   pathFloorRightBtn: { 
-    color: "#003366",
     width: 40,
     height: 40,
     borderRadius: 20,
