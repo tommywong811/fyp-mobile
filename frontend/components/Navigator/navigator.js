@@ -13,6 +13,7 @@ import {
   Keyboard,
   Platform,
   TouchableHighlight,
+  Image
 } from "react-native";
 import {
   CHANGE_FLOOR,
@@ -28,7 +29,8 @@ import {
   Text,
   Input,
   Item,
-  Icon
+  Icon,
+  ListItem
 } from "native-base";
 import MapTiles from "../mapTiles/MapTiles";
 const { width } = Dimensions.get("window");
@@ -37,6 +39,7 @@ import { api } from "../../../backend";
 import realm from "../../../backend/Realm/realm";
 import { searchShortestPath } from "../../../backend/api/search/searchShortestPath";
 import _ from "lodash";
+import EventListPage from "../EventListPage/EventListPage";
 
 /**
  * childrenView:
@@ -237,6 +240,7 @@ class Navigator extends React.Component {
     return (
       <View>
         <ScrollView>
+          <Image source={require('../../asset/hkust_icon.png')} style={styles.ustBannerImage}></Image>
           <Text style={styles.drawerSubSection}>Buildings</Text>
           <View style={styles.lineStyle} />
           {this._allBuildings.map(item => (
@@ -262,7 +266,7 @@ class Navigator extends React.Component {
                 ? this._getAllFloors(item).map(floor => {
                   floor_ID = null;
                   listToAddF = ['1','2','3','4','5','6','7','G']
-
+                  style = Object.assign({}, item._id === this.props.currFloor ? styles.activeFloor : {}, styles.drawerSubItems)
                   if(listToAddF.includes(floor._id)) {
                     floor_ID = floor._id + '/F';
                   }
@@ -271,7 +275,7 @@ class Navigator extends React.Component {
                   }
                     return (
                       <Text
-                        style={styles.drawerSubItems}
+                        style={style}
                         key={floor._id}
                         onPress={() => {
                           if (item._id !== this.props.currFloor) {
@@ -294,6 +298,13 @@ class Navigator extends React.Component {
                 : null}
             </View>
           ))}
+
+          <View style={styles.menuItem}>
+            <Text style={styles.drawerSubSection}>
+              Events
+            </Text>
+            <Icon type='Ionicons' name='ios-arrow-forward' style={styles.menuItemArrowRight}></Icon>
+          </View>
         </ScrollView>
       </View>
     );
@@ -345,7 +356,7 @@ class Navigator extends React.Component {
         ref={drawer => {
           this.drawer = drawer;
         }}
-        drawerWidth={(width * 1) / 2}
+        drawerWidth={width / 2 }
         drawerPosition={DrawerLayout.positions.Left}
         drawerType="front"
         drawerBackgroundColor="#FFFFFF"
@@ -573,7 +584,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     color: "#003366",
     paddingLeft: 10,
-    padding: 9,
+    padding: 5,
     width: "100%"
   },
   buildingItems: {
@@ -585,8 +596,8 @@ const styles = StyleSheet.create({
   drawerSubItems: {
     backgroundColor: "white",
     color: "#003366",
-    marginLeft: 51,
-    padding: 9,
+    marginLeft: 30,
+    padding: 5,
     width: "100%"
   },
   activeFloor: {
@@ -625,5 +636,20 @@ const styles = StyleSheet.create({
     alignSelf: "flex-end",
     marginLeft: "auto",
 
+  },
+  ustBannerImage: {
+    width: width / 2 - 10,
+    height: 75,
+    padding: 3,
+    resizeMode: 'contain'
+  },
+  menuItem: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingRight: 5
+  },
+  menuItemArrowRight: {
   }
 });
