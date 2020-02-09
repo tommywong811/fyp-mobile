@@ -9,7 +9,6 @@ import {
     Platform,
     Keyboard,
 } from 'react-native';
-import {Line, Svg} from 'react-native-svg'
 import NotFoundZoom0 from '../../asset/notFoundZoom0';
 import { getFloorDimension, dirToUri, getNodeOffsetForEachFloor, getNodeImageByTagId, getNodeImageByConnectorId } from '../../plugins/MapTiles';
 import {mapTileSize, logicTileSize} from './config';
@@ -287,6 +286,15 @@ class MapTiles extends React.Component{
 
     _renderPath() {
         const {pathInCurrFloor} = this.state;
+        let x1 = null;
+        let x2 = null;
+        let y1 = null;
+        let y2 = null;
+        let length = null;
+        let deg = null;
+        let translateX = null;
+        let translateY = null;
+
         return (
             <View
                 style={[{
@@ -297,26 +305,38 @@ class MapTiles extends React.Component{
                     width: 80 * this.props.cache[0].length,
                     height: 80 * this.props.cache.length,
             }]}>
-                <Svg height={80 * this.props.cache.length} width={80 * this.props.cache[0].length}>
-                    {pathInCurrFloor.map((node, key)=>{
-                        if (key === pathInCurrFloor.length - 1) {  // last node can't be the starting point of the line
-                            return null
+                {pathInCurrFloor.map((node, key)=>{
+                    if (key === pathInCurrFloor.length - 1) {  // last node can't be the starting point of the line
+                        return null
                         }
-                        else {
-                            return(
-                                <Line
-                                    key = {key}
-                                    x1={(node.coordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x}
-                                    x2={(pathInCurrFloor[key + 1].coordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x}
-                                    y1={(node.coordinates[1] - this.props.offSetY) /  logicTileSize * 80 + this.state.nodeOffset.y}
-                                    y2={(pathInCurrFloor[key + 1].coordinates[1] - this.props.offSetY) /  logicTileSize * 80 + this.state.nodeOffset.y}
-                                    stroke="red"
-                                    strokeWidth="2"
-                                />
-                            )
-                        }
-                    })}
-                </Svg>
+                    else {
+                        x1= (node.coordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x;
+                        x2= (pathInCurrFloor[key + 1].coordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x;
+                        y1= (node.coordinates[1] - this.props.offSetY) /  logicTileSize * 80 + this.state.nodeOffset.y;
+                        y2= (pathInCurrFloor[key + 1].coordinates[1] - this.props.offSetY) /  logicTileSize * 80 + this.state.nodeOffset.y;
+                        length = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
+                        deg = Math.atan2((y2 - y1), (x2- x1)) / 2 / Math.PI * 360;
+                        translateX = - (length / 2) * ( 1 - Math.cos(deg * 2 * Math.PI / 360))
+                        translateY = length / 2 * Math.sin(deg * 2 * Math.PI / 360)
+
+                        return(
+                            <View
+                                key = {key}
+                                style={[{
+                                    flex: 1,
+                                    position: 'absolute',
+                                    top:  ((node.coordinates[1] - this.props.offSetY) /  logicTileSize * 80 + this.state.nodeOffset.y) + translateY,
+                                    left: (node.coordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x + translateX,
+                                    width: length,
+                                    transform: [{ rotate: (deg + 'deg')}],
+                                    height: 2,
+                                    backgroundColor: 'red',
+                                    borderRadius: 2,
+                                }]}>
+                            </View>
+                        )
+                    }
+                })}
             </View>
         );
     }
