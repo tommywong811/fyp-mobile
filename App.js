@@ -13,6 +13,7 @@ import { Provider } from 'react-redux';
 import EventListPage from './frontend/components/EventListPage/EventListPage';
 
 import { Router, Scene } from 'react-native-router-flux';
+import { StyleSheet } from 'react-native';
 
 export default class App extends Component {
   constructor(props){
@@ -23,17 +24,22 @@ export default class App extends Component {
   render(){
     return (
       <Provider store={store}>
-        <Router>
+        <Router 
+          navigationBarStyle={styles.navBar} 
+          titleStyle={styles.navTitle} 
+        >
           <Scene key="root">
             <Scene 
               key='DownloadProgress'
               component={DownloadProgress}
               hideNavBar={true}
+              headerTintColor="white"
               initial/>
             <Scene
               key='EventListPage'
               component={EventListPage}
               title='Event List'
+              headerTintColor="white"
             />
           </Scene>
         </Router>
@@ -42,3 +48,16 @@ export default class App extends Component {
   }
 
 }
+
+
+const styles = StyleSheet.create({
+  navBar: {
+    backgroundColor: '#003366'
+  },
+  navTitle: {
+    color: 'white'
+  },
+  navIcon: {
+    tintColor: 'white'
+  }
+})
