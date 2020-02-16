@@ -40,6 +40,7 @@ import realm from "../../../backend/Realm/realm";
 import { searchShortestPath } from "../../../backend/api/search/searchShortestPath";
 import _ from "lodash";
 import EventListPage from "../EventListPage/EventListPage";
+import { Actions } from 'react-native-router-flux';
 
 /**
  * childrenView:
@@ -306,7 +307,10 @@ class Navigator extends React.Component {
           ))}
 
           <View style={styles.menuItem}>
-            <Text style={styles.drawerSubSection}>
+            <Text 
+              style={styles.drawerSubSection}
+              onPress={() => Actions.EventListPage()}
+            >
               Events
             </Text>
             <Icon type='Ionicons' name='ios-arrow-forward' style={styles.menuItemArrowRight}></Icon>

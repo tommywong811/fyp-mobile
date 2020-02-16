@@ -1,7 +1,8 @@
 import React from 'react';
 import { Container, Header, Content, Card, CardItem, Text, Body } from 'native-base';
 import axios from 'axios';
-import moment from 'moment'
+import moment from 'moment';
+import { ActivityIndicator, View, StyleSheet } from 'react-native';
 /**
  * childrenView: 
  */
@@ -14,12 +15,14 @@ export default class EventListPage extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            event_list: []
+            event_list: [],
+            isLoading: false
         }
     }
 
     async componentWillMount() {
         try {
+            this.setState({isLoading: true})
             const now = moment().format('YYYY-MM-DD');
             const url = `${BASEPATH}?date_from=${now}`
             const res = await axios.get(url, {
@@ -28,7 +31,8 @@ export default class EventListPage extends React.Component {
                 }
             })
             this.setState({
-                event_list: res['data']['event']
+                event_list: res['data']['event'],
+                isLoading: false
             })
         } catch (err) {
             alert(JSON.stringify(err, null, 2))
@@ -38,8 +42,14 @@ export default class EventListPage extends React.Component {
     render(){
         return(
             <Container>
+                {
+                    this.state.isLoading &&
+                    <View style={[styles.horizontal]}>
+                        <ActivityIndicator size="large" color="#0000ff" />
+                    </View>
+                }
                 {/* TODO: Add filter and search */}
-                <Content>
+                <Content style={{flex:1}}>
                     {this.state.event_list.map((event, key) => {
                         return (
                             <Card key = {key}>
@@ -76,3 +86,12 @@ export default class EventListPage extends React.Component {
         );
     }
 }
+
+const styles = StyleSheet.create({
+    horizontal: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      padding: 10
+    }
+})
+  

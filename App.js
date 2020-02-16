@@ -7,65 +7,38 @@
  */
 import 'node-libs-react-native/globals';
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View, Image, Alert, Button, Animated} from 'react-native';
 import DownloadProgress from './frontend/components/progress/progress';
-import allReducer from './frontend/reducer/index';
 import store from './store.js';
 import { Provider } from 'react-redux';
+import EventListPage from './frontend/components/EventListPage/EventListPage';
 
-/**TEST IMPORT */
+import { Router, Scene } from 'react-native-router-flux';
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android:
-    'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
-
-type Props = {};
-export default class App extends Component<Props> {
+export default class App extends Component {
   constructor(props){
     super(props);
-
   }
 
 
   render(){
     return (
       <Provider store={store}>
-        <DownloadProgress />
+        <Router>
+          <Scene key="root">
+            <Scene 
+              key='DownloadProgress'
+              component={DownloadProgress}
+              hideNavBar={true}
+              initial/>
+            <Scene
+              key='EventListPage'
+              component={EventListPage}
+              title='Event List'
+            />
+          </Scene>
+        </Router>
       </Provider>
     )
-    /*return (
-      <Provider store={store}>
-        <TestNavigator>
-          <TestMap></TestMap>
-        </TestNavigator>
-      </Provider>
-    )*/
   }
 
 }
-
-function onPressHandler(){
-  console.log("Hello");
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-});
