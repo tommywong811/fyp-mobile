@@ -75,7 +75,18 @@ class Navigator extends React.Component {
       floorInPath: null,
       expandedFloorId: null,
       currentPathFloorIndex: null,
+      isKeyBoardShown: false,
     });
+  }
+
+  componentDidMount() {
+    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {this.setState({isKeyBoardShown: true})});
+    this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {this.setState({isKeyBoardShown: false})});
+  }
+
+  componentWillUnmount() {
+    this.keyboardDidShowListener.remove();
+    this.keyboardDidHideListener.remove();
   }
 
   componentWillReceiveProps(nextProps) {
@@ -476,6 +487,8 @@ class Navigator extends React.Component {
               onCloseSuggestionList={() =>
                 this.setState({ fromSuggestionList: [], toSuggestionList: [] })
               }
+              isKeyBoardShown={this.state.isKeyBoardShown}
+              isSuggestionListOpen={this.state.fromSuggestionList.length > 0 || this.state.toSuggestionList.length > 0}
               searchKeyword={this.state.currentSearchKeyword}
               resetCurrentSearchKeyword={() =>
                 this._resetCurrentSearchKeyword()

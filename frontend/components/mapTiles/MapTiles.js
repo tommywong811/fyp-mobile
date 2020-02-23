@@ -355,9 +355,13 @@ class MapTiles extends React.Component {
         );
     }
 
-    _onPanEndHandler(evt, gestureState, zoomableViewEventObject) {
-        Keyboard.dismiss();
-        this.props.onCloseSuggestionList();
+    _onPanEndHandler(evt, gestureState, zoomableViewEventObject) {  
+        if (this.props.isSuggestionListOpen) {
+            this.props.onCloseSuggestionList();
+        }
+        if (this.props.isKeyBoardShown) {
+            Keyboard.dismiss();
+        }
         this.state.gestureOffset.x += (gestureState.dx / zoomableViewEventObject.zoomLevel);
         this.state.gestureOffset.y += (gestureState.dy / zoomableViewEventObject.zoomLevel);
     }
@@ -373,11 +377,13 @@ class MapTiles extends React.Component {
     }
 
     _onZoomAfter(evt, gestureState, zoomableViewEventObject) {
-        Keyboard.dismiss();
-        this.props.onCloseSuggestionList();
-        this.setState({
-            zoom: zoomableViewEventObject.zoomLevel,
-        })
+        if (this.props.isSuggestionListOpen) {
+            this.props.onCloseSuggestionList();
+        }
+        if (this.props.isKeyBoardShown) {
+            Keyboard.dismiss();
+        }
+        this.state.zoom = zoomableViewEventObject.zoomLevel
     }
 
     // _renderModal() {
@@ -420,7 +426,6 @@ class MapTiles extends React.Component {
                 zoomStep={0.5}
                 initialZoom={1}
                 bindToBorders={true}
-                onZoomAfter={this.logOutZoomState}
                 onPanResponderMove={this._onPanMoveHandler}
                 onPanResponderEnd={this._onPanEndHandler}
                 onZoomAfter={this._onZoomAfter.bind(this)}
