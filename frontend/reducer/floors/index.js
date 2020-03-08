@@ -117,11 +117,6 @@ export default floorReducer = (state = initialState, action) => {
                 ...state,
                 currentFloor: action.payload.currentFloor
             };
-        case UPDATE_CURRENT_NODE:
-            return {
-                ...state,
-                currentNode: action.payload.currentNode
-            };
         case CHANGE_BUILDING:
             return {
                 ...state,

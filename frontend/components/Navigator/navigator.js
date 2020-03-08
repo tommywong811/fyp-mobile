@@ -251,7 +251,7 @@ class Navigator extends React.Component {
 
   _searchRoom(currentNode = null) {
     this.setState({
-      isLoading: true,
+      isLoading: currentNode === this.props.currentNode ? false : true,
       suggestionList: [] // suggestion dropdown dismiss after search button press
     });
     Keyboard.dismiss();
