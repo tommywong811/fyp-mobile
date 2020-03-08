@@ -1,5 +1,5 @@
 import {api} from '../../../backend'
-import {UPDATE_PATH } from './actionList'
+import {UPDATE_PATH, CLEAR_PATH_STATE } from './actionList'
 import {searchShortestPath} from '../../../backend/api/search/searchShortestPath'
 import {transformNodeResponse} from '../../../backend/api/nodes/transformNodeResponse'
 
@@ -33,6 +33,10 @@ export default pathReducer = (state = initialState, action) => {
                 ...state,
                 data: shortest_path.data,
                 floors: shortest_path.floors,
+            };
+        case CLEAR_PATH_STATE:
+            return {
+                ...initialState,
             };
         default:
             return state;

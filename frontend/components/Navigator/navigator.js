@@ -19,9 +19,10 @@ import {
   CHANGE_FLOOR,
   CHANGE_BUILDING,
   CHANGE_NODE,
-  RENDER_LOADING_PAGE
+  RENDER_LOADING_PAGE,
+  SAVE_PREVIOUS_NODE,
 } from "../../reducer/floors/actionList";
-import {UPDATE_PATH} from "../../reducer/path/actionList";
+import {UPDATE_PATH, CLEAR_PATH_STATE} from "../../reducer/path/actionList";
 import {
   Button,
   Container,
@@ -64,11 +65,14 @@ class Navigator extends React.Component {
   componentWillMount() {
     this.setState({
       searchInput: "",
+      fromSearchInput: "",
+      toSearchInput: "",
       currentSearchKeyword: "",
       currentLocation: "",
       isLoading: false,
       fromSuggestionList: [],
       toSuggestionList: [],
+      suggestionList: [],
       currentNode: null,
       fromNode: null, 
       toNode: null,
@@ -76,6 +80,8 @@ class Navigator extends React.Component {
       expandedFloorId: null,
       currentPathFloorIndex: null,
       isKeyBoardShown: false,
+      isFindDirection: false,
+      previousSearchNode: null,
     });
   }
 
@@ -111,26 +117,54 @@ class Navigator extends React.Component {
     }
   }
 
-  async setCacheToSuggestionList(isFrom) {
+  async setCacheToSuggestionList(suggestionListStateName) {
     let suggestionCache = await AsyncStorage.getItem("suggestions");
     if (suggestionCache) {
       let suggestionCacheData = JSON.parse(suggestionCache).data;
       this.setState({
-        ...(isFrom ? {fromSuggestionList : suggestionCacheData} : {toSuggestionList : suggestionCacheData}),
+        [suggestionListStateName]: suggestionCacheData,
       });
     }
   }
 
-  _onFocusSearchBar(text, isFrom) {
+
+  _onFocusSearchBar() {
+      this.setCacheToSuggestionList('suggestionList');
+  }
+
+  _onFocusSearchDirectionBar(text, isFrom) {
     if (!text) {
-      this.setCacheToSuggestionList(isFrom);
+      this.setCacheToSuggestionList(isFrom ? 'fromSuggestionList' :'toSuggestionList');
       this.setState({
         ...(isFrom ? {toSuggestionList : []} : {fromSuggestionList : []}),
       })
     }
   }
 
-  _onChangeSearchText(text, isFrom) {
+  _onChangeSearchText(text) {
+    this.isInputting = true;
+    this.setState({
+      searchInput: text
+    });
+    if (text !== "" && text !== " ") {
+      var nodes = api.nodes({ name: text }).data;
+      this.isInputting = false;
+      nodes.forEach(e => {
+        e.buildingName = this._buildingnameToString(
+          this.props.allFloors.find(floor => floor._id == e.floorId)[
+            "buildingId"
+          ]
+        );
+      });
+      this.setState({
+        suggestionList: nodes
+      });
+    } else {
+      this.setCacheToSuggestionList();
+    }
+  }
+
+  _onChangeDirectionSearchText(text, isFrom) {
     this.isInputting = true;
     this.setState({
       ...(isFrom ? {fromSearchInput: text} : {toSearchInput: text})
@@ -159,7 +193,36 @@ class Navigator extends React.Component {
     });
   }
 
-  _onPressSuggestion(node, isFrom) {
+  _onPressBackToSearch() {
+    this.setState({
+      toSuggestionList: [],
+      fromSuggestionList: [],
+      suggestionList: [],
+      isFindDirection: false,
+      toSearchInput : '',
+      fromSearchInput : '',
+      toNode: null,
+      fromNode: null,
+      searchInput: this.props.currentNode.name,
+    });
+
+    this.props.clear_path_state();
+    if (this.props.previousNode) {
+      this._onPressSuggestion(this.props.previousNode)
+    }
+  }
+
+  _onPressSuggestion(node) {
+    this.setState(
+      {
+        searchInput: node.name,
+        suggestionList: []
+      },
+      this._searchRoom(node)
+    );
+  }
+
+  _onPressDirectionSuggestion(node, isFrom) {
     this.setState(
       {
         ...(isFrom ? 
@@ -173,11 +236,32 @@ class Navigator extends React.Component {
     );
   }
 
-  _onPressSearchPath() {
-    this._searchRoom();
+  _onPressDirectionLayout() {
+    this.setState({
+      isFindDirection: true,
+      toSearchInput : this.props.currentNode.name,
+      toNode: this.props.currentNode,
+    })
+    this.props.save_previous_node(this.props.currentNode);
   }
 
-  _searchRoom() {
+  _onPressSearchPath() {
+    this._searchDirection();
+  }
+
+  _searchRoom(currentNode = null) {
+    this.setState({
+      isLoading: true,
+      suggestionList: [] // suggestion dropdown dismiss after search button press
+    });
+    Keyboard.dismiss();
+    setTimeout(() => {
+      // only setTimeout can make the Keyboard dismiss before the change node finished
+      this.props.change_node(this.state.searchInput, currentNode);
+    }, 100);
+  }
+
+  _searchDirection() {
     this.setState({
       isLoading: true,
       fromSuggestionList: [],
@@ -332,7 +416,17 @@ class Navigator extends React.Component {
   }
 
   render() {
-    const { fromSearchInput, toSearchInput, currentSearchKeyword, isLoading, fromNode, toNode, currentPathFloorIndex } = this.state;
+    const { 
+      searchInput,
+      fromSearchInput,
+      toSearchInput, 
+      currentSearchKeyword, 
+      isLoading, 
+      fromNode, 
+      toNode, 
+      currentPathFloorIndex,
+      isFindDirection,
+    } = this.state;
 
     floor_ID = null;
     listToAddF = ['1','2','3','4','5','6','7','G']
@@ -344,10 +438,24 @@ class Navigator extends React.Component {
       floor_ID = this.props.currFloor;
     }
 
+    var suggestions = this.state.suggestionList.map((node, index) => {
+      return (
+        <TouchableOpacity
+          onPress={() => this._onPressSuggestion(node)}
+          style={{ backgroundColor: "white" }}
+          key={index}
+        >
+          <Text style={{ padding: 10 }}>
+            {node.name}, {node.floorId}, {node.buildingName}
+          </Text>
+        </TouchableOpacity>
+      );
+    });
+
     var fromSuggestions = this.state.fromSuggestionList.map((node, index) => {
       return (
         <TouchableOpacity
-          onPress={() => this._onPressSuggestion(node, true)}
+          onPress={() => this._onPressDirectionSuggestion(node, true)}
           style={{ backgroundColor: "white" }}
           key={index}
         >
@@ -361,7 +469,7 @@ class Navigator extends React.Component {
     var toSuggestions = this.state.toSuggestionList.map((node, index) => {
       return (
         <TouchableOpacity
-          onPress={() => this._onPressSuggestion(node, false)}
+          onPress={() => this._onPressDirectionSuggestion(node, false)}
           style={{ backgroundColor: "white" }}
           key={index}
         >
@@ -385,104 +493,168 @@ class Navigator extends React.Component {
       >
         <Container>
           <LoadingPage text="Loading..." style={Platform.OS === 'android' ? {} : {position: 'relative'}} >
-            <Item
-              rounded
-              style={{
-                backgroundColor: "white",
-                borderColor: "#BCE0FD",
-                borderWidth: 2,
-                marginTop: 10,
-                marginLeft: 5,
-                marginRight: 5,
-                zIndex: 999
-              }}
-            >
-              <Icon
-                active
-                name="md-menu"
-                style={{ color: "#003366", fontSize: 20}}
-                onPress={() => this.drawer.openDrawer()}
-              ></Icon>
-              <Input
-                placeholder="From"
-                placeholderTextColor="#003366"
-                fontSize={17}
-                onChangeText={input => this._onChangeSearchText(input, true)}
-                onFocus={() => this._onFocusSearchBar(true)}
+            {!isFindDirection && [
+              <Item
+                key={0}
+                rounded
                 style={{
                   backgroundColor: "white",
-                  borderColor: "transparent",
-                  borderWidth: 1,
-                  backgroundColor: "transparent",
-                  borderRadius: 10,
-                  height: 48,
-                  padding: 10
+                  borderColor: "#BCE0FD",
+                  borderWidth: 2,
+                  marginTop: 10,
+                  marginLeft: 5,
+                  marginRight: 5,
+                  zIndex: 999
                 }}
-                value={fromSearchInput}
-              />
-            </Item>
-            <View style={Platform.OS === 'android' ? { maxHeight: 200} : {maxHeight: 200, position: 'absolute', zIndex:1000, top: 50}}>
-              <ScrollView
-                keyboardShouldPersistTaps="always"
+                >
+                <Icon
+                  active
+                  name="md-menu"
+                  style={{ color: "#003366" }}
+                  onPress={() => this.drawer.openDrawer()}
+                ></Icon>
+                <Input
+                  placeholder="Where are you going?"
+                  placeholderTextColor="#003366"
+                  fontSize={17}
+                  onChangeText={input => this._onChangeSearchText(input)}
+                  onFocus={() => this._onFocusSearchBar()}
+                  style={{
+                    backgroundColor: "white",
+                    borderColor: "transparent",
+                    borderWidth: 1,
+                    backgroundColor: "transparent",
+                    borderRadius: 10,
+                    height: 48,
+                    padding: 10
+                  }}
+                  value={searchInput}
+                />
+                <Icon active name="search" style={{ color: "#003366" }}></Icon>
+              </Item>
+              ,
+              <View key={1} style={Platform.OS === 'android' ? { maxHeight: 200} : {maxHeight: 200, position: 'absolute', zIndex:1, top: 50}}>
+                <ScrollView
+                  keyboardShouldPersistTaps="always"
+                  style={{
+                    zIndex: 2,
+                    marginLeft: 15,
+                    marginRight: 15,
+                    marginTop: 10
+                  }}
+                >
+                  {suggestions}
+                </ScrollView>
+              </View>
+            ]}
+            {isFindDirection && [
+              <Item
+                key={0}
+                rounded
                 style={{
-                  zIndex: 2,
-                  marginLeft: 15,
-                  marginRight: 15,
-                  marginTop: 10
+                  backgroundColor: "white",
+                  borderColor: "#BCE0FD",
+                  borderWidth: 2,
+                  marginTop: 10,
+                  marginLeft: 5,
+                  marginRight: 5,
+                  zIndex: 999
                 }}
               >
-                {fromSuggestions}
-              </ScrollView>
-            </View>
-            <Item
-              rounded
-              style={{
-                backgroundColor: "white",
-                borderColor: "#BCE0FD",
-                borderWidth: 2,
-                marginTop: 10,
-                marginLeft: 5,
-                marginRight: 5,
-                zIndex: 999
-              }}
-            >
-              <Input
-                placeholder="To"
-                placeholderTextColor="#003366"
-                fontSize={17}
-                onChangeText={input => this._onChangeSearchText(input, false)}
-                onFocus={() => this._onFocusSearchBar(false)}
-                style={{
-                  backgroundColor: "white",
-                  borderColor: "transparent",
-                  borderWidth: 1,
-                  backgroundColor: "transparent",
-                  borderRadius: 10,
-                  height: 48,
-                  padding: 10,
-                  paddingLeft: 40,
-                }}
-                value={toSearchInput}
-              />
-              {fromNode && toNode &&
-                <TouchableHighlight onPress={()=> this._onPressSearchPath()} underlayColor="white">
-                  <Icon active name="search" style={{ color: "#003366" }}></Icon>
+                <Icon
+                  active
+                  name="md-menu"
+                  style={{ color: "#003366", fontSize: 20}}
+                  onPress={() => this.drawer.openDrawer()}
+                ></Icon>
+                <Input
+                  placeholder="From"
+                  placeholderTextColor="#003366"
+                  fontSize={17}
+                  onChangeText={input => this._onChangeDirectionSearchText(input, true)}
+                  onFocus={() => this._onFocusSearchDirectionBar(true)}
+                  style={{
+                    backgroundColor: "white",
+                    borderColor: "transparent",
+                    borderWidth: 1,
+                    backgroundColor: "transparent",
+                    borderRadius: 10,
+                    height: 48,
+                    padding: 10
+                  }}
+                  value={fromSearchInput}
+                />
+                <TouchableHighlight style={styles.backToSearchBtn} onPress={()=> this._onPressBackToSearch()} underlayColor="#428bca">
+                  <Text style={styles.backToSearchBtnText}>Back to Search</Text>
                 </TouchableHighlight>
-              }
-            </Item>
-            <View style={Platform.OS === 'android' ? { maxHeight: 200} : {maxHeight: 200, position: 'absolute', zIndex:1000, top: 100}}>
-              <ScrollView
-                keyboardShouldPersistTaps="always"
+              </Item>
+              ,
+              <View key={1} style={Platform.OS === 'android' ? { maxHeight: 200} : {maxHeight: 200, position: 'absolute', zIndex:1000, top: 50}}>
+                <ScrollView
+                  keyboardShouldPersistTaps="always"
+                  style={{
+                    zIndex: 2,
+                    marginLeft: 15,
+                    marginRight: 15,
+                    marginTop: 10
+                  }}
+                >
+                  {fromSuggestions}
+                </ScrollView>
+              </View>
+              ,
+              <Item
+                key={2}
+                rounded
                 style={{
-                  zIndex: 2,
-                  marginLeft: 15,
-                  marginRight: 15,
-                  marginTop: 10
+                  backgroundColor: "white",
+                  borderColor: "#BCE0FD",
+                  borderWidth: 2,
+                  marginTop: 10,
+                  marginLeft: 5,
+                  marginRight: 5,
+                  zIndex: 999
                 }}
               >
-                {toSuggestions}
-              </ScrollView>
-            </View>
+                <Input
+                  placeholder="To"
+                  placeholderTextColor="#003366"
+                  fontSize={17}
+                  onChangeText={input => this._onChangeDirectionSearchText(input, false)}
+                  onFocus={() => this._onFocusSearchDirectionBar(false)}
+                  style={{
+                    backgroundColor: "white",
+                    borderColor: "transparent",
+                    borderWidth: 1,
+                    backgroundColor: "transparent",
+                    borderRadius: 10,
+                    height: 48,
+                    padding: 10,
+                    paddingLeft: 40,
+                  }}
+                  value={toSearchInput}
+                />
+                {fromNode && toNode &&
+                  <TouchableHighlight onPress={()=> this._onPressSearchPath()} underlayColor="white">
+                    <Icon active name="search" style={{ color: "#003366" }}></Icon>
+                  </TouchableHighlight>
+                }
+              </Item>
+              ,
+              <View key={3} style={Platform.OS === 'android' ? { maxHeight: 200} : {maxHeight: 200, position: 'absolute', zIndex:1000, top: 100}}>
+                <ScrollView
+                  keyboardShouldPersistTaps="always"
+                  style={{
+                    zIndex: 2,
+                    marginLeft: 15,
+                    marginRight: 15,
+                    marginTop: 10
+                  }}
+                >
+                  {toSuggestions}
+                </ScrollView>
+              </View>
+            ]}
             <MapTiles
               onCloseSuggestionList={() =>
                 this.setState({ fromSuggestionList: [], toSuggestionList: [] })
@@ -494,7 +666,18 @@ class Navigator extends React.Component {
                 this._resetCurrentSearchKeyword()
               }
             ></MapTiles>
-
+            
+            {!isFindDirection && this.props.currentNode &&
+              <View
+                style={styles.roomDetailBox}
+                >
+                <Text style={styles.roomName}>{this.props.currentNode.name}</Text>
+                <Text style={styles.roomFloor}>{`${this._buildingnameToString(this.props.currBuilding)} - ${floor_ID}`}</Text>
+                <TouchableHighlight style={styles.directionBtn} onPress={()=> this._onPressDirectionLayout()} underlayColor="#428bca">
+                  <Text style={styles.directionBtnText}>Direction</Text>
+                </TouchableHighlight>
+              </View>
+            }
             <View>
               <Text
                 style={{
@@ -567,6 +750,8 @@ function mapStateToProps(state) {
     currentNode: state.floorReducer.currentNode,
     currentBuilding: state.floorReducer.currentBuilding,
     shortestPath: state.pathReducer,
+    previousFloor: state.floorReducer.previousFloor,
+    previousNode: state.floorReducer.previousNode,
   };
 }
 
@@ -589,6 +774,18 @@ function mapDispatchToProps(dispatch) {
         type: UPDATE_PATH,
         payload: { fromId: fromId, toId: toId, noStairCase: noStairCase, noEscalator: noEscalator}
       })},
+    clear_path_state: () => {
+      dispatch({
+        type: CLEAR_PATH_STATE,
+        payload: {}
+      })
+    },
+    save_previous_node: (node) => {
+      dispatch({
+        type: SAVE_PREVIOUS_NODE,
+        payload: {node: node}
+      })
+    },
     render_loading_page: () =>
       dispatch({ type: RENDER_LOADING_PAGE, payload: true })
   };
@@ -687,5 +884,52 @@ const styles = StyleSheet.create({
     paddingRight: 5
   },
   menuItemArrowRight: {
-  }
+  },
+
+  roomDetailBox: {
+    backgroundColor: "white",
+    width: "95%",
+    alignSelf: "center",
+    margin: 5,
+    height: 150,
+    borderRadius: 20,
+    padding: 20,
+  },
+
+  roomName: {
+    fontSize: 20,
+    color: "#003366",
+    // paddingBottom: 10,
+  },
+  roomFloor: {
+    fontSize: 16,
+    color: "#003366",
+  },
+  directionBtn: {
+    backgroundColor: "#428bca",
+    paddingTop: 5,
+    paddingLeft: 5,
+    paddingBottom: 5,
+    paddingRight: 5,
+    borderRadius: 12,
+    width: 100,
+    marginTop: 'auto',
+  },
+  directionBtnText: {
+    color: "white",
+    fontSize: 16,
+    textAlign: "center",
+  },
+  backToSearchBtn: {
+    backgroundColor: "#428bca",
+    borderRadius: 12,
+    padding: 5,
+    width: 100,
+    marginRight: 10,
+  },
+  backToSearchBtnText: {
+    color: "white",
+    fontSize: 12,
+    textAlign: "center",
+  },
 });

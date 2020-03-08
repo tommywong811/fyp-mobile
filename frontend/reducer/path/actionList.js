@@ -1,1 +1,2 @@
 export const UPDATE_PATH = 'UPDATE_PATH';
+export const CLEAR_PATH_STATE = 'CLEAR_PATH_STATE';

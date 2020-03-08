@@ -12,6 +12,7 @@ import {
     UPDATE_CURRENT_FLOOR,
     RENDER_LOADING_PAGE,
     UPDATE_MAPTILE_CACHE,
+    SAVE_PREVIOUS_NODE,
 } from './actionList'
 
 import AsyncStorage from '@react-native-community/async-storage';
@@ -28,6 +29,7 @@ let initialState = {
     currentBuilding: null,
     renderLoadingPage: false,
     mapTileCache: {},
+    previousNode: null,
 }
 
 function updateMapTileCache(mapTileCache, payload, currentFloor) {
@@ -115,6 +117,11 @@ export default floorReducer = (state = initialState, action) => {
                 ...state,
                 currentFloor: action.payload.currentFloor
             };
+        case UPDATE_CURRENT_NODE:
+            return {
+                ...state,
+                currentNode: action.payload.currentNode
+            };
         case CHANGE_BUILDING:
             return {
                 ...state,
@@ -159,6 +166,11 @@ export default floorReducer = (state = initialState, action) => {
             return {
                 ...state,
                 'renderLoadingPage': action.payload,
+            }
+        case SAVE_PREVIOUS_NODE:
+            return {
+                ...state,
+                'previousNode': action.payload.node,
             }
         default:
             return state;
