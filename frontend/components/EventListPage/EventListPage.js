@@ -3,6 +3,7 @@ import { Container, Header, Content, Card, CardItem, Text, Body, Badge, DatePick
 import axios from 'axios';
 import moment from 'moment';
 import { ActivityIndicator, View, StyleSheet, FlatList, Dimensions, Modal, Platform } from 'react-native';
+import { Actions } from 'react-native-router-flux';
 import { WebView } from 'react-native-webview';
 /**
  * childrenView: 
@@ -73,7 +74,6 @@ export default class EventListPage extends React.Component {
             let { page, event_list } = this.state;
             if(!this.state.keepLoading) return;
             const url = `${BASEPATH}/getEvent.php?date_from=${date_from?date_from:this.state.now}${date_to?`&date_to=${date_to}`:''}${cat_id?`&cat_id=${cat_id}`:''}&sort=A&page_size=10&page_num=${page}`
-            alert(url)
             let res = await axios.get(url, {
                 headers: {
                     Authorization: `Bearer ${API_KEY}`
@@ -143,6 +143,10 @@ export default class EventListPage extends React.Component {
         this.setState({ selectedCategory: category });
     }
 
+    goToMapTilePage() {
+
+    }
+
     renderCard(item) {
         return (
             <Card style={styles.item}>
@@ -164,7 +168,9 @@ export default class EventListPage extends React.Component {
                             <Text style={styles.itemDetailLabel}>Time : </Text><Text>{moment(item.events_start_dt, 'YYYY-MM-DD HH:mm:ss').format('HH:mm')} - {moment(item.events_end_dt, 'YYYY-MM-DD HH:mm:ss').format('HH:mm')}</Text>
                         </View>
                         <View style={styles.itemDetailRow}>
-                            <Text style={styles.itemDetailLabel}>Venue : </Text><Text>{item.events_en_venue || '-'}</Text>
+                            <Text style={styles.itemDetailLabel}>Venue : </Text><Text style={styles.link} onPress={()=>{Actions.push('NavigatorPage', {
+                                searchKeyword: item.events_en_venue || ''
+                            })}}>{item.events_en_venue || '-'}</Text>
                         </View>
                         {/* event.events_en_abstract */}
                     </Body>
@@ -333,6 +339,11 @@ const styles = StyleSheet.create({
 
     itemDetailLabel: {
         fontWeight: "bold"
+    },
+
+    link: {
+        color: '#003366',
+        textDecorationLine: 'underline'
     }
 })
   

@@ -64,7 +64,7 @@ class Navigator extends React.Component {
 
   componentWillMount() {
     this.setState({
-      searchInput: "",
+      searchInput: '',
       fromSearchInput: "",
       toSearchInput: "",
       currentSearchKeyword: "",
@@ -88,6 +88,9 @@ class Navigator extends React.Component {
   componentDidMount() {
     this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {this.setState({isKeyBoardShown: true})});
     this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {this.setState({isKeyBoardShown: false})});
+    this.setState({
+      searchInput: this.props.searchKeyword ? this.props.searchKeyword : ''
+    })
   }
 
   componentWillUnmount() {
@@ -144,7 +147,7 @@ class Navigator extends React.Component {
   _onChangeSearchText(text) {
     this.isInputting = true;
     this.setState({
-      searchInput: text
+      searchInput: text.trim()
     });
     if (text !== "" && text !== " ") {
       var nodes = api.nodes({ name: text }).data;
