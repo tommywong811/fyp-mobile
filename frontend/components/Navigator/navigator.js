@@ -21,6 +21,7 @@ import {
   CHANGE_NODE,
   RENDER_LOADING_PAGE,
   SAVE_PREVIOUS_NODE,
+  CLEAR_NODE,
 } from "../../reducer/floors/actionList";
 import {UPDATE_PATH, CLEAR_PATH_STATE} from "../../reducer/path/actionList";
 import {
@@ -99,7 +100,7 @@ class Navigator extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.currentNode != this.props.currentNode) {
+    if (nextProps.currentNode && nextProps.currentNode != this.props.currentNode) {
       // for _searchRoom function after find_node
       this.props.change_floor(nextProps.currFloor, nextProps.currentBuilding);
       this.setState({
@@ -394,6 +395,7 @@ class Navigator extends React.Component {
                                 floor._id,
                                 floor.buildingId
                               );
+                              this.props.clear_current_node();
                             }, 100);
                           }
                           this.drawer.closeDrawer();
@@ -785,6 +787,10 @@ function mapDispatchToProps(dispatch) {
       dispatch({
         type: CHANGE_NODE,
         payload: { name: name, currentNode: currentNode }
+      }),
+    clear_current_node: () => 
+      dispatch({
+        type: CLEAR_NODE,
       }),
     search_shortest_path: (fromId, toId, noStairCase, noEscalator) =>{
       dispatch({
