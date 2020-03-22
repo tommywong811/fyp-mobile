@@ -16,6 +16,7 @@ import { Router, Scene } from 'react-native-router-flux';
 import { StyleSheet } from 'react-native';
 import FacilityInfoPage from './frontend/components/FacilityInfoPage/FacilityInfoPage';
 import SettingsPage from './frontend/components/SettingsPage/SettingsPage';
+import navigator from './frontend/components/Navigator/navigator';
 
 export default class App extends Component {
   constructor(props) {
@@ -36,8 +37,12 @@ export default class App extends Component {
               key='DownloadProgress'
               component={DownloadProgress}
               hideNavBar={true}
-              headerTintColor="white"
               initial />
+            <Scene
+              key='NavigatorPage'
+              component={navigator}
+              hideNavBar={true}
+            />
             <Scene
               key='EventListPage'
               component={EventListPage}
