@@ -74,7 +74,7 @@ class Navigator extends React.Component {
       toSuggestionList: [],
       suggestionList: [],
       currentNode: null,
-      fromNode: null, 
+      fromNode: null,
       toNode: null,
       floorInPath: null,
       expandedFloorId: null,
@@ -102,7 +102,7 @@ class Navigator extends React.Component {
       this.setState({
         isLoading: false
       });
-    } 
+    }
     if (this.props.shortestPath.floors !== nextProps.shortestPath.floors) {
       this.props.change_floor(nextProps.shortestPath.floors[0], null)
       this.setState({
@@ -225,8 +225,8 @@ class Navigator extends React.Component {
   _onPressDirectionSuggestion(node, isFrom) {
     this.setState(
       {
-        ...(isFrom ? 
-          {fromSearchInput: node.name, fromNode: node} 
+        ...(isFrom ?
+          {fromSearchInput: node.name, fromNode: node}
           :
           {toSearchInput : node.name, toNode: node}
         ),
@@ -340,22 +340,25 @@ class Navigator extends React.Component {
 
   _renderDrawer() {
     return (
-      <View>
+      <View style={styles.drawerContainer}>
         <ScrollView>
+
           <Image source={require('../../asset/hkust_icon.png')} style={styles.ustBannerImage}></Image>
           <Text style={styles.drawerSubSection}>Buildings</Text>
+
           <View style={styles.lineStyle} />
           {this._allBuildings.map(item => (
             <View style={styles.drawerItems} key={item}>
-              <View style={styles.buildingItems}>
-                <Text
-                  style={{ color: "#003366" }}
+              <TouchableOpacity style={styles.buildingItems}
                   onPress={() => {
                     this.setState({
                       expandedFloorId:
                         this.state.expandedFloorId === item ? null : item
                     });
                   }}
+              >
+                <Text
+                  style={{ color: "#003366" }}
                 >
                   {this._buildingnameToString(item)}
                 </Text>
@@ -363,7 +366,7 @@ class Navigator extends React.Component {
                   name="arrow-dropdown"
                   style={styles.drawerItemsIcon}
                 ></Icon>
-              </View>
+              </TouchableOpacity>
               {this.state.expandedFloorId === item
                 ? this._getAllFloors(item).map(floor => {
                   floor_ID = null;
@@ -401,29 +404,39 @@ class Navigator extends React.Component {
             </View>
           ))}
 
-          <View style={styles.menuItem}>
-            <Text 
-              style={styles.drawerSubSection}
-              onPress={() => Actions.EventListPage()}
-            >
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => Actions.EventListPage()}
+          >
+            <Text style={styles.drawerSubSection}>
               Events
             </Text>
             <Icon type='Ionicons' name='ios-arrow-forward' style={styles.menuItemArrowRight}></Icon>
-          </View>
+          </TouchableOpacity>
+
         </ScrollView>
+
+        <View style={styles.menuSetting}>
+          <Icon
+            type='Ionicons'
+            name='md-settings'
+            onPress={() => Actions.SettingsPage()}
+          ></Icon>
+        </View>
+
       </View>
     );
   }
 
   render() {
-    const { 
+    const {
       searchInput,
       fromSearchInput,
-      toSearchInput, 
-      currentSearchKeyword, 
-      isLoading, 
-      fromNode, 
-      toNode, 
+      toSearchInput,
+      currentSearchKeyword,
+      isLoading,
+      fromNode,
+      toNode,
       currentPathFloorIndex,
       isFindDirection,
     } = this.state;
@@ -666,7 +679,7 @@ class Navigator extends React.Component {
                 this._resetCurrentSearchKeyword()
               }
             ></MapTiles>
-            
+
             {!isFindDirection && this.props.currentNode &&
               <View
                 style={styles.roomDetailBox}
@@ -721,9 +734,9 @@ class Navigator extends React.Component {
             </View>
             {isLoading &&
               <View
-                style={{flex: 1, 
-                        top: 0, 
-                        left: 0, 
+                style={{flex: 1,
+                        top: 0,
+                        left: 0,
                         width: '100%',
                         height: '100%',
                         justifyContent: "center",
@@ -794,6 +807,11 @@ function mapDispatchToProps(dispatch) {
 export default connect(mapStateToProps, mapDispatchToProps)(Navigator);
 
 const styles = StyleSheet.create({
+  drawerContainer: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
   container: {
     flex: 1
   },
@@ -847,22 +865,22 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  pathFloorLeftBtn: { 
+  pathFloorLeftBtn: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "white", 
+    backgroundColor: "white",
     marginRight: 12,
     justifyContent: "center",
     alignItems: "center",
     marginRight: "auto",
 
   },
-  pathFloorRightBtn: { 
+  pathFloorRightBtn: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "white", 
+    backgroundColor: "white",
     marginRight: "auto",
     justifyContent: "center",
     alignItems: "center",
@@ -875,6 +893,10 @@ const styles = StyleSheet.create({
     height: 75,
     padding: 3,
     resizeMode: 'contain'
+  },
+  menuSetting: {
+    alignSelf: 'flex-end',
+    padding: 15
   },
   menuItem: {
     display: 'flex',

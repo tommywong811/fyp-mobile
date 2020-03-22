@@ -15,6 +15,7 @@ import EventListPage from './frontend/components/EventListPage/EventListPage';
 import { Router, Scene } from 'react-native-router-flux';
 import { StyleSheet } from 'react-native';
 import FacilityInfoPage from './frontend/components/FacilityInfoPage/FacilityInfoPage';
+import SettingsPage from './frontend/components/SettingsPage/SettingsPage';
 
 export default class App extends Component {
   constructor(props) {
@@ -46,6 +47,11 @@ export default class App extends Component {
               component={FacilityInfoPage}
               headerTintColor="white"
               modal='true'>
+            </Scene>
+            <Scene key='SettingsPage'
+              component={SettingsPage}
+              headerTintColor='white'
+              title='Settings'>
             </Scene>
           </Scene>
         </Router>
