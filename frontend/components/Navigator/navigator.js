@@ -418,6 +418,7 @@ class Navigator extends React.Component {
 
         <View style={styles.menuSetting}>
           <Icon
+            color="#003366"
             type='Ionicons'
             name='md-settings'
             onPress={() => Actions.SettingsPage()}

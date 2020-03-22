@@ -29,6 +29,7 @@ export default class App extends Component {
         <Router
           navigationBarStyle={styles.navBar}
           titleStyle={styles.navTitle}
+          headerTintColor="#003366"
         >
           <Scene key="root">
             <Scene
@@ -41,16 +42,13 @@ export default class App extends Component {
               key='EventListPage'
               component={EventListPage}
               title='Event List'
-              headerTintColor="white"
             />
             <Scene key='FacilityInfoPage'
               component={FacilityInfoPage}
-              headerTintColor="white"
               modal='true'>
             </Scene>
             <Scene key='SettingsPage'
               component={SettingsPage}
-              headerTintColor='white'
               title='Settings'>
             </Scene>
           </Scene>
@@ -64,12 +62,12 @@ export default class App extends Component {
 
 const styles = StyleSheet.create({
   navBar: {
-    backgroundColor: '#003366'
+    backgroundColor: 'white'
   },
   navTitle: {
-    color: 'white'
+    color: '#003366'
   },
   navIcon: {
-    tintColor: 'white'
+    tintColor: '#003366'
   }
 })

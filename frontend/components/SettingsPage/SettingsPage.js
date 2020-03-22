@@ -202,7 +202,8 @@ export default class EventListPage extends React.Component {
 
 const styles = StyleSheet.create({
   languagePicker: {
-    width: 120
+    width: 120,
+    color: 'white'
   },
 
   collapsedContent: {
@@ -210,7 +211,7 @@ const styles = StyleSheet.create({
   },
 
   text_color: {
-    color: '#003366'
+    color: 'white'
   },
 
   text_title: {
@@ -242,8 +243,7 @@ const styles = StyleSheet.create({
   settingTab: {
     flex: 1,
     marginVertical: 10,
-    borderWidth: 1,
-    borderColor: '#003366',
+    backgroundColor: '#003366',
     flexDirection: 'column',
     justifyContent: 'space-around',
     padding: 20,
@@ -261,10 +261,10 @@ const styles = StyleSheet.create({
 
   settingTabTitle: {
     marginLeft: 25,
-    color: '#003366'
+    color: 'white'
   },
 
   settingTabIcon: {
-    color: '#003366'
+    color: 'white'
   },
 })
