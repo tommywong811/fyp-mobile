@@ -4,6 +4,7 @@ import DrawerLayout from "react-native-gesture-handler/DrawerLayout";
 import LoadingPage from "../LoadingPage/LoadingPage";
 import AsyncStorage from "@react-native-community/async-storage";
 import {
+  Modal,
   View,
   StyleSheet,
   Dimensions,
@@ -42,7 +43,7 @@ import { searchShortestPath } from "../../../backend/api/search/searchShortestPa
 import _ from "lodash";
 import EventListPage from "../EventListPage/EventListPage";
 import { Actions } from 'react-native-router-flux';
-
+import ImagePicker from 'react-native-image-picker';
 /**
  * childrenView:
  */
@@ -58,7 +59,12 @@ class Navigator extends React.Component {
     this.state = {
       allFloorIds: this._getAllFloors(),
       isBuilding: true,
-      expandedFloorId: null
+      expandedFloorId: null,
+      photo : null,
+      modalVisible: false,
+      modalfirst: "random",
+      modalsecond: 'random',
+      modalthird: 'random',
     };
   }
 
@@ -432,6 +438,48 @@ class Navigator extends React.Component {
     );
   }
 
+  createFormData = (photo, body) => {
+    const data = new FormData();
+
+    data.append('photo', {
+      name: photo.fileName,
+      type: photo.type,
+      uri:
+          Platform.OS === 'android'
+              ? photo.uri
+              : photo.uri.replace('file://', ''),
+    });
+
+    Object.keys(body).forEach(key => {
+      data.append(key, body[key]);
+    });
+
+    return data;
+  };
+
+  handleUploadPhoto() {
+    fetch('http://192.168.0.115:3000/api/upload', {
+      method: 'POST',
+      body: this.createFormData(this.state.photo, {userId: '123'}),
+    })
+        .then(response => response.json())
+        .then(response => {
+          console.log('upload success', response);
+          this.setState({
+            modalfirst: response.most,
+            modalsecond: response.second,
+            modalthird: response.third,
+          })
+          this.setState({photo: null,
+            modalVisible: true,
+          });
+        })
+        .catch(error => {
+          console.log('upload error', error);
+          alert('Upload failed!');
+        });
+  }
+
   render() {
     const {
       searchInput,
@@ -509,6 +557,42 @@ class Navigator extends React.Component {
         renderNavigationView={this._renderDrawer}
       >
         <Container>
+          <View><Modal
+              animationType="none"
+              transparent={true}
+              visible={this.state.modalVisible}
+              onRequestClose={() => {
+                this.setState({
+                  modalVisible: false
+                })
+              }}>
+            <View style={{flex: 1,
+              justifyContent: 'center',
+              padding: 20,
+            }}>
+              <View style={{borderRadius: 10,
+                alignItems: 'center',
+                backgroundColor: 'white'}}>
+                <Text style={{fontSize: 20}}
+                onPress={() => {
+                  var nodes = api.nodes({ name: this.state.modalfirst }).data;
+                  nodes.forEach(e => {
+                    e.buildingName = this._buildingnameToString(
+                        this.props.allFloors.find(floor => floor._id == e.floorId)[
+                            "buildingId"
+                            ]
+                    );
+                  });
+                  this._searchRoom(nodes[0]);
+                  this.setState({
+                    modalVisible:false
+                  })
+                }}>{this.state.modalfirst}</Text>
+                <Text>{this.state.modalsecond}</Text>
+                <Text>{this.state.modalthird}</Text>
+              </View>
+            </View>
+          </Modal></View>
           <LoadingPage text="Loading..." style={Platform.OS === 'android' ? {} : {position: 'relative'}} >
             {!isFindDirection && [
               <Item
@@ -547,6 +631,31 @@ class Navigator extends React.Component {
                   }}
                   value={searchInput}
                 />
+                <Icon
+                    active
+                    name="camera"
+                    onPress={() => {ImagePicker.showImagePicker(response => {
+                      console.log('Response = ', response);
+
+                      if (response.didCancel) {
+                        console.log('User cancelled image picker');
+                      } else if (response.error) {
+                        console.log('ImagePicker Error: ', response.error);
+                      } else if (response.customButton) {
+                        console.log('User tapped custom button: ', response.customButton);
+                      } else {
+                        const source = {uri: response.uri};
+
+                        // You can also display the image using data:
+                        // const source = { uri: 'data:image/jpeg;base64,' + response.data };
+
+                        this.setState({
+                          photo : response,
+                        });
+                        this.handleUploadPhoto();
+                      }
+                    });}}
+                ></Icon>
                 <Icon active name="search" style={{ color: "#003366" }}></Icon>
               </Item>
               ,
