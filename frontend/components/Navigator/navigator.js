@@ -721,7 +721,7 @@ class Navigator extends React.Component {
                   <Icon
                   reverse
                   name="ios-arrow-back"
-                  style={{fontSize: 20}}
+                  style={{fontSize: 20, backgroundColor: '#1773c2'}}
                   reverseColor='white'></Icon>
                 </TouchableHighlight>
               }
@@ -733,7 +733,7 @@ class Navigator extends React.Component {
                   <Icon
                   reverse
                   name="ios-arrow-forward"
-                  style={{fontSize: 20}}
+                  style={{fontSize: 20, backgroundColor: '#1773c2'}}
                   reverseColor="white"></Icon>
                 </TouchableHighlight>
               }
@@ -879,7 +879,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "white",
+    backgroundColor: "#1773c2",
     marginRight: 12,
     justifyContent: "center",
     alignItems: "center",
@@ -890,7 +890,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "white",
+    backgroundColor: "#1773c2",
     marginRight: "auto",
     justifyContent: "center",
     alignItems: "center",

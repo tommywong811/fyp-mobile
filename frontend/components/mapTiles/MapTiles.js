@@ -227,7 +227,7 @@ class MapTiles extends React.Component {
                                     <TouchableOpacity onPress={() => {
                                         // this.setModalVisible(true);
                                         // this.setState({ selectedNode: node.name });
-                                        Actions.FacilityInfoPage({ selectedNode: node.name });
+                                        // Actions.FacilityInfoPage({ selectedNode: node.name });
                                     }}>
                                         <Image
                                             source={getNodeImageByConnectorId(node.connectorId)}
@@ -385,29 +385,6 @@ class MapTiles extends React.Component {
         }
         this.state.zoom = zoomableViewEventObject.zoomLevel
     }
-
-    // _renderModal() {
-    //     var selectedNode = this.state.selectedNode;
-    //     return (
-    //         <Modal
-    //             animationType="slide"
-    //             transparent={false}
-    //             visible={this.state.modalVisible}
-    //         >
-    //             <Button
-    //                 onPress={() => {
-    //                     this.setModalVisible(!this.state.modalVisible);
-    //                 }}
-    //             >
-    //                 <Text>X</Text>
-    //             </Button>
-    //             <SliderBox images={this.state.images} />
-    //             <Text>{selectedNode}★★★★★ </Text>
-
-
-    //         </Modal>
-    //     );
-    // }
 
     setModalVisible(visible) {
         this.setState({ modalVisible: visible });
