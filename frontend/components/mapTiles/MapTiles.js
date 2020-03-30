@@ -56,6 +56,29 @@ class MapTiles extends React.Component {
         };
     }
 
+    isValidRestaurant(name) {
+        let restaurant = [
+            "Starbucks Coffee", 
+            "Pacific Coffee",
+            "Chinese Restaurant",
+            "UC Bistro",
+            "McDonalds",
+            "Passion",
+            "Subway",
+            "LG1 canteen",
+            "Gold Rice Bowl",
+            "Asia Pacific",
+            "Seafront Cafeteria",
+            "Halal Food Counter",
+            "UniBar",
+            "Food Truck"
+        ]
+        if(restaurant.indexOf(name)>-1)
+            return true;
+        else
+            return false;
+    }
+
     componentWillMount() {
         this.setState({
             'nodesInFloor': this.props.nodes.filter((node) => node.floorId === this.props.currFloor),
@@ -249,7 +272,9 @@ class MapTiles extends React.Component {
                                     }]}>
                                     <TouchableOpacity onPress={() => {
                                         // alert(node.name)
-                                        Actions.FacilityInfoPage({ selectedNode: node.name });
+                                        if(this.isValidRestaurant(node.name)){
+                                            Actions.FacilityInfoPage({ selectedNode: node.name });
+                                        }
                                     }
                                     }>
                                         <Image
