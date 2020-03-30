@@ -119,9 +119,14 @@ class MapTiles extends React.Component {
                 this.setMapOffset(-80 - nodeOffset.x, 0);
             }
         }
-        if (nextProps.shortestPath.data) {
+        if (nextProps.shortestPath.data && (this.state.pathInCurrFloor.length === 0 || nextProps.currFloor != this.props.currFloor)) {
             this.setState({
                 'pathInCurrFloor': nextProps.shortestPath.data.filter((data) => data.floorId === nextProps.currFloor)
+            })
+        } 
+        if (!nextProps.shortestPath.data) {
+            this.setState({
+                'pathInCurrFloor': [],
             })
         }
     }
@@ -438,7 +443,7 @@ class MapTiles extends React.Component {
                 >
                     {this._renderAllMapTile()}
                     {this._renderAllNodes()}
-                    {this.props.shortestPath.data && this._renderPath()}
+                    {this.state.pathInCurrFloor.length > 0 && this._renderPath()}
                     {/* {this._renderModal()} */}
                 </Animated.View>
             </ReactNativeZoomableView>
