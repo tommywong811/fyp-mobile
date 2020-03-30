@@ -148,7 +148,7 @@ class Navigator extends React.Component {
   _onChangeSearchText(text) {
     this.isInputting = true;
     this.setState({
-      searchInput: text.trim()
+      searchInput: text
     });
     if (text !== "" && text !== " ") {
       var nodes = api.nodes({ name: text }).data;
