@@ -65,6 +65,7 @@ class Navigator extends React.Component {
       modalfirst: "random",
       modalsecond: 'random',
       modalthird: 'random',
+      animation: false,
     };
   }
 
@@ -458,6 +459,7 @@ class Navigator extends React.Component {
   };
 
   handleUploadPhoto() {
+    this.setState({isLoading : true});
     fetch('http://192.168.0.115:3000/api/upload', {
       method: 'POST',
       body: this.createFormData(this.state.photo, {userId: '123'}),
@@ -469,6 +471,7 @@ class Navigator extends React.Component {
             modalfirst: response.most,
             modalsecond: response.second,
             modalthird: response.third,
+            isLoading: false
           })
           this.setState({photo: null,
             modalVisible: true,
@@ -478,6 +481,30 @@ class Navigator extends React.Component {
           console.log('upload error', error);
           alert('Upload failed!');
         });
+  }
+
+  handleModal(index){
+    if(index == 1){
+      var nodes = api.nodes({ name: this.state.modalfirst }).data;
+    }
+    else if(index == 2){
+      var nodes = api.nodes({ name: this.state.modalsecond }).data;
+    }
+    else if(index == 3){
+      var nodes = api.nodes({ name: this.state.modalthird }).data;
+    }
+
+    nodes.forEach(e => {
+      e.buildingName = this._buildingnameToString(
+          this.props.allFloors.find(floor => floor._id == e.floorId)[
+              "buildingId"
+              ]
+      );
+    });
+    this._searchRoom(nodes[0]);
+    this.setState({
+      modalVisible:false
+    })
   }
 
   render() {
@@ -573,26 +600,24 @@ class Navigator extends React.Component {
               <View style={{borderRadius: 10,
                 alignItems: 'center',
                 backgroundColor: 'white'}}>
-                <Text style={{fontSize: 20}}
-                onPress={() => {
-                  var nodes = api.nodes({ name: this.state.modalfirst }).data;
-                  nodes.forEach(e => {
-                    e.buildingName = this._buildingnameToString(
-                        this.props.allFloors.find(floor => floor._id == e.floorId)[
-                            "buildingId"
-                            ]
-                    );
-                  });
-                  this._searchRoom(nodes[0]);
-                  this.setState({
-                    modalVisible:false
-                  })
-                }}>{this.state.modalfirst}</Text>
-                <Text>{this.state.modalsecond}</Text>
-                <Text>{this.state.modalthird}</Text>
+                <TouchableOpacity
+                onPress={() => this.handleModal(1)}>
+                  <Text style={{fontSize: 20}}>{this.state.modalfirst}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => this.handleModal(2)}>
+                  <Text style={{fontSize: 20}}>{this.state.modalsecond}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    onPress={() => this.handleModal(3)}>
+                  <Text style={{fontSize: 20}}>{this.state.modalthird}</Text>
+                </TouchableOpacity>
               </View>
             </View>
           </Modal></View>
+          <View>
+            <ActivityIndicator animating={this.state.animation} size="large" color="#0000ff" style={styles.activityIndicator}></ActivityIndicator>
+          </View>
           <LoadingPage text="Loading..." style={Platform.OS === 'android' ? {} : {position: 'relative'}} >
             {!isFindDirection && [
               <Item
@@ -1066,5 +1091,11 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 12,
     textAlign: "center",
+  },
+  activityIndicator: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: 80
   },
 });
