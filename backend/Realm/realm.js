@@ -40,7 +40,10 @@ export async function createDB(){
         realm.write(() => {
             for (let name in db_names) {
                 data[db_names[name]].forEach((doc, index)=>{
-                    console.log(`${db_names[name]} ${index}`);
+                    if(db_names[name] === 'nodes') {
+                        doc['tagIdsKeyword'] = doc['tagIds'].join(',');
+                        doc['keywordCSV'] = doc['keywords'].join(',');
+                    }
                     realm.create(db_names[name], doc, true)
                 })
             }

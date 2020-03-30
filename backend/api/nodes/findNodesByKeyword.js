@@ -17,10 +17,7 @@ function findNodesByKeyword(name) {
   }
 
   let data = realm.objects(config.db.nodes.name)
-  .filtered('unsearchable != true')
-  .filter(o => {
-    return ( o.name && o.name.includes(name) ) || ( o.keywords.some(k => k.includes(name)) || Object.keys(o.tagIds).some(e=>o.tagIds[e].includes(name.toLowerCase())))
-  })
+  .filtered(`unsearchable != true AND name CONTAINS[c] '${name}' OR keywordCSV CONTAINS[c] '${name}' OR tagIdsKeyword CONTAINS[c] '${name}'`)
   .slice(0, MAX_NODES_RETURN_LIMIT);
 
   data = toResponse(Array.from(data), config.db.nodes.name);
