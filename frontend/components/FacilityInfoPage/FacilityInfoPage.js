@@ -44,8 +44,22 @@ export default class FacilityInfoPage extends React.Component {
   constructor(props) {
     super(props);
 
+    this.menuList.set('Starbucks Coffee', 'https://cso.ust.hk/sites/cso862-prod.sites2.ust.hk/files/2018-11/starbucks_menu.pdf');
+    this.menuList.set('Pacific Coffee', 'https://cso.ust.hk/sites/cso862-prod.sites2.ust.hk/files/2018-09/LSK_pacificcoffee_menu.pdf');
+    this.menuList.set('Chinese Restaurant', 'https://cso.ust.hk/sites/cso862-prod.sites2.ust.hk/files/2018-12/menu_GF2017.PDF');
+    this.menuList.set('UC Bistro', 'https://cso.ust.hk/sites/cso862-prod.sites2.ust.hk/files/2019-11/UniBistro_Menu_Nov_2019.pdf');
+    this.menuList.set('McDonalds', 'https://cso.ust.hk/sites/cso862-prod.sites2.ust.hk/files/2019-03/menu_McD_2012-1.pdf');
     this.menuList.set('Passion', 'https://cso.ust.hk/sites/cso862-prod.sites2.ust.hk/files/2018-12/res_cc_cafe_menu-1.pdf');
-    
+    this.menuList.set('Subway', 'https://cso.ust.hk/sites/cso862-prod.sites2.ust.hk/files/2019-01/ann_cat_sw_come_menu.pdf');
+    this.menuList.set('LG1 canteet', 'https://cso.ust.hk/sites/cso862-prod.sites2.ust.hk/files/2018-12/res_can.teenII_menu.pdf');
+    this.menuList.set('Gold Rice Bowl', 'https://cso.ust.hk/sites/cso862-prod.sites2.ust.hk/files/2019-08/GRB%20Menu_2019.pdf');
+    this.menuList.set('Asia Pacific', 'https://cso.ust.hk/sites/cso862-prod.sites2.ust.hk/files/2019-08/APC%20Menu_2019.pdf');
+    this.menuList.set('Seafront Cafeteria', 'https://cso.ust.hk/sites/cso862-prod.sites2.ust.hk/files/2018-12/res_seafront_menu.pdf');
+    this.menuList.set('Halal Food Counter', 'https://cso.ust.hk/sites/cso862-prod.sites2.ust.hk/files/2019-01/Halal_menu.pdf');
+    this.menuList.set('UniBar', 'https://cso.ust.hk/sites/cso862-prod.sites2.ust.hk/files/2018-12/menu_bar2017.pdf');
+
+
+
     this.state = {
       isLoading: false,
       // page: 1,
@@ -60,8 +74,8 @@ export default class FacilityInfoPage extends React.Component {
       ],
 
       menuSource: {
-        uri: 'https://cso.ust.hk/sites/cso862-prod.sites2.ust.hk/files/2018-12/res_cc_cafe_menu-1.pdf',
-        // uri: this.menuList.get(this.props.selectedNode),
+        // uri: 'https://cso.ust.hk/sites/cso862-prod.sites2.ust.hk/files/2018-12/res_cc_cafe_menu-1.pdf',
+        uri: this.menuList.get(this.props.selectedNode),
         cache: true,
       },
 
@@ -80,7 +94,7 @@ export default class FacilityInfoPage extends React.Component {
       this.setState({ isLoading: true });
       await this.fetchData(1);
     } catch (err) {
-      alert(JSON.stringify(err, null, 2));
+      // alert(JSON.stringify(err, null, 2));
     }
   }
   handleSlide = type => {
