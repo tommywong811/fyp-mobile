@@ -14,6 +14,8 @@ import Navigator from '../Navigator/navigator';
 import { UPDATE_FLOOR_DATA, UPDATE_CURRENT_FLOOR } from '../../reducer/floors/actionList';
 import { UPDATE_NODE_DATA } from '../../reducer/nodes/actionList'
 import { createDB } from '../../../backend/Realm/realm';
+import buildGraph from "../../../backend/api/graph/build";
+import graphCache from "../../../backend/api/graph/cache";
 
 class ProgressBar extends React.Component{
     constructor(props){
@@ -57,6 +59,9 @@ class ProgressBar extends React.Component{
             this.setState({ finished: true })
         }
 
+        if (!graphCache.data) { // prebuild graph for searching path
+            graphCache.data = buildGraph();
+        }
     }
 
     _renderProgress(){

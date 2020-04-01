@@ -226,7 +226,7 @@ class MapTiles extends React.Component {
                         if (nodeName.includes('ROOM')) {
                             return (
                                 <View
-                                    key={key}
+                                    key={node._id}
                                     style={[{
                                         flex: 1,
                                         position: 'absolute',
@@ -245,7 +245,7 @@ class MapTiles extends React.Component {
                         } else if (node.connectorId && getNodeImageByConnectorId(node.connectorId)) {
                             return (
                                 <View
-                                    key={key}
+                                    key={node._id}
                                     style={[{
                                         flex: 1,
                                         position: 'absolute',
@@ -256,6 +256,7 @@ class MapTiles extends React.Component {
                                         // this.setModalVisible(true);
                                         // this.setState({ selectedNode: node.name });
                                         // Actions.FacilityInfoPage({ selectedNode: node.name });
+                                        alert(node.name)
                                     }}>
                                         <Image
                                             source={getNodeImageByConnectorId(node.connectorId)}
@@ -268,7 +269,7 @@ class MapTiles extends React.Component {
                         } else if (node.tagIds && node.tagIds.length > 0 && getNodeImageByTagId(node.tagIds[0])) {
                             return (
                                 <View
-                                    key={key}
+                                    key={node._id}
                                     style={[{
                                         flex: 1,
                                         position: 'absolute',
