@@ -5,6 +5,7 @@ import LoadingPage from "../LoadingPage/LoadingPage";
 import AsyncStorage from "@react-native-community/async-storage";
 import {
   Modal,
+    Alert,
   View,
   StyleSheet,
   Dimensions,
@@ -66,6 +67,7 @@ class Navigator extends React.Component {
       modalsecond: 'random',
       modalthird: 'random',
       animation: false,
+      modalshowmore: false,
     };
   }
 
@@ -604,14 +606,37 @@ class Navigator extends React.Component {
                 onPress={() => this.handleModal(1)}>
                   <Text style={{fontSize: 20}}>{this.state.modalfirst}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                    onPress={() => this.handleModal(2)}>
-                  <Text style={{fontSize: 20}}>{this.state.modalsecond}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                    onPress={() => this.handleModal(3)}>
-                  <Text style={{fontSize: 20}}>{this.state.modalthird}</Text>
-                </TouchableOpacity>
+                {this.state.modalshowmore && <View
+                    style={{borderRadius: 10,
+                      alignItems: 'center',
+                      backgroundColor: 'white'}}>
+                  <TouchableOpacity
+                      onPress={() => this.handleModal(2)}>
+                    <Text style={{fontSize: 20}}>{this.state.modalsecond}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                      onPress={() => this.handleModal(3)}>
+                    <Text style={{fontSize: 20}}>{this.state.modalthird}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                      onPress={() => Alert.alert(
+                          'User-experience Enhancement Program',
+                          'Terms and Conditions',
+                          [
+                            {text: 'Ask me later', onPress: () => console.log('Ask me later pressed')},
+                            {text: 'Disagree', onPress: () => console.log('Cancel Pressed'), style: 'cancel'},
+                            {text: 'Agree', onPress: () => console.log('OK Pressed')},
+                          ],
+                          { cancelable: false }
+                      )
+                      }>
+                    <Text style={{fontSize: 15}}>Join User-experience Enhancement Program</Text>
+                  </TouchableOpacity>
+                </View>}
+                { !this.state.modalshowmore && <TouchableOpacity
+                onPress={() => this.setState({modalshowmore: true })}>
+                  <Text style={{fontSize: 20}}>Show more result</Text>
+                </TouchableOpacity>}
               </View>
             </View>
           </Modal></View>
