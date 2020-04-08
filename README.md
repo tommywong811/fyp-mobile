@@ -1,5 +1,7 @@
 <h1> Path Advisor Mobile Version (Android Frontend Docs)</h1>
+
 --- 
+
 <h2>
     <ol>
         <a href="#Part1"><li>APIs</li></a>
