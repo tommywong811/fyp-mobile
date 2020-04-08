@@ -17,26 +17,26 @@
 
 <ol>
 <li><h3><strong>Reducer</strong></h3>  
-   <details>
+   <details id="FloorReducer">
    <summary>
    Floors
    </summary>
-   <h3 id="FloorReducer">Floor reducer provides data about the current floor.</h3>
+   <h3>Floor reducer provides data about the current floor.</h3>
 
    State:
    <pre>
-   * data
-   * currentFloor
-   * currX
-   * currY
-   * sumX
-   * sumY
-   * suggestedNodes
-   * currentNode
-   * currentBuilding
-   * renderLoadingPage
-   * mapTileCache
-   * previousNode
+   * data: All maptile data of all floors.
+   * currentFloor: The current floor ID.
+   * currX: The x coordinate of current node. 
+   * currY: The y coordinate of current node. 
+   * sumX: The number of maptiles in x direction of this floor. 
+   * sumY: The number of maptiles in y direction of this floor.
+   * suggestedNodes: The suggested node.
+   * currentNode: The current searched node. 
+   * currentBuilding: The current Building.
+   * renderLoadingPage: Whether display the loading page.
+   * mapTileCache: A 2D array that stores the URIs of all maptiles in the floor.
+   * previousNode: The previous node.
    </pre>
 
    Actions:
@@ -61,8 +61,8 @@
    <h3>Nodes</h3>
    State
    <pre>
-   * data
-   * currentNode
+   * data: All node data.
+   * currentNode: The current node.
    </pre>
 
    Actions
@@ -76,10 +76,10 @@
    <h3>Path</h3>
    State
    <pre>
-   * data
-   * fromNodeId
-   * toNodeId
-   * floors
+   * data: A path of nodes from home to destination.  
+   * fromNodeId: The ID of home node.
+   * toNodeId: The ID of destination node.
+   * floors: The floors of home node and destination node.
    </pre>
 
    Actions
@@ -93,47 +93,162 @@
 <li><h3><strong>Utility Plugin</strong> (Under plugins folder)</h3>
     <ul>
     <li>
-        <strong>getMapTileNumber(x, y)</strong>
+    <details><summary>
+    <strong>dirToUri</strong>
+    </summary>
+    <pre>[Input]:
+    dir: The direction identity of a maptile.
+[Output]:
+    uri: The unique identity of a maptile in database. 
+    </pre>
+    </details>
+    </li> 
+    <li>
+    <details><summary>
+    <strong>createImage</strong>
+    </summary>
+    <pre>[Input]:
+    uri: The unique identity of a maptile in database.
+[Output]:
+    Image: an image component with specific uri.
+    </pre></details>
+    </li> 
+    <li>
+    <details><summary>
+    <strong>generateMapTiles</strong></summary>
+    <pre>[Input]:
+    offsetX: The x coordinate of the upper left corner.
+    offsetY: The y coordinate of the upper left corner.
+    width: The width of this floor.
+    height: The height of this floor.
+    floor: The floor that is displayed.
+    level: Zoom level.
+[Output]:
+    {result, dimension}: The "result" is a list of maptile. The "dimension" contains width and height of this floor.
+    </pre></details>
+    </li> 
+    <li>
+    <details><summary>
+    <strong>getFloorDimension</strong></summary>
+    <pre>[Input]:
+    offsetX: The x coordinate of the upper left corner.
+    offsetY: The y coordinate of the upper left corner.
+    width: The width of this floor.
+    height: The height of this floor.
+[Output]:
+    {left, top, width, height}: 
+        left: The logical x coordinate upper left, 
+        top: The logical y coordinate upper left, 
+        width: The logical width of this floor, 
+        height: The logical height of this floor  
+    </pre></details>
+    </li> 
+    <li>
+    <details><summary>
+    <strong>mapTilesRefactor</strong></summary>
+    <pre>[Input]:
+    mapTiles: A two dimensional array of maptiles.
+[Output]:
+    result: A one dimensional array contains the same maptiles as mapTiles.
+    </pre></details>
+    </li> 
+    <li>
+    <details><summary>
+    <strong>getMapTileDim</strong></summary>
+    <pre>[Input]:
+    maptiles: A one dimensional array of maptiles.
+[Output]:
+    {width, height}:
+        width: The number of maptiles in x direction.
+        height: The number of maptiles in y direction.
+    </pre></details>
     </li>
-    <li><strong>getMapTileDir</strong></li> 
-    <li><strong>dirToUri</strong></li> 
-    <li><strong>createImage</strong></li> 
-    <li><strong>generateMapTiles</strong></li> 
-    <li><strong>getFloorDimension</strong></li> 
-    <li><strong>mapTilesRefactor</strong></li> 
-    <li><strong>getMapTileDim</strong></li>
-    <li><strong>getDefualtView</strong></li>
-    <li><strong>getNodeOffsetForEachFloor</strong></li>
-    <li><strong>getNodeImageByConnectorId</strong></li>
-    <li><strong>getNodeImageByTagId</strong></li>
+    <li>
+    <details><summary>
+    <strong>getDefualtView</strong></summary>
+    <pre>[Input]:
+    left: The x of upper left corner. 
+    top: The y of upper left corner.
+    numOfRow: The number of maptiles in y direction. 
+    numOfCol: The number of maptiles in x direction.
+    floorId:
+    zoomLevel: Zoom level
+    cacheImage: A two dimensional array containing all URIs of maptiles in the floor. This parameter will be rewritten in the function. 
+    </pre></detials>
+    </li>
+    <li>
+    <details><summary>
+    <strong>getNodeOffsetForEachFloor</strong></summary>
+    <pre>[Input]:
+    floorId: The ID of a floor.
+[OutPut]:
+    {x, y}:
+        x: The number of maptiles in x direction;
+        y: The number of maptiles in y direction;
+    </pre></details>
+    </li>
+    <li>
+    <details><summary>
+    <strong>getNodeImageByConnectorId</strong></summary>
+    <pre>[Input]:
+    connectorId: The ID of a connector.
+[Output]:
+    image: The image of that connector.
+    </pre></details>
+    </li>
+    <li>
+    <details><summary>
+    <strong>getNodeImageByTagId</strong></summary>
+    <pre>[Input]:
+    tag: The ID of a tag.
+[Output]:
+    image: The image of that tag.
+    </pre></details>
+    </li>
     </ul>
 </li>
 
 <li><h3><strong>Components</strong></h3>
     <ul>
-        <li>
-            EventListPage
+        <li><details><summary>
+            EventListPage</summary>
             <pre>This Component is responsible to call HKUST event calendar to fetch recent events. After fetching events, it will display all events on a new page.
-            </pre>    
+            </pre></details>    
         </li>
-        <li>
-            FacilityInforPage
+        <li><details><summary>
+            FacilityInforPage</summary>
             <pre>This Component is used to store some real world pictures of the campus facility.(Still Updating)
-            </pre>    
+            </pre></details>    
         </li>
-        <li>
-            LoadingPage
+        <li><details><summary>
+            LoadingPage</summary>
             <pre>This Component shows when the content is loading, for example, switch to another floor.
-            </pre>
+            </pre></details>
         </li>
-        <li>MapTiles
+        <li><details><summary>
+            MapTiles</summary>
             <pre>This component get the floor information from <a href="#FloorReducer">Floor Reducer</a>, which includes the dimension of the floor. We can make use of APIs from backend to find the uri of every maptile.
-            </pre>
+            </pre></details>
         </li>
-        <li>Navigator</li>
-        <li>Progress</li>
-        <li>SettingsPage</li>
-        <li>MainScreen</li>
+        <li id="Navigator"><details><summary>
+            Navigator</summary>
+            <pre>This is the component is one of the main page of this app. It contains a left menu bar, a main map area, and a search bar reside here.
+            </pre></details>
+        </li>
+        <li><details><summary>
+            Progress</summary>
+            <pre>This component is the loading page. It will be used upon initializing the app or switching between floors.
+            </pre></details>
+        </li>
+        <li><details><summary>
+            SettingsPage</summary>
+            <pre>This component is the setting page that will display if the user click the "Gear" icon.
+            </pre></details>
+        </li>
+        <li><details><summary>
+            MainScreen</summary>
+            <pre>This component is the pan gesture wrapper. It will handle gesture events.</pre></details>
+        </li>
     </ul>
 </li>
 </ol>
@@ -176,4 +291,10 @@ d. Enter "npx react-native run-android" to run the application.
 </ul>
 
 
-<h2 id="Part5">Part V: How to Add Features</h2>
+<h2 id="Part5">Part V: How to Add Small Features</h2>
+<ol>
+<li>Create a folder under "frontent->component".</li>
+<li>Write and export "index.js" that can render your componet.</li>
+<li>Import your component to <a href="#Navigator">Navigator Component</a></li>
+<li>Register your component inside "_renderDrawer()" in <a href="#Navigator">Navigator Component</a></li>
+</ol>
