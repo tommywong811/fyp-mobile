@@ -1,6 +1,18 @@
 <h1> Path Advisor Mobile Version (Android Frontend Docs)</h1>
+--- 
+<h2>
+    <ol>
+        <a href="#Part1"><li>APIs</li></a>
+        <a href="#Part2"><li>Getting Started</li></a>
+        <a href="#Part3"><li>Potential Issue</li></a>
+        <a href="#Part4"><li>Possible Future Features</li></a>
+        <a href="#Part4"><li>How to Add Features</li></a>
+    </ol>
+</h2>
 
+---
 <h2 id="Part1">Part I: APIs</h2> 
+
 ---
 
 <ol>
