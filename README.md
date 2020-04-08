@@ -1,7 +1,5 @@
 <h1> Path Advisor Mobile Version (Android Frontend Docs)</h1>
 
---- 
-
 <h2>
     <ol>
         <a href="#Part1"><li>APIs</li></a>
@@ -12,10 +10,10 @@
     </ol>
 </h2>
 
----
+
 <h2 id="Part1">Part I: APIs</h2> 
 
----
+
 
 <ol>
 <li><h3><strong>Reducer</strong></h3>  
@@ -23,7 +21,7 @@
    <summary>
    Floors
    </summary>
-   <h3>Floor reducer provides data about the current floor.</h3>
+   <h3 id="FloorReducer">Floor reducer provides data about the current floor.</h3>
 
    State:
    <pre>
@@ -93,28 +91,45 @@
 </li>
 
 <li><h3><strong>Utility Plugin</strong> (Under plugins folder)</h3>
-   <ul>
-   <li><strong>getMapTileNumber(x, y)</strong></li>
-   <li><strong>getMapTileDir</strong></li> 
-   <li><strong>dirToUri</strong></li> 
-   <li><strong>createImage</strong></li> 
-   <li><strong>generateMapTiles</strong></li> 
-   <li><strong>getFloorDimension</strong></li> 
-   <li><strong>mapTilesRefactor</strong></li> 
-   <li><strong>getMapTileDim</strong></li>
-   <li><strong>getDefualtView</strong></li>
-   <li><strong>getNodeOffsetForEachFloor</strong></li>
-   <li><strong>getNodeImageByConnectorId</strong></li>
-   <li><strong>getNodeImageByTagId</strong></li>
-   </ul>
+    <ul>
+    <li>
+        <strong>getMapTileNumber(x, y)</strong>
+    </li>
+    <li><strong>getMapTileDir</strong></li> 
+    <li><strong>dirToUri</strong></li> 
+    <li><strong>createImage</strong></li> 
+    <li><strong>generateMapTiles</strong></li> 
+    <li><strong>getFloorDimension</strong></li> 
+    <li><strong>mapTilesRefactor</strong></li> 
+    <li><strong>getMapTileDim</strong></li>
+    <li><strong>getDefualtView</strong></li>
+    <li><strong>getNodeOffsetForEachFloor</strong></li>
+    <li><strong>getNodeImageByConnectorId</strong></li>
+    <li><strong>getNodeImageByTagId</strong></li>
+    </ul>
 </li>
 
 <li><h3><strong>Components</strong></h3>
     <ul>
-        <li>EventListPage</li>
-        <li>FacilityInforPage</li>
-        <li>LoadingPAge</li>
-        <li>MapTiles</li>
+        <li>
+            EventListPage
+            <pre>This Component is responsible to call HKUST event calendar to fetch recent events. After fetching events, it will display all events on a new page.
+            </pre>    
+        </li>
+        <li>
+            FacilityInforPage
+            <pre>This Component is used to store some real world pictures of the campus facility.(Still Updating)
+            </pre>    
+        </li>
+        <li>
+            LoadingPage
+            <pre>This Component shows when the content is loading, for example, switch to another floor.
+            </pre>
+        </li>
+        <li>MapTiles
+            <pre>This component get the floor information from <a href="#FloorReducer">Floor Reducer</a>, which includes the dimension of the floor. We can make use of APIs from backend to find the uri of every maptile.
+            </pre>
+        </li>
         <li>Navigator</li>
         <li>Progress</li>
         <li>SettingsPage</li>
@@ -123,9 +138,9 @@
 </li>
 </ol>
 
----
+
 <h2 id="Part2">Part II: Getting Started</h2> 
----
+
 This Path Advisor mobile version application is developed with “React Native” If you do not have any experience in React Native, please visit its [website](https://reactnative.dev/). Here is the instructions on how to start building your project.  
 <pre>1.Install React Native <br />Please read the [React Native Environment Setup](https://reactnative.dev/docs/environment-setup) thoroughly. Please install "React Native CLI" instead of "Expo CLI".</pre> 
 <pre>2. Download this project. </pre>
@@ -136,9 +151,9 @@ c. Enter "npx jetify".
 d. Enter "npx react-native run-android" to run the application. 
 </pre> 
 
----
+
 <h2 id="Part3">Part III: Potential Issues</h2>   
---- 
+
 <ul>
     <li id="PI1">
         <h3>Backend Performance</h3>
@@ -146,10 +161,10 @@ d. Enter "npx react-native run-android" to run the application.
     </li>
 </ul>
 
---- 
+ 
 
 <h2 id="Part4">Part IV: Possible Future Features</h2>    
---- 
+
 <ul>
     <li>
         <h3>Improvement on Querying Performance</h3>
@@ -160,7 +175,5 @@ d. Enter "npx react-native run-android" to run the application.
     </li>
 </ul>
 
---- 
+
 <h2 id="Part5">Part V: How to Add Features</h2>
----
----
