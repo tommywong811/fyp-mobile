@@ -45,6 +45,7 @@ import _ from "lodash";
 import EventListPage from "../EventListPage/EventListPage";
 import { Actions } from 'react-native-router-flux';
 import ImagePicker from 'react-native-image-picker';
+import {grey50} from "react-native-material-ui/src/styles/colors";
 /**
  * childrenView:
  */
@@ -592,33 +593,71 @@ class Navigator extends React.Component {
               visible={this.state.modalVisible}
               onRequestClose={() => {
                 this.setState({
-                  modalVisible: false
+                  modalVisible: false,
+                  modalshowmore: false,
                 })
               }}>
             <View style={{flex: 1,
               justifyContent: 'center',
               padding: 20,
+              backgroundColor: 'rgba(0,0,0,0.5)'
             }}>
-              <View style={{borderRadius: 10,
-                alignItems: 'center',
+              <View style={{ borderRadius:15,
                 backgroundColor: 'white'}}>
-                <TouchableOpacity
+                <TouchableOpacity style={{width: '100%'}}
                 onPress={() => this.handleModal(1)}>
-                  <Text style={{fontSize: 20}}>{this.state.modalfirst}</Text>
+                  <View style={{
+                    flexDirection: "row",
+                    padding: 10,
+                  }}>
+                    <Icon active name="md-pin"/>
+                    <View style={{
+                      flexDirection:"column",
+                      paddingLeft:10,
+                    }}>
+                  <Text style={{fontSize: 17}}>{this.state.modalfirst}</Text>
+                  <Text style={{fontSize: 12 ,color:'lightgrey'}}>Confidence:0.772</Text>
+                    </View>
+                  </View>
                 </TouchableOpacity>
                 {this.state.modalshowmore && <View
-                    style={{borderRadius: 10,
-                      alignItems: 'center',
+                    style={{
+                      borderRadius:15,
+                      width : '100%',
                       backgroundColor: 'white'}}>
                   <TouchableOpacity
                       onPress={() => this.handleModal(2)}>
-                    <Text style={{fontSize: 20}}>{this.state.modalsecond}</Text>
+                    <View style={{
+                      flexDirection: "row",
+                      padding: 10,
+                    }}>
+                      <Icon active name="md-pin"/>
+                      <View style={{
+                        flexDirection:"column",
+                        paddingLeft:10,
+                      }}>
+                        <Text style={{fontSize: 17}}>{this.state.modalsecond}</Text>
+                        <Text style={{fontSize: 12 ,color:'lightgrey'}}>Confidence:0.772</Text>
+                      </View>
+                    </View>
                   </TouchableOpacity>
                   <TouchableOpacity
                       onPress={() => this.handleModal(3)}>
-                    <Text style={{fontSize: 20}}>{this.state.modalthird}</Text>
+                    <View style={{
+                      flexDirection: "row",
+                      padding: 10,
+                    }}>
+                      <Icon active name="md-pin"/>
+                      <View style={{
+                        flexDirection:"column",
+                        paddingLeft:10,
+                      }}>
+                        <Text style={{fontSize: 17}}>{this.state.modalthird}</Text>
+                        <Text style={{fontSize: 12 ,color:'lightgrey'}}>Confidence:0.772</Text>
+                      </View>
+                    </View>
                   </TouchableOpacity>
-                  <TouchableOpacity
+                  <TouchableOpacity style={{alignItems:"center", borderRadius:15,}}
                       onPress={() => Alert.alert(
                           'User-experience Enhancement Program',
                           'Terms and Conditions',
@@ -633,10 +672,9 @@ class Navigator extends React.Component {
                     <Text style={{fontSize: 15}}>Join User-experience Enhancement Program</Text>
                   </TouchableOpacity>
                 </View>}
-                { !this.state.modalshowmore && <TouchableOpacity
-                onPress={() => this.setState({modalshowmore: true })}>
-                  <Text style={{fontSize: 20}}>Show more result</Text>
-                </TouchableOpacity>}
+                { !this.state.modalshowmore &&<View style={{alignItems:"center"}}>
+                 <Button onPress={() => this.setState({modalshowmore: true })}><Text>Show More</Text></Button>
+                </View>}
               </View>
             </View>
           </Modal></View>
