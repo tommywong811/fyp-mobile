@@ -4,6 +4,7 @@ import DrawerLayout from "react-native-gesture-handler/DrawerLayout";
 import LoadingPage from "../LoadingPage/LoadingPage";
 import AsyncStorage from "@react-native-community/async-storage";
 import {
+  CheckBox,
   Modal,
     Alert,
   View,
@@ -46,6 +47,7 @@ import EventListPage from "../EventListPage/EventListPage";
 import { Actions } from 'react-native-router-flux';
 import ImagePicker from 'react-native-image-picker';
 import {grey50} from "react-native-material-ui/src/styles/colors";
+import {Checkbox} from "react-native-material-ui";
 /**
  * childrenView:
  */
@@ -603,7 +605,8 @@ class Navigator extends React.Component {
               backgroundColor: 'rgba(0,0,0,0.5)'
             }}>
               <View style={{ borderRadius:15,
-                backgroundColor: 'white'}}>
+                backgroundColor: 'white',
+              justifyContent: 'center'}}>
                 <TouchableOpacity style={{width: '100%'}}
                 onPress={() => this.handleModal(1)}>
                   <View style={{
@@ -657,7 +660,8 @@ class Navigator extends React.Component {
                       </View>
                     </View>
                   </TouchableOpacity>
-                  <TouchableOpacity style={{alignItems:"center", borderRadius:15,}}
+                  <TouchableOpacity style={{borderRadius:15,flexDirection: "row",
+                    padding: 10,}}
                       onPress={() => Alert.alert(
                           'User-experience Enhancement Program',
                           'Terms and Conditions',
@@ -669,11 +673,11 @@ class Navigator extends React.Component {
                           { cancelable: false }
                       )
                       }>
-                    <Text style={{fontSize: 15}}>Join User-experience Enhancement Program</Text>
+                    <CheckBox /><Text style={{fontSize: 15, color: "blue"}}>Join User-experience Enhancement Program</Text>
                   </TouchableOpacity>
                 </View>}
-                { !this.state.modalshowmore &&<View style={{alignItems:"center"}}>
-                 <Button onPress={() => this.setState({modalshowmore: true })}><Text>Show More</Text></Button>
+                { !this.state.modalshowmore &&<View>
+                 <Button onPress={() => this.setState({modalshowmore: true })} style={{alignItems:"center", justifyContent: "center", width:"100%", borderBottomLeftRadius: 15, borderBottomRightRadius:15}}><Text>Show More</Text></Button>
                 </View>}
               </View>
             </View>
