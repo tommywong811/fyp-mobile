@@ -276,7 +276,7 @@ class Navigator extends React.Component {
     setTimeout(() => {
       this.props.change_node(this.state.fromSearchInput, this.state.fromNode);
       if (this.state.fromSearchInput && this.state.toSearchInput) {
-        this.props.search_shortest_path(this.state.fromNode._id, this.state.toNode._id, true, false)  // TO DO: set the fromTo through user input
+        this.props.search_shortest_path(this.state.fromNode._id, this.state.toNode._id, false, true)  // TO DO: set the fromTo through user input
       }
     }, 1)
   }
