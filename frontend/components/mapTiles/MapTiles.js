@@ -18,7 +18,8 @@ import { api } from '../../../backend';
 import store from '../../../store.js';
 import {
     UPDATE_MAPTILE_CACHE,
-    CHANGE_FLOOR
+    CHANGE_FLOOR,
+    CHANGE_NODE
 } from '../../reducer/floors/actionList.js';
 import {
     TouchableOpacity,
@@ -251,7 +252,8 @@ class MapTiles extends React.Component {
                                     </Text>
                                 </View>
                             )
-                        } else if (node.connectorId && getNodeImageByConnectorId(node.connectorId)) {
+                        }
+                        else if (node.connectorId && getNodeImageByConnectorId(node.connectorId)) {
                             return (
                                 <View
                                     key={node._id}
@@ -267,7 +269,8 @@ class MapTiles extends React.Component {
                                         // Actions.FacilityInfoPage({ selectedNode: node.name });
                                         // alert(node.name)
                                         // console.log(this.props.shortestPath);
-                                        this._onPressPathNextFloor();
+                                        this._onPressChangeFloor(node);
+                                        // this._onPressPathNextFloor();
                                     }}>
                                         <Image
                                             source={getNodeImageByConnectorId(node.connectorId)}
@@ -277,7 +280,30 @@ class MapTiles extends React.Component {
                                     </TouchableOpacity>
                                 </View>
                             )
-                        } else if (node.tagIds && node.tagIds.length > 0 && getNodeImageByTagId(node.tagIds[0])) {
+                        } 
+                        else if (node.connectorId && getNodeImageByConnectorId(node.name)) {
+                            return (
+                                <View
+                                    key={node._id}
+                                    style={[{
+                                        flex: 1,
+                                        position: 'absolute',
+                                        top: (node.centerCoordinates[1] - this.props.offSetY) / logicTileSize * 80 + this.state.nodeOffset.y,
+                                        left: (node.centerCoordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x + 2,
+                                    }]}>
+                                    <TouchableOpacity onPress={() => {
+                                        this._onPressChangeFloor(node);
+                                    }}>
+                                        <Image
+                                            source={getNodeImageByConnectorId(node.name)}
+                                            style={[{ height: 10, width: 10 }]}
+                                        >
+                                        </Image>
+                                    </TouchableOpacity>
+                                </View>
+                            )
+                        }
+                        else if (node.tagIds && node.tagIds.length > 0 && getNodeImageByTagId(node.tagIds[0])) {
                             return (
                                 <View
                                     key={node._id}
@@ -397,12 +423,38 @@ class MapTiles extends React.Component {
         );
     }
 
+    _onPressChangeFloor(node) {
+        let connectors = []
+
+        if(this.props.shortestPath.data != null) {
+            let indexOfConnector;
+            for (var i = 0; i < this.props.shortestPath.data.length; i++) {
+                if((this.props.shortestPath.data[i]._id == node._id)) {
+                    indexOfConnector = i;
+                }
+                if(this.props.shortestPath.data[i].connectorId) {
+                    console.log(this.props.shortestPath.data[i])
+                }
+            }
+            // console.log("gfvregvwer");
+            // console.log(indexOfConnector);
+
+            if (this.props.shortestPath.data[indexOfConnector].floorId == this.props.shortestPath.data[indexOfConnector - 1].floorId) {
+                this._onPressPathNextFloor()
+            }
+            else {
+                this._onPressPathPreviousFloor()
+            }
+        }
+    }
+
     _onPressPathNextFloor() {
-        console.log("393" + this.props.shortestPath.floors)
+        // console.log("393" + this.props.shortestPath.floors)
+
         this.props.change_floor(this.props.shortestPath.floors[this.state.currentPathFloorIndex + 1], null)
     
         const nextCurrNode = this.props.shortestPath.data.find(node =>  node.floorId === this.props.shortestPath.floors[this.state.currentPathFloorIndex + 1])
-        this.props.change_floor(null, nextCurrNode);
+        this.props.change_node(null, nextCurrNode);
         // change the current node to the starting point on the floor
     
         this.setState({
@@ -568,6 +620,11 @@ function mapDispatchToProps(dispatch) {
             type: CHANGE_FLOOR,
             payload: { floor: floor, buildingId: buildingId }
         }),
+        change_node: (name, currentNode = null) => 
+            dispatch({
+            type: CHANGE_NODE,
+            payload: { name: name, currentNode: currentNode }
+        })
     }
 }
 
