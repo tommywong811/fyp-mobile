@@ -461,6 +461,16 @@ class Navigator extends React.Component {
             <Icon type='Ionicons' name='ios-arrow-forward' style={styles.menuItemArrowRight}></Icon>
           </TouchableOpacity>
 
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => Actions.BarnHeatMapPage()}
+          >
+            <Text style={styles.drawerSubSection}>
+              Barn Heatmap
+            </Text>
+            <Icon type='Ionicons' name='ios-arrow-forward' style={styles.menuItemArrowRight}></Icon>
+          </TouchableOpacity>
+
         </ScrollView>
 
         <View style={styles.menuSetting}>

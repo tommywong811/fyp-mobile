@@ -11,6 +11,7 @@ import DownloadProgress from './frontend/components/progress/progress';
 import store from './store.js';
 import { Provider } from 'react-redux';
 import EventListPage from './frontend/components/EventListPage/EventListPage';
+import BarnHeatMapPage from './frontend/components/BarnHeatMapPage/BarnHeatMapPage';
 
 import { Router, Scene } from 'react-native-router-flux';
 import { StyleSheet } from 'react-native';
@@ -47,6 +48,11 @@ export default class App extends Component {
               key='EventListPage'
               component={EventListPage}
               title='Event List'
+            />
+            <Scene
+              key='BarnHeatMapPage'
+              component={BarnHeatMapPage}
+              title='Barn Heatmap'
             />
             <Scene key='FacilityInfoPage'
               component={FacilityInfoPage}
