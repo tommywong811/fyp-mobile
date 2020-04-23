@@ -57,8 +57,7 @@ class Navigator extends React.Component {
     this.isInputting = false;
     this.delay_execution = null;
     this.state = {
-      allFloorIds: this._getAllFloors(),
-      isBuilding: true,
+      allFloors: this._getAllFloors(),
       expandedFloorId: null
     };
   }
@@ -305,8 +304,12 @@ class Navigator extends React.Component {
     return result;
   }
   //Get all floor names in one building
-  _getAllFloors(buildingId) {
-    return this.props.allFloors.filter(item => item.buildingId === buildingId);
+  _getAllFloors() {
+    let buildingFloorObject = {}
+    this._allBuildings.map(building => {
+      buildingFloorObject[building] = this.props.allFloors.filter(item => item.buildingId === building)
+    })
+    return buildingFloorObject;
   }
   _buildingnameToString(name) {
     switch (name) {
@@ -405,12 +408,13 @@ class Navigator extends React.Component {
                   {this._buildingnameToString(item)}
                 </Text>
                 <Icon
-                  name="arrow-dropdown"
+                  name="caret-down"
+                  type='FontAwesome'
                   style={styles.drawerItemsIcon}
                 ></Icon>
               </TouchableOpacity>
               {this.state.expandedFloorId === item
-                ? this._getAllFloors(item).map(floor => {
+                ? this.state.allFloors[item].map(floor => {
                   floor_ID = null;
                   listToAddF = ['1','2','3','4','5','6','7','G']
                   style = Object.assign({}, item._id === this.props.currFloor ? styles.activeFloor : {}, styles.drawerSubItems)
@@ -588,7 +592,7 @@ class Navigator extends React.Component {
                   }}
                   value={searchInput}
                 />
-                <Icon active name="search" style={{ color: "#003366" }}></Icon>
+                <Icon active name="search-location" type='FontAwesome5' style={{ color: "#003366", fontSize: 17 }}></Icon>
               </Item>
               ,
               <View key={1} style={Platform.OS === 'android' ? { maxHeight: 200} : {maxHeight: 200, position: 'absolute', zIndex:1, top: 50}}>
@@ -621,9 +625,9 @@ class Navigator extends React.Component {
               >
                 <Icon
                   active
-                  name="md-menu"
-                  style={{ color: "#003366", fontSize: 20}}
-                  onPress={() => this.drawer.openDrawer()}
+                  name="my-location"
+                  type='MaterialIcons'
+                  style={{ color: "#003366", fontSize: 14}}
                 ></Icon>
                 <Input
                   placeholder="From"
@@ -674,6 +678,12 @@ class Navigator extends React.Component {
                   zIndex: 999
                 }}
               >
+                <Icon
+                  active
+                  name="location-pin"
+                  type='Entypo'
+                  style={{ color: "#dd0022", fontSize: 14}}
+                ></Icon>
                 <Input
                   placeholder="To"
                   placeholderTextColor="#003366"
@@ -687,8 +697,7 @@ class Navigator extends React.Component {
                     backgroundColor: "transparent",
                     borderRadius: 10,
                     height: 48,
-                    padding: 10,
-                    paddingLeft: 40,
+                    padding: 10
                   }}
                   value={toSearchInput}
                 />
@@ -904,7 +913,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between"
   },
-  drawerItemsIcon: {},
+  drawerItemsIcon: {
+    color: '#003366',
+    fontSize: 16
+  },
   drawerSubItems: {
     backgroundColor: "white",
     color: "#003366",
@@ -1002,7 +1014,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   backToSearchBtn: {
-    backgroundColor: "#428bca",
+    backgroundColor: "#003366",
     borderRadius: 12,
     padding: 5,
     width: 100,
