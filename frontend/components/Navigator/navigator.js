@@ -332,6 +332,8 @@ class Navigator extends React.Component {
   }
 
   _onPressPathNextFloor() {
+    // console.log(this.props.shortestPath.floors);
+
     this.props.change_floor(this.props.shortestPath.floors[this.state.currentPathFloorIndex + 1], null)
 
     const nextCurrNode = this.props.shortestPath.data.find(node =>  node.floorId === this.props.shortestPath.floors[this.state.currentPathFloorIndex + 1])

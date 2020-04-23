@@ -17,7 +17,8 @@ import { mapTileSize, logicTileSize } from './config';
 import { api } from '../../../backend';
 import store from '../../../store.js';
 import {
-    UPDATE_MAPTILE_CACHE
+    UPDATE_MAPTILE_CACHE,
+    CHANGE_FLOOR
 } from '../../reducer/floors/actionList.js';
 import {
     TouchableOpacity,
@@ -84,6 +85,7 @@ class MapTiles extends React.Component {
             'nodesInFloor': this.props.nodes.filter((node) => node.floorId === this.props.currFloor),
             'nodeOffset': getNodeOffsetForEachFloor(this.props.currFloor),
             'pathInCurrFloor': [],
+            'currentPathFloorIndex': null
         });
     }
 
@@ -129,6 +131,13 @@ class MapTiles extends React.Component {
                 'pathInCurrFloor': [],
             })
         }
+
+        if (this.props.shortestPath.floors !== nextProps.shortestPath.floors) {
+            this.props.change_floor(nextProps.shortestPath.floors[0], null)
+            this.setState({
+              currentPathFloorIndex: 0,
+            })
+          }
     }
 
     setMapOffset(x, y) {
@@ -256,7 +265,9 @@ class MapTiles extends React.Component {
                                         // this.setModalVisible(true);
                                         // this.setState({ selectedNode: node.name });
                                         // Actions.FacilityInfoPage({ selectedNode: node.name });
-                                        alert(node.name)
+                                        // alert(node.name)
+                                        // console.log(this.props.shortestPath);
+                                        this._onPressPathNextFloor();
                                     }}>
                                         <Image
                                             source={getNodeImageByConnectorId(node.connectorId)}
@@ -384,6 +395,31 @@ class MapTiles extends React.Component {
                 })}
             </View>
         );
+    }
+
+    _onPressPathNextFloor() {
+        console.log("393" + this.props.shortestPath.floors)
+        this.props.change_floor(this.props.shortestPath.floors[this.state.currentPathFloorIndex + 1], null)
+    
+        const nextCurrNode = this.props.shortestPath.data.find(node =>  node.floorId === this.props.shortestPath.floors[this.state.currentPathFloorIndex + 1])
+        this.props.change_floor(null, nextCurrNode);
+        // change the current node to the starting point on the floor
+    
+        this.setState({
+          currentPathFloorIndex: this.state.currentPathFloorIndex + 1,
+        })
+      }
+    
+
+    _onPressPathPreviousFloor() {
+        this.props.change_floor(this.props.shortestPath.floors[this.state.currentPathFloorIndex - 1], null)
+    
+        const nextCurrNode = this.props.shortestPath.data.find(node =>  node.floorId === this.props.shortestPath.floors[this.state.currentPathFloorIndex - 1])
+        this.props.change_node(null, nextCurrNode) // change the current node to the starting point on the floor
+    
+        this.setState({
+          currentPathFloorIndex: this.state.currentPathFloorIndex - 1,
+        })
     }
 
     _onPanEndHandler(evt, gestureState, zoomableViewEventObject) {  
@@ -525,4 +561,14 @@ function mapStateToProps(state) {
     });
 }
 
-export default connect(mapStateToProps, null)(MapTiles);
+function mapDispatchToProps(dispatch) {
+    return {
+        change_floor: (floor, buildingId) =>
+            dispatch({
+            type: CHANGE_FLOOR,
+            payload: { floor: floor, buildingId: buildingId }
+        }),
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(MapTiles);

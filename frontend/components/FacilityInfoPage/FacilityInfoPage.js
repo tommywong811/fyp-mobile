@@ -290,11 +290,6 @@ export default class FacilityInfoPage extends React.Component {
   };
 
   render() {
-    const source = {
-      uri:
-        "https://cso.ust.hk/sites/cso862-prod.sites2.ust.hk/files/2019-01/menu_McC_2012.pdf",
-      cache: true
-    };
     const { height } = Dimensions.get("window");
     active = this.state.active;
     xTabOne = this.state.xTabOne;
