@@ -357,10 +357,34 @@ class Navigator extends React.Component {
         <ScrollView>
 
           <Image source={require('../../asset/hkust_icon.png')} style={styles.ustBannerImage}></Image>
+
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => {
+              if (this.props.currFloor !== 'Overall') {
+                setTimeout(() => {
+                  // to let the menu close
+                  this.props.render_loading_page();
+                  this.props.change_floor(
+                    'Overall',
+                    'campusMap'
+                  );
+                  this.props.clear_current_node();
+                }, 100);
+              }
+              this.drawer.closeDrawer();
+            }}
+          >
+            <Text style={styles.drawerSubSection}>
+              University Map
+            </Text>
+            <Icon type='Ionicons' name='ios-arrow-forward' style={styles.menuItemArrowRight}></Icon>
+          </TouchableOpacity>
+
           <Text style={styles.drawerSubSection}>Buildings</Text>
 
           <View style={styles.lineStyle} />
-          {this._allBuildings.map(item => (
+          {this._allBuildings.map(item => item !== 'campusMap' && (
             <View style={styles.drawerItems} key={item}>
               <TouchableOpacity style={styles.buildingItems}
                   onPress={() => {
