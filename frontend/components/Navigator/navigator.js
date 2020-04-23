@@ -342,6 +342,15 @@ class Navigator extends React.Component {
     })
   }
 
+  _onPressSwapSearch() {
+    this.setState({
+      fromSearchInput: this.state.toSearchInput,
+      toSearchInput: this.state.fromSearchInput,
+      fromNode: this.state.toNode,
+      toNode: this.state.fromNode
+    })
+  }
+
   _renderDrawer() {
     return (
       <View style={styles.drawerContainer}>
@@ -654,9 +663,14 @@ class Navigator extends React.Component {
                   value={toSearchInput}
                 />
                 {fromNode && toNode &&
-                  <TouchableHighlight onPress={()=> this._onPressSearchPath()} underlayColor="white">
-                    <Icon active name="search" style={{ color: "#003366" }}></Icon>
-                  </TouchableHighlight>
+                  <View style={{flexDirection: 'row'}}>
+                    <TouchableHighlight onPress={()=> this._onPressSwapSearch()} underlayColor="white">
+                      <Icon style={{color: "#003366" }} active name="swap-vertical" type='MaterialCommunityIcons'></Icon>
+                    </TouchableHighlight>
+                    <TouchableHighlight onPress={()=> this._onPressSearchPath()} underlayColor="white">
+                      <Icon active name="search" style={{ color: "#003366" }}></Icon>
+                    </TouchableHighlight>
+                  </View>
                 }
               </Item>
               ,
