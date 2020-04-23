@@ -83,6 +83,7 @@ class Navigator extends React.Component {
       isKeyBoardShown: false,
       isFindDirection: false,
       previousSearchNode: null,
+      isClosedRoomDetailBox: true
     });
   }
 
@@ -259,7 +260,8 @@ class Navigator extends React.Component {
   _searchRoom(currentNode = null) {
     this.setState({
       isLoading: currentNode === this.props.currentNode ? false : true,
-      suggestionList: [] // suggestion dropdown dismiss after search button press
+      suggestionList: [], // suggestion dropdown dismiss after search button press
+      isClosedRoomDetailBox: false
     });
     Keyboard.dismiss();
     setTimeout(() => {
@@ -481,6 +483,7 @@ class Navigator extends React.Component {
       toNode,
       currentPathFloorIndex,
       isFindDirection,
+      isClosedRoomDetailBox
     } = this.state;
 
     floor_ID = null;
@@ -727,18 +730,22 @@ class Navigator extends React.Component {
               }
             ></MapTiles>
 
-            {!isFindDirection && this.props.currentNode &&
+            {!isClosedRoomDetailBox && !isFindDirection && this.props.currentNode &&
               <View
                 style={styles.roomDetailBox}
                 >
-                <Text style={styles.roomName}>{this.props.currentNode.name}</Text>
+                <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                  <Text style={styles.roomName}>{this.props.currentNode.name}</Text>
+                  <Icon onPress={()=>{ this.setState({isClosedRoomDetailBox: true}) }} style={{color: "white" }} active name="close"></Icon>
+                </View>
                 <Text style={styles.roomFloor}>{`${this._buildingnameToString(this.props.currBuilding)} - ${floor_ID}`}</Text>
                 <TouchableHighlight style={styles.directionBtn} onPress={()=> this._onPressDirectionLayout()} underlayColor="#428bca">
                   <Text style={styles.directionBtnText}>Direction</Text>
                 </TouchableHighlight>
               </View>
             }
-            <View>
+            { isClosedRoomDetailBox &&
+              <View>
               <Text
                 style={{
                   padding: 5,
@@ -751,6 +758,7 @@ class Navigator extends React.Component {
                 {floor_ID}
               </Text>
             </View>
+            }
             <View
               style={styles.pathFloorControlContainer}
               >
@@ -960,7 +968,7 @@ const styles = StyleSheet.create({
   },
 
   roomDetailBox: {
-    backgroundColor: "white",
+    backgroundColor: "#003366",
     width: "95%",
     alignSelf: "center",
     margin: 5,
@@ -971,12 +979,12 @@ const styles = StyleSheet.create({
 
   roomName: {
     fontSize: 20,
-    color: "#003366",
+    color: "white",
     // paddingBottom: 10,
   },
   roomFloor: {
     fontSize: 16,
-    color: "#003366",
+    color: "white",
   },
   directionBtn: {
     backgroundColor: "#428bca",
