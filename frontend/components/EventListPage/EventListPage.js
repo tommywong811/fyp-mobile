@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardItem, Text, Body, Badge, DatePicker, Item, Label, Button, Picker } from 'native-base';
 import axios from 'axios';
 import moment from 'moment';
-import { ActivityIndicator, View, StyleSheet, FlatList, Dimensions, Modal, Platform } from 'react-native';
+import { ActivityIndicator, View, StyleSheet, FlatList, Dimensions, Modal, Platform, Linking } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 /**
  * childrenView: 
@@ -34,6 +34,8 @@ export default class EventListPage extends React.Component {
         this.fetchCategory = this.fetchCategory.bind(this);
         this.filter = this.filter.bind(this);
         this.setSelectedCategory = this.setSelectedCategory.bind(this);
+        this.onPressVenue = this.onPressVenue.bind(this);
+        this.checkIsClickable = this.checkIsClickable.bind(this);
     }
 
     async componentWillMount() {
@@ -142,8 +144,33 @@ export default class EventListPage extends React.Component {
         this.setState({ selectedCategory: category });
     }
 
-    goToMapTilePage() {
+    async onPressVenue(venue) {
+        if (venue === '' || venue === null || venue.toLowerCase().includes('online') || venue.toLowerCase().includes('zoom')) {
+            if (venue.includes('http')) {
+                let testUrl = venue.match(/\bhttps?:\/\/\S+/gi);
+                Linking.canOpenURL(testUrl[0]).then(supported => {
+                    if(supported) Linking.openURL(testUrl[0])
+                }).catch(err => {})
+            } else {
+                return;
+            }
+        } else {
+            Actions.push('NavigatorPage', {
+                searchKeyword: venue || ''
+            })
+        }
+    }
 
+    checkIsClickable(venue) {
+        if (venue === '' || venue === null || venue.toLowerCase().includes('online') || venue.toLowerCase().includes('zoom')) {
+            if (venue.includes('http')) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return true;
+        }
     }
 
     renderCard(item) {
@@ -167,9 +194,13 @@ export default class EventListPage extends React.Component {
                             <Text style={styles.itemDetailLabel}>Time : </Text><Text>{moment(item.events_start_dt, 'YYYY-MM-DD HH:mm:ss').format('HH:mm')} - {moment(item.events_end_dt, 'YYYY-MM-DD HH:mm:ss').format('HH:mm')}</Text>
                         </View>
                         <View style={styles.itemDetailRow}>
-                            <Text style={styles.itemDetailLabel}>Venue : </Text><Text style={styles.link} onPress={()=>{Actions.push('NavigatorPage', {
-                                searchKeyword: item.events_en_venue || ''
-                            })}}>{item.events_en_venue || '-'}</Text>
+                            <Text style={styles.itemDetailLabel}>Venue : </Text>
+                            <Text style={
+                                    this.checkIsClickable(item.events_en_venue) ? styles.link : null
+                                } 
+                                onPress={()=>this.onPressVenue(item.events_en_venue)}>
+                                {item.events_en_venue || '-'}
+                            </Text>
                         </View>
                         {/* event.events_en_abstract */}
                     </Body>
