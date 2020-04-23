@@ -92,6 +92,9 @@ class Navigator extends React.Component {
     this.setState({
       searchInput: this.props.searchKeyword ? this.props.searchKeyword : ''
     })
+    if (this.props.searchKeyword !== '' && this.props.searchKeyword !== undefined && this.props.searchKeyword !== null) {
+      this._onChangeSearchText(this.props.searchKeyword)
+    }
   }
 
   componentWillUnmount() {
