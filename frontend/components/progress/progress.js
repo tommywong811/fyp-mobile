@@ -78,14 +78,14 @@ class ProgressBar extends React.Component{
         if(!this.state.finished){
             return( 
                 <SafeAreaView style={{flex: 1}}>
-                    <View style={{flex: 6, zIndex:1, flexDirection: 'column', backgroundColor: '#5e9cff', justifyContent:'center', alignItems:'center'}}>
-                        <Image style={{width: 100, height: 100, marginBottom: 20}} source={LOGO_IMAGE}></Image>
+                    <View style={{flex: 6, zIndex:1, flexDirection: 'column', backgroundColor: '#003366', justifyContent:'center', alignItems:'center'}}>
+                        {/* <Image style={{width: 100, height: 100, marginBottom: 20}} source={LOGO_IMAGE}></Image> */}
                         <ActivityIndicator size="large" color="#c9e6ff"></ActivityIndicator>
                         {/* <Progress.Circle progress={this.state.written/this.state.total} endAndgle={1} size={60}
                             showsText={true}
                             style={{justifyContent: 'center', alignItems: 'center', backgroundColor: '#5e9cff'}}
                             textStyle={{justifyContent: 'center', alignItems: 'center'}}/> */}
-                        <Text style={{color: 'white', fontSize: 14, marginTop: 10}}>{'Initialize data'}</Text>
+                        <Text style={{color: 'white', fontSize: 14, marginTop: 10}}>{'Please wait, initializing data...'}</Text>
                     </View> 
                 </SafeAreaView>
             );

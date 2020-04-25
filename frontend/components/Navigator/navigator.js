@@ -820,7 +820,7 @@ class Navigator extends React.Component {
                         zIndex: 100,
                         position: "absolute",
                         }}>
-                <ActivityIndicator size="large" color="#0000ff" ></ActivityIndicator>
+                <ActivityIndicator size="large" color="#003366" ></ActivityIndicator>
               </View>
             }
           </LoadingPage>
