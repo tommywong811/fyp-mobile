@@ -16,6 +16,7 @@ import { UPDATE_NODE_DATA } from '../../reducer/nodes/actionList'
 import { createDB } from '../../../backend/Realm/realm';
 import buildGraph from "../../../backend/api/graph/build";
 import graphCache from "../../../backend/api/graph/cache";
+import Store from 'react-native-fs-store';
 
 class ProgressBar extends React.Component{
     constructor(props){
@@ -59,8 +60,17 @@ class ProgressBar extends React.Component{
             this.setState({ finished: true })
         }
 
-        if (!graphCache.data) { // prebuild graph for searching path
-            graphCache.data = buildGraph();
+        try {
+            const AsyncStorage = new Store('graphStore');
+            let cachedGraphCache = await AsyncStorage.getItem('cachedGraphCache');
+            if (!cachedGraphCache) { // prebuild graph for searching path
+                graphCache.data = buildGraph()
+                await AsyncStorage.setItem('cachedGraphCache', JSON.stringify(graphCache));
+            } else {
+                graphCache.data = JSON.parse(cachedGraphCache).data ;
+            }
+        } catch (error) {
+            console.log('GraphDataGraph Error', error)
         }
     }
 
