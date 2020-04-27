@@ -21,7 +21,7 @@ export default class PanoramaViewPage extends React.Component {
                     style={styles.viewer}
                     dimensions={{ height: Dimensions.get('window').height, width: Dimensions.get("window").width }}
                     inputType="mono"
-                    imageUrl="https://raw.githubusercontent.com/googlevr/gvr-android-sdk/master/assets/panoramas/testRoom1_2kMono.jpg"
+                    imageUrl="http://klor.student.ust.hk/image/panorama_sample.jpg"
                 />
             </View>
         );
