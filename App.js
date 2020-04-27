@@ -18,6 +18,7 @@ import { StyleSheet } from 'react-native';
 import FacilityInfoPage from './frontend/components/FacilityInfoPage/FacilityInfoPage';
 import SettingsPage from './frontend/components/SettingsPage/SettingsPage';
 import navigator from './frontend/components/Navigator/navigator';
+import PanoramaViewPage from './frontend/components/PanoramaViewPage/PanoramaViewPage';
 
 export default class App extends Component {
   constructor(props) {
@@ -53,6 +54,11 @@ export default class App extends Component {
               key='BarnHeatMapPage'
               component={BarnHeatMapPage}
               title='Barn Heatmap'
+            />
+            <Scene
+              key='PanoramaViewPage'
+              component={PanoramaViewPage}
+              title='Panorama View'
             />
             <Scene key='FacilityInfoPage'
               component={FacilityInfoPage}

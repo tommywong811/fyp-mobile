@@ -760,9 +760,14 @@ class Navigator extends React.Component {
                   <Icon onPress={()=>{ this.setState({isClosedRoomDetailBox: true}) }} style={{color: "white" }} active name="close"></Icon>
                 </View>
                 <Text style={styles.roomFloor}>{`${this._buildingnameToString(this.props.currBuilding)} - ${floor_ID}`}</Text>
-                <TouchableHighlight style={styles.directionBtn} onPress={()=> this._onPressDirectionLayout()} underlayColor="#428bca">
-                  <Text style={styles.directionBtnText}>Direction</Text>
-                </TouchableHighlight>
+                <View style={{flexDirection: 'row', marginTop: 10}}>
+                  <TouchableHighlight style={styles.directionBtn} onPress={()=> this._onPressDirectionLayout()} underlayColor="#428bca">
+                    <Text style={styles.directionBtnText}>Direction</Text>
+                  </TouchableHighlight>
+                  <TouchableHighlight style={styles.directionBtn} onPress={()=> Actions.PanoramaViewPage()} underlayColor="#428bca">
+                    <Text style={styles.directionBtnText}>Street View</Text>
+                  </TouchableHighlight>
+                </View>
               </View>
             }
             { isClosedRoomDetailBox &&
@@ -1019,6 +1024,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     width: 100,
     marginTop: 'auto',
+    marginRight: 5
   },
   directionBtnText: {
     color: "white",

@@ -148,6 +148,7 @@ android {
 }
 
 dependencies {
+    implementation project(':@lightbase_react-native-panorama-view')
     implementation project(':react-native-pdf')
     implementation project(':react-native-webview')
     implementation project(':react-native-vector-icons')
