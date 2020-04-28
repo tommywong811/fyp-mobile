@@ -14,6 +14,16 @@ target 'project' do
 
     pod 'react-native-pdf', :path => '../node_modules/react-native-pdf'
 
+    pod 'RNCMaskedView', :path => '../node_modules/@react-native-community/masked-view'
+
+    pod 'RNBackgroundFetch', :path => '../node_modules/react-native-background-fetch'
+
+    pod 'react-native-safe-area-context', :path => '../node_modules/react-native-safe-area-context'
+
+    pod 'RNScreens', :path => '../node_modules/react-native-screens'
+
+    pod 'RNSVG', :path => '../node_modules/react-native-svg'
+
   end
 
   target 'projectTests' do

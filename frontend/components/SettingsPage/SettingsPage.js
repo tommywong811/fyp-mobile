@@ -1,6 +1,9 @@
 import React from 'react';
 import { Container, Header, Content, Text, Body, Icon } from 'native-base';
 import { Picker, ScrollView, Switch, View, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import { api } from '../../../backend';
+import AsyncStorage from '@react-native-community/async-storage';
+import autoUpdateHandler from "../../../backend/utils/autoUpdate";
 
 const SUPPORT_LANGUAGES = [
   {label: 'English', value: 'english'}
@@ -15,9 +18,28 @@ export default class EventListPage extends React.Component {
           renderAboutUs: false,
           renderTAS: false,
           notifications: false,
+          autoUpdate: false,
+          dbResponse: '',
           language: 'English'
 
       }
+  }
+
+  componentDidMount() {
+    AsyncStorage.getItem('autoUpdate', (err, result) => {
+      if(!err) {
+        if(result !== null) {
+          this.setState({autoUpdate: JSON.parse(result)})
+        }
+      }
+    })
+    AsyncStorage.getItem('notifications', (err, result) => {
+      if(!err) {
+        if(result !== null) {
+          this.setState({notifications: JSON.parse(result)})
+        }
+      }
+    })
   }
 
   componentWillMount() {
@@ -28,10 +50,23 @@ export default class EventListPage extends React.Component {
       }
   }
 
-  notificationsOnPress() {
+  async notificationsOnPress() {
+    var notifications = !this.state.notifications
+    await AsyncStorage.setItem('notifications', JSON.stringify(notifications))
     this.setState({
-      notifications: !this.state.notifications
+      notifications: notifications
     })
+  }
+
+  async autoUpdateOnPress() {
+    var autoUpdate = !this.state.autoUpdate
+    await AsyncStorage.setItem('autoUpdate', JSON.stringify(autoUpdate))
+    this.setState({autoUpdate: autoUpdate})
+    if(autoUpdate) {
+      autoUpdateHandler.configure()
+    } else {
+      autoUpdateHandler.stop()
+    }
   }
 
   TASOnPress() {
@@ -128,6 +163,26 @@ export default class EventListPage extends React.Component {
                     </Picker>
                   </View>
                 </View>
+
+                <View
+                  style={styles.settingTab}
+                >
+                  <View style={styles.settingTabRow}>
+                    <View style={styles.settingTabRowGroup}>
+                      <Icon type='AntDesign' name='bells' style={styles.settingTabIcon}></Icon>
+                      <Text style={styles.settingTabTitle}>Auto Update</Text>
+                    </View>
+                    <Text style={styles.settingTabTitle}>{this.state.dbResponse}</Text>
+                    <Switch
+                      onValueChange={(value) => this.autoUpdateOnPress()}
+                      value={this.state.autoUpdate}
+                      thumbColor='white'
+                      trackColor={{true: '#003366', false: 'grey'}}
+                    >
+                    </Switch>
+                  </View>
+                </View>
+
 
                 <TouchableOpacity style={styles.settingTab}>
                   <View style={styles.settingTabRow}>

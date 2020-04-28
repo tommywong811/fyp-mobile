@@ -788,7 +788,7 @@ function mapDispatchToProps(dispatch) {
         type: CHANGE_NODE,
         payload: { name: name, currentNode: currentNode }
       }),
-    clear_current_node: () => 
+    clear_current_node: () =>
       dispatch({
         type: CLEAR_NODE,
       }),

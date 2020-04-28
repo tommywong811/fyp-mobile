@@ -17,12 +17,25 @@ import { StyleSheet } from 'react-native';
 import FacilityInfoPage from './frontend/components/FacilityInfoPage/FacilityInfoPage';
 import SettingsPage from './frontend/components/SettingsPage/SettingsPage';
 import navigator from './frontend/components/Navigator/navigator';
+import { api } from './backend';
+import AsyncStorage from '@react-native-community/async-storage';
+import autoUpdateHandler from './backend/utils/autoUpdate'
 
 export default class App extends Component {
   constructor(props) {
     super(props);
   }
 
+  componentDidMount() {
+    AsyncStorage.getItem('autoUpdate', (err, result) => {
+      if(JSON.parse(result)) {
+        console.log("autoUpdate switched on")
+        autoUpdateHandler.configure()
+      } else {
+        console.log("autoUpdate switched off")
+      }
+    })
+  }
 
   render() {
     return (

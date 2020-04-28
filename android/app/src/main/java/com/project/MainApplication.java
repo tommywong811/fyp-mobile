@@ -3,6 +3,11 @@ package com.project;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.horcrux.svg.SvgPackage;
+import com.swmansion.rnscreens.RNScreensPackage;
+import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
+import com.transistorsoft.rnbackgroundfetch.RNBackgroundFetchPackage;
+import org.reactnative.maskedview.RNCMaskedViewPackage;
 import org.wonday.pdf.RCTPdfView;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
@@ -33,6 +38,11 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new SvgPackage(),
+            new RNScreensPackage(),
+            new SafeAreaContextPackage(),
+            new RNBackgroundFetchPackage(),
+            new RNCMaskedViewPackage(),
             new RCTPdfView(),
             new RNCWebViewPackage(),
             new VectorIconsPackage(),
