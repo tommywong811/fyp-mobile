@@ -11,6 +11,7 @@ import DownloadProgress from './frontend/components/progress/progress';
 import store from './store.js';
 import { Provider } from 'react-redux';
 import EventListPage from './frontend/components/EventListPage/EventListPage';
+import BarnHeatMapPage from './frontend/components/BarnHeatMapPage/BarnHeatMapPage';
 
 import { Router, Scene } from 'react-native-router-flux';
 import { StyleSheet } from 'react-native';
@@ -20,6 +21,7 @@ import navigator from './frontend/components/Navigator/navigator';
 import { api } from './backend';
 import AsyncStorage from '@react-native-community/async-storage';
 import autoUpdateHandler from './backend/utils/autoUpdate'
+import PanoramaViewPage from './frontend/components/PanoramaViewPage/PanoramaViewPage';
 
 export default class App extends Component {
   constructor(props) {
@@ -60,6 +62,16 @@ export default class App extends Component {
               key='EventListPage'
               component={EventListPage}
               title='Event List'
+            />
+            <Scene
+              key='BarnHeatMapPage'
+              component={BarnHeatMapPage}
+              title='Barn Heatmap'
+            />
+            <Scene
+              key='PanoramaViewPage'
+              component={PanoramaViewPage}
+              title='Panorama View'
             />
             <Scene key='FacilityInfoPage'
               component={FacilityInfoPage}

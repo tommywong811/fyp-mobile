@@ -8,6 +8,7 @@ import com.swmansion.rnscreens.RNScreensPackage;
 import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
 import com.transistorsoft.rnbackgroundfetch.RNBackgroundFetchPackage;
 import org.reactnative.maskedview.RNCMaskedViewPackage;
+import nl.lightbase.PanoramaViewPackage;
 import org.wonday.pdf.RCTPdfView;
 import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
@@ -43,6 +44,7 @@ public class MainApplication extends Application implements ReactApplication {
             new SafeAreaContextPackage(),
             new RNBackgroundFetchPackage(),
             new RNCMaskedViewPackage(),
+            new PanoramaViewPackage(),
             new RCTPdfView(),
             new RNCWebViewPackage(),
             new VectorIconsPackage(),

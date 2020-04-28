@@ -9,6 +9,8 @@ include ':react-native-background-fetch'
 project(':react-native-background-fetch').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-background-fetch/android')
 include ':@react-native-community_masked-view'
 project(':@react-native-community_masked-view').projectDir = new File(rootProject.projectDir, '../node_modules/@react-native-community/masked-view/android')
+include ':@lightbase_react-native-panorama-view'
+project(':@lightbase_react-native-panorama-view').projectDir = new File(rootProject.projectDir, '../node_modules/@lightbase/react-native-panorama-view/android')
 include ':react-native-pdf'
 project(':react-native-pdf').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-pdf/android')
 include ':react-native-webview'
