@@ -4,6 +4,7 @@ import DrawerLayout from "react-native-gesture-handler/DrawerLayout";
 import LoadingPage from "../LoadingPage/LoadingPage";
 import AsyncStorage from "@react-native-community/async-storage";
 import {
+  TextInput,
   CheckBox,
   Modal,
     Alert,
@@ -16,7 +17,8 @@ import {
   Keyboard,
   Platform,
   TouchableHighlight,
-  Image
+  Image,
+    NativeModules,
 } from "react-native";
 import {
   CHANGE_FLOOR,
@@ -71,6 +73,8 @@ class Navigator extends React.Component {
       modalthird: 'random',
       animation: false,
       modalshowmore: false,
+      modalList:null,
+      confidencefirst: null,
     };
   }
 
@@ -429,6 +433,16 @@ class Navigator extends React.Component {
             <Icon type='Ionicons' name='ios-arrow-forward' style={styles.menuItemArrowRight}></Icon>
           </TouchableOpacity>
 
+          <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => NativeModules.Administration.Navigation()}
+          >
+            <Text style={styles.drawerSubSection}>
+              Administration
+            </Text>
+            <Icon type='Ionicons' name='ios-arrow-forward' style={styles.menuItemArrowRight}></Icon>
+          </TouchableOpacity>
+
         </ScrollView>
 
         <View style={styles.menuSetting}>
@@ -465,7 +479,7 @@ class Navigator extends React.Component {
 
   handleUploadPhoto() {
     this.setState({isLoading : true});
-    fetch('http://192.168.0.115:3000/api/upload', {
+    fetch('http://192.168.0.115:3002/api/upload', {
       method: 'POST',
       body: this.createFormData(this.state.photo, {userId: '123'}),
     })
@@ -473,9 +487,24 @@ class Navigator extends React.Component {
         .then(response => {
           console.log('upload success', response);
           this.setState({
-            modalfirst: response.most,
-            modalsecond: response.second,
-            modalthird: response.third,
+            modalfirst:response.data[0].position,
+            confidencefirst:response.data[0].confidence,
+            modalList: response.data.map((data) => <TouchableOpacity
+                onPress={() => this.handleModal(data.position)}>
+              <View style={{
+                flexDirection: "row",
+                padding: 10,
+              }}>
+                <Icon active name="md-pin"/>
+                <View style={{
+                  flexDirection:"column",
+                  paddingLeft:10,
+                }}>
+                  <Text style={{fontSize: 17}}>{data.position}</Text>
+                  <Text style={{fontSize: 12 ,color:'lightgrey'}}>Confidence:{data.confidence}</Text>
+                </View>
+              </View>
+            </TouchableOpacity>),
             isLoading: false
           })
           this.setState({photo: null,
@@ -488,16 +517,8 @@ class Navigator extends React.Component {
         });
   }
 
-  handleModal(index){
-    if(index == 1){
-      var nodes = api.nodes({ name: this.state.modalfirst }).data;
-    }
-    else if(index == 2){
-      var nodes = api.nodes({ name: this.state.modalsecond }).data;
-    }
-    else if(index == 3){
-      var nodes = api.nodes({ name: this.state.modalthird }).data;
-    }
+  handleModal(data){
+      var nodes = api.nodes({ name: data }).data;
 
     nodes.forEach(e => {
       e.buildingName = this._buildingnameToString(
@@ -607,59 +628,32 @@ class Navigator extends React.Component {
               <View style={{ borderRadius:15,
                 backgroundColor: 'white',
               justifyContent: 'center'}}>
-                <TouchableOpacity style={{width: '100%'}}
-                onPress={() => this.handleModal(1)}>
+                {!this.state.modalshowmore && <TouchableOpacity style={{width: '100%'}}
+                                   onPress={() => this.handleModal(this.state.modalfirst)}>
                   <View style={{
                     flexDirection: "row",
                     padding: 10,
                   }}>
                     <Icon active name="md-pin"/>
                     <View style={{
-                      flexDirection:"column",
-                      paddingLeft:10,
+                      flexDirection: "column",
+                      paddingLeft: 10,
                     }}>
-                  <Text style={{fontSize: 17}}>{this.state.modalfirst}</Text>
-                  <Text style={{fontSize: 12 ,color:'lightgrey'}}>Confidence:0.772</Text>
+                      <Text style={{fontSize: 17}}>{this.state.modalfirst}</Text>
+                      <Text style={{fontSize: 12, color: 'lightgrey'}}>Confidence:{this.state.confidencefirst}</Text>
                     </View>
                   </View>
-                </TouchableOpacity>
+                </TouchableOpacity>}
                 {this.state.modalshowmore && <View
                     style={{
                       borderRadius:15,
                       width : '100%',
                       backgroundColor: 'white'}}>
-                  <TouchableOpacity
-                      onPress={() => this.handleModal(2)}>
-                    <View style={{
-                      flexDirection: "row",
-                      padding: 10,
-                    }}>
-                      <Icon active name="md-pin"/>
-                      <View style={{
-                        flexDirection:"column",
-                        paddingLeft:10,
-                      }}>
-                        <Text style={{fontSize: 17}}>{this.state.modalsecond}</Text>
-                        <Text style={{fontSize: 12 ,color:'lightgrey'}}>Confidence:0.772</Text>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                      onPress={() => this.handleModal(3)}>
-                    <View style={{
-                      flexDirection: "row",
-                      padding: 10,
-                    }}>
-                      <Icon active name="md-pin"/>
-                      <View style={{
-                        flexDirection:"column",
-                        paddingLeft:10,
-                      }}>
-                        <Text style={{fontSize: 17}}>{this.state.modalthird}</Text>
-                        <Text style={{fontSize: 12 ,color:'lightgrey'}}>Confidence:0.772</Text>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
+                  {this.state.modalList}
+                  <TextInput placeholder="Or please tell us the correct location"
+                  selectionColor={'#428AF8'}
+                  underlineColorAndroid={'#428AF8'}
+                  style={{height: 40, paddingLeft:6}}/>
                   <TouchableOpacity style={{borderRadius:15,flexDirection: "row",
                     padding: 10,}}
                       onPress={() => Alert.alert(

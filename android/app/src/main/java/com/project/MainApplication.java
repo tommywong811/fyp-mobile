@@ -40,7 +40,8 @@ public class MainApplication extends Application implements ReactApplication {
             new RealmReactPackage(),
             new RNZipArchivePackage(),
             new AsyncStoragePackage(),
-            new RNFetchBlobPackage()
+            new RNFetchBlobPackage(),
+              new AdministrationReactPackage()
       );
     }
 

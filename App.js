@@ -17,6 +17,7 @@ import { StyleSheet } from 'react-native';
 import FacilityInfoPage from './frontend/components/FacilityInfoPage/FacilityInfoPage';
 import SettingsPage from './frontend/components/SettingsPage/SettingsPage';
 import navigator from './frontend/components/Navigator/navigator';
+import Administration from "./frontend/components/Administration/Administration";
 
 export default class App extends Component {
   constructor(props) {
@@ -56,6 +57,9 @@ export default class App extends Component {
               component={SettingsPage}
               title='Settings'>
             </Scene>
+            <Scene key='Administration'
+                   component={Administration}
+                   title={'Administration'}></Scene>
           </Scene>
         </Router>
       </Provider>

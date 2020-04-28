@@ -9,7 +9,8 @@ import {
     Platform,
     Keyboard,
     Modal,
-    StyleSheet
+    StyleSheet,
+    NativeModules,
 } from 'react-native';
 import NotFoundZoom0 from '../../asset/notFoundZoom0';
 import { getFloorDimension, dirToUri, getNodeOffsetForEachFloor, getNodeImageByTagId, getNodeImageByConnectorId } from '../../plugins/MapTiles';
@@ -209,6 +210,7 @@ class MapTiles extends React.Component {
                                         style={[{
                                             fontSize: 6,
                                         }]}
+                                        onPress={() => NativeModules.Administration.Navigation(node.name)}
                                     >
                                         {node.name.split('ROOM ')[1]}
                                     </Text>
@@ -355,7 +357,7 @@ class MapTiles extends React.Component {
         );
     }
 
-    _onPanEndHandler(evt, gestureState, zoomableViewEventObject) {  
+    _onPanEndHandler(evt, gestureState, zoomableViewEventObject) {
         if (this.props.isSuggestionListOpen) {
             this.props.onCloseSuggestionList();
         }
