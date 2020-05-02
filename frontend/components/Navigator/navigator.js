@@ -749,6 +749,8 @@ class Navigator extends React.Component {
               resetCurrentSearchKeyword={() =>
                 this._resetCurrentSearchKeyword()
               }
+              _onPressPathNextFloor={this._onPressPathNextFloor.bind(this)}
+              _onPressPathPreviousFloor={this._onPressPathPreviousFloor.bind(this)}
             ></MapTiles>
 
             {!isClosedRoomDetailBox && !isFindDirection && this.props.currentNode &&

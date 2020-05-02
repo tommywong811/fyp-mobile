@@ -86,7 +86,6 @@ class MapTiles extends React.Component {
             'nodesInFloor': this.props.nodes.filter((node) => node.floorId === this.props.currFloor),
             'nodeOffset': getNodeOffsetForEachFloor(this.props.currFloor),
             'pathInCurrFloor': [],
-            'currentPathFloorIndex': null
         });
     }
 
@@ -133,12 +132,6 @@ class MapTiles extends React.Component {
             })
         }
 
-        if (this.props.shortestPath.floors !== nextProps.shortestPath.floors) {
-            this.props.change_floor(nextProps.shortestPath.floors[0], null)
-            this.setState({
-              currentPathFloorIndex: 0,
-            })
-          }
     }
 
     setMapOffset(x, y) {
@@ -465,38 +458,12 @@ class MapTiles extends React.Component {
             // console.log(indexOfConnector);
 
             if (this.props.shortestPath.data[indexOfConnector].floorId == this.props.shortestPath.data[indexOfConnector - 1].floorId) {
-                this._onPressPathNextFloor()
+                this.props._onPressPathNextFloor()
             }
             else {
-                this._onPressPathPreviousFloor()
+                this.props._onPressPathPreviousFloor()
             }
         }
-    }
-
-    _onPressPathNextFloor() {
-        // console.log("393" + this.props.shortestPath.floors)
-
-        this.props.change_floor(this.props.shortestPath.floors[this.state.currentPathFloorIndex + 1], null)
-    
-        const nextCurrNode = this.props.shortestPath.data.find(node =>  node.floorId === this.props.shortestPath.floors[this.state.currentPathFloorIndex + 1])
-        this.props.change_node(null, nextCurrNode);
-        // change the current node to the starting point on the floor
-    
-        this.setState({
-          currentPathFloorIndex: this.state.currentPathFloorIndex + 1,
-        })
-      }
-    
-
-    _onPressPathPreviousFloor() {
-        this.props.change_floor(this.props.shortestPath.floors[this.state.currentPathFloorIndex - 1], null)
-    
-        const nextCurrNode = this.props.shortestPath.data.find(node =>  node.floorId === this.props.shortestPath.floors[this.state.currentPathFloorIndex - 1])
-        this.props.change_node(null, nextCurrNode) // change the current node to the starting point on the floor
-    
-        this.setState({
-          currentPathFloorIndex: this.state.currentPathFloorIndex - 1,
-        })
     }
 
     _onPanEndHandler(evt, gestureState, zoomableViewEventObject) {  
