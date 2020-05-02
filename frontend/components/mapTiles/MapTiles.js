@@ -400,22 +400,47 @@ class MapTiles extends React.Component {
                         deg = Math.atan2((y2 - y1), (x2 - x1)) / 2 / Math.PI * 360;
                         translateX = - (length / 2) * (1 - Math.cos(deg * 2 * Math.PI / 360))
                         translateY = length / 2 * Math.sin(deg * 2 * Math.PI / 360)
-
+                        console.log(key === Math.floor(pathInCurrFloor.length / 2), Math.floor(pathInCurrFloor.length / 2))
                         return (
-                            <View
-                                key={key}
-                                style={[{
-                                    flex: 1,
-                                    position: 'absolute',
-                                    top: ((node.coordinates[1] - this.props.offSetY) / logicTileSize * 80 + this.state.nodeOffset.y) + translateY,
-                                    left: (node.coordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x + translateX,
-                                    width: length,
-                                    transform: [{ rotate: (deg + 'deg') }],
-                                    height: 2,
-                                    backgroundColor: 'red',
-                                    borderRadius: 2,
-                                }]}>
-                            </View>
+                            <React.Fragment key={key}>
+                                <View
+                                    style={[{
+                                        flex: 1,
+                                        position: 'absolute',
+                                        top: ((node.coordinates[1] - this.props.offSetY) / logicTileSize * 80 + this.state.nodeOffset.y) + translateY,
+                                        left: (node.coordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x + translateX,
+                                        width: length,
+                                        transform: [{ rotate: (deg + 'deg') }],
+                                        height: 2,
+                                        backgroundColor: 'red',
+                                        borderRadius: 2,
+                                    }]}>
+                                </View>
+                                {key === Math.floor(pathInCurrFloor.length / 2) &&
+                                    <View
+                                        style={[{
+                                            flex: 1,
+                                            position: 'absolute',
+                                            top: ((node.coordinates[1] - this.props.offSetY) / logicTileSize * 80 + this.state.nodeOffset.y)  + translateY - 4  * Math.cos(deg * 2 * Math.PI / 360),
+                                            left: (node.coordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x  + length / 2 + translateX + 4  * Math.cos(deg * 4 * Math.PI / 360),
+                                            transform: [{ rotate: ((deg + 90) + 'deg') }],
+                                            width: 0,
+                                            height: 0,
+                                            backgroundColor: 'transparent',
+                                            borderStyle: 'solid',
+                                            borderLeftWidth: 4,
+                                            borderRightWidth: 4,
+                                            borderBottomWidth: 8,
+                                            borderLeftColor: 'transparent',
+                                            borderRightColor: 'transparent',
+                                            borderBottomColor: 'red'
+                                        }]}
+                                    >
+
+                                    </View>
+
+                                }
+                            </React.Fragment>
                         )
                     }
                 })}
