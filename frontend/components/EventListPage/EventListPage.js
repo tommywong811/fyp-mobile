@@ -26,7 +26,9 @@ export default class EventListPage extends React.Component {
             dateFrom: moment().format('YYYY-MM-DD'),
             dateTo: null,
             selectedCategory: '',
-            categories: []
+            selectedPostingUnit: '',
+            categories: [],
+            postingUnits: []
         }
         this.setFromDate = this.setFromDate.bind(this);
         this.setToDate = this.setToDate.bind(this);
@@ -41,8 +43,9 @@ export default class EventListPage extends React.Component {
     async componentWillMount() {
         try {
             this.setState({isLoading: true})
-            await this.fetchData();
             await this.fetchCategory();
+            await this.fetchPostUnit();
+            await this.fetchData();
         } catch (err) {
             alert(JSON.stringify(err, null, 2))
         }
@@ -70,11 +73,23 @@ export default class EventListPage extends React.Component {
         })
     }
 
-    async fetchData(date_from=null, date_to=null, cat_id=null) {
+    async fetchPostUnit() {
+        const url = `${BASEPATH}/getEventPostingunit.php`
+        const res = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${API_KEY}`
+            }
+        })
+        this.setState({
+            postingUnits: res['data']
+        })
+    }
+
+    async fetchData(date_from=null, date_to=null, cat_id=null, posting_unit=null) {
         try {
             let { page, event_list } = this.state;
             if(!this.state.keepLoading) return;
-            const url = `${BASEPATH}/getEvent.php?date_from=${date_from?date_from:this.state.now}${date_to?`&date_to=${date_to}`:''}${cat_id?`&cat_id=${cat_id}`:''}&sort=A&page_size=10&page_num=${page}`
+            const url = `${BASEPATH}/getEvent.php?date_from=${date_from?date_from:this.state.now}${date_to?`&date_to=${date_to}`:''}${cat_id?`&cat_id=${cat_id}`:''}${posting_unit?`&posting_unit=${posting_unit}`:''}&sort=A&page_size=10&page_num=${page}`
             let res = await axios.get(url, {
                 headers: {
                     Authorization: `Bearer ${API_KEY}`
@@ -91,6 +106,10 @@ export default class EventListPage extends React.Component {
             }
             const new_list = this.processEventList(res['data']['event']);
             event_list = event_list.concat(new_list)
+            event_list.map(e=> {
+                let res = this.state.postingUnits.find(unit => unit['unit_id'] === e['events_dept'])
+                e['events_dept'] = res ? res['unit_en_name']: e['events_dept']
+            })
             this.setState({
                 event_list: event_list,
                 totalNumOfItems: res['data']['total_cnt'],
@@ -129,7 +148,7 @@ export default class EventListPage extends React.Component {
             keepLoading: true,
             isModalVisible: !this.state.isModalVisible
         });
-        await this.fetchData(this.state.dateFrom, this.state.dateTo?this.state.dateTo:null, this.state.selectedCategory?this.state.selectedCategory:null);
+        await this.fetchData(this.state.dateFrom, this.state.dateTo?this.state.dateTo:null, this.state.selectedCategory?this.state.selectedCategory:null, this.state.selectedPostingUnit?this.state.selectedPostingUnit:null);
     }
 
     setFromDate(newDate) {
@@ -142,6 +161,10 @@ export default class EventListPage extends React.Component {
 
     setSelectedCategory(category) {
         this.setState({ selectedCategory: category });
+    }
+
+    setSelectedCategory(unit) {
+        this.setState({ selectedPostingUnit: unit });
     }
 
     async onPressVenue(venue) {
@@ -184,6 +207,9 @@ export default class EventListPage extends React.Component {
 
                 <CardItem>
                     <Body>
+                        <View style={styles.itemDetailRow}>
+                            <Text style={styles.itemDetailLabel}>Posting Unit : </Text><Text>{item.events_dept || '-'}</Text>
+                        </View>
                         <View style={styles.itemDetailRow}>
                             <Text style={styles.itemDetailLabel}>Speaker : </Text><Text>{item.events_en_candidate || '-'}</Text>
                         </View>
@@ -237,6 +263,7 @@ export default class EventListPage extends React.Component {
                             <Label>Date From:</Label>
                             <DatePicker
                                 locale={'en'}
+                                defaultDate={new Date()} 
                                 maximumDate={this.state.dateTo?new Date(this.state.dateTo.split('-')[0], Number(this.state.dateTo.split('-')[1])-1, this.state.dateTo.split('-')[2]):new Date(2999,11,31)}
                                 onDateChange={this.setFromDate}
                             />
@@ -257,13 +284,21 @@ export default class EventListPage extends React.Component {
                                 selectedValue={this.state.selectedCategory}
                                 onValueChange={this.setSelectedCategory}
                             >
-                                {/* <Picker.Item label='Test1' value='1'></Picker.Item>
-                                <Picker.Item label='Test2' value='2'></Picker.Item>
-                                <Picker.Item label='Test3' value='3'></Picker.Item>
-                                <Picker.Item label='Test4' value='4'></Picker.Item>
-                                <Picker.Item label='Test5' value='5'></Picker.Item> */}
                                 {this.state.categories.map(category => {
                                     return (<Picker.Item label={category.cat_en_name} value={category.cat_id} key={category.cat_id}></Picker.Item>)
+                                })}
+                            </Picker>
+                        </Item>
+                        <Item fixedLabel>
+                            <Label>Posting Unit:</Label>
+                            <Picker
+                                mode="dropdown"
+                                placeholder="Select Posting Unit"
+                                selectedValue={this.state.selectedPostingUnit}
+                                onValueChange={this.setSelectedCategory}
+                            >
+                                {this.state.postingUnits.map(unit => {
+                                    return (<Picker.Item label={unit.unit_en_name} value={unit.unit_id} key={unit.unit_id}></Picker.Item>)
                                 })}
                             </Picker>
                         </Item>
