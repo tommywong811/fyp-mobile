@@ -669,13 +669,6 @@
   dependencies:
     prop-types "^15.5.10"
 
-"@egjs/hammerjs@^2.0.17":
-  version "2.0.17"
-  resolved "https://registry.yarnpkg.com/@egjs/hammerjs/-/hammerjs-2.0.17.tgz#5dc02af75a6a06e4c2db0202cae38c9263895124"
-  integrity sha512-XQsZgjm2EcVUiZQf11UBJQfmZeEmOW8DpI1gsFeln6w0ae0ii4dMQEQ0kjl6DspdWX1aGY1/loyXnP0JS06e/A==
-  dependencies:
-    "@types/hammerjs" "^2.0.36"
-
 "@jest/console@^24.7.1":
   version "24.7.1"
   resolved "https://registry.yarnpkg.com/@jest/console/-/console-24.7.1.tgz#32a9e42535a97aedfe037e725bd67e954b459545"
@@ -822,6 +815,11 @@
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^12.0.9"
 
+"@lightbase/react-native-panorama-view@^0.1.3":
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/@lightbase/react-native-panorama-view/-/react-native-panorama-view-0.1.3.tgz#d8c756d05b95f10b76d952506dd49a7d2efa6a49"
+  integrity sha512-VY5FNTuPiuN9+BawblZTkqi+Y4PH5P5B+RnP+tH48ZdhLcN5eQCsaCz125YrvyrIIBtiJi8OYBtiDNL4i6Szwg==
+
 "@react-native-community/async-storage@github:react-native-community/async-storage":
   version "1.7.1"
   resolved "https://codeload.github.com/react-native-community/async-storage/tar.gz/5161cab537ee4ed9d6beb4fc6d4e056b753042e6"
@@ -961,11 +959,6 @@
   integrity sha512-CeBpmX1J8kWLcDEnI3Cl2Eo6RfbGvzUctA+CjZUhOKDFbLfcr7fc4usEqLNWetrlJd7RhAkyYe2czXop4fICpw==
   dependencies:
     "@babel/types" "^7.3.0"
-
-"@types/hammerjs@^2.0.36":
-  version "2.0.36"
-  resolved "https://registry.yarnpkg.com/@types/hammerjs/-/hammerjs-2.0.36.tgz#17ce0a235e9ffbcdcdf5095646b374c2bf615a4c"
-  integrity sha512-7TUK/k2/QGpEAv/BCwSHlYu3NXZhQ9ZwBYpzr9tjlPIL2C5BeGhH3DmVavRx3ZNyELX5TLC91JTz/cen6AAtIQ==
 
 "@types/istanbul-lib-coverage@*", "@types/istanbul-lib-coverage@^2.0.0":
   version "2.0.1"
@@ -2172,6 +2165,11 @@ cross-spawn@^6.0.0:
     shebang-command "^1.2.0"
     which "^1.2.9"
 
+crypto-js@^3.1.9-1:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-3.3.0.tgz#846dd1cce2f68aacfa156c8578f926a609b7976b"
+  integrity sha512-DIT51nX0dCfKltpRiXV+/TVZq+Qq2NgF4644+K7Ttnla7zEzqc+kjJyiB96BHNyUTBxyjzRcZYpUdZa+QAqi6Q==
+
 css-select@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/css-select/-/css-select-2.1.0.tgz#6a34653356635934a81baca68d0255432105dbef"
@@ -2824,6 +2822,11 @@ fast-levenshtein@~2.0.4:
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/fast-levenshtein/-/fast-levenshtein-2.0.6.tgz#3d8a5c66883a16a30ca8643e851f19baa7797917"
   integrity sha1-PYpcZog6FqMMqGQ+hR8Zuqd5eRc=
+
+fast-plist@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/fast-plist/-/fast-plist-0.1.2.tgz#a45aff345196006d406ca6cdcd05f69051ef35b8"
+  integrity sha1-pFr/NFGWAG1AbKbNzQX2kFHvNbg=
 
 fastpriorityqueue@^0.6.3:
   version "0.6.3"
@@ -3544,7 +3547,7 @@ inquirer@^3.0.6:
     strip-ansi "^4.0.0"
     through "^2.3.6"
 
-invariant@2.2.4, invariant@^2.2.4:
+invariant@2.2.4, invariant@^2.2.2, invariant@^2.2.4:
   version "2.2.4"
   resolved "https://registry.yarnpkg.com/invariant/-/invariant-2.2.4.tgz#610f3c92c9359ce1db616e538008d23ff35158e6"
   integrity sha512-phJfQVBuaJM5raOpJjSfkiD6BpbCE4Ns//LaXl6wGYtUBY83nWS6Rf9tXm2e8VaK60JEjYldbPif/A2B1C2gNA==
@@ -4496,7 +4499,7 @@ lodash.keyby@^4.6.0:
   resolved "https://registry.yarnpkg.com/lodash.keyby/-/lodash.keyby-4.6.0.tgz#7f6a1abda93fd24e22728a4d361ed8bcba5a4354"
   integrity sha1-f2oavak/0k4icopNNh7YvLpaQ1Q=
 
-lodash.merge@^4.0.0:
+lodash.merge@^4.0.0, lodash.merge@^4.6.1:
   version "4.6.2"
   resolved "https://registry.yarnpkg.com/lodash.merge/-/lodash.merge-4.6.2.tgz#558aa53b43b661e1925a0afdfa36a9a1085fe57a"
   integrity sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==
@@ -6146,6 +6149,15 @@ react-lifecycles-compat@^3.0.4:
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
   integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
 
+react-native-background-fetch@^3.0.4:
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/react-native-background-fetch/-/react-native-background-fetch-3.0.4.tgz#0b1e8b282e482343ce7f478ffb94cb72dfde054a"
+  integrity sha512-ZUfwFPDvTRK4Tkl59Is9t2L8cekgRIUA1jNAzMjNrH2O9hpPJ3jYGzfp/+ipxlVZIs+Y83KsgNbL3g7R83r6zw==
+  dependencies:
+    fast-plist "^0.1.2"
+    plist "^3.0.1"
+    xcode "^2.0.0"
+
 react-native-crypto@^2.0.1:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/react-native-crypto/-/react-native-crypto-2.1.2.tgz#cfe68cad51cd1f73a4202b7ac164f96c1144cb2a"
@@ -6176,6 +6188,13 @@ react-native-easy-grid@0.2.1:
   dependencies:
     lodash "4.17.11"
 
+react-native-fs-store@^0.1.6:
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/react-native-fs-store/-/react-native-fs-store-0.1.6.tgz#347c4f0a36d5ca9054026bfd6e69ef202f716da0"
+  integrity sha512-X/F08LXV7HwlsOgc/Ei1lyYeTWtrX2QGqHjqpIxoLYqV/EdFKxzMMZx+GxHT3b699vu4ZZOhPGQ/FEvV0S4MQw==
+  dependencies:
+    lodash.merge "^4.6.1"
+
 react-native-fs@^2.13.3:
   version "2.13.3"
   resolved "https://registry.yarnpkg.com/react-native-fs/-/react-native-fs-2.13.3.tgz#a422f0ecd8a093a7e99d8d51ff51440e090a18a8"
@@ -6184,15 +6203,14 @@ react-native-fs@^2.13.3:
     base-64 "^0.1.0"
     utf8 "^2.1.1"
 
-react-native-gesture-handler@^1.6.0:
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/react-native-gesture-handler/-/react-native-gesture-handler-1.6.0.tgz#e9a4e1d0c7ac21eb0d6b6ec013e73f9c0c33a629"
-  integrity sha512-KulGCWKTxa6xBpPP4LWEPmmLqBqOe2jbtdlILOVF/dR4EgImiaBVrKdOHeRMyMzJOYAWxs5uDZsyA8hgSsm+lw==
+react-native-gesture-handler@~1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/react-native-gesture-handler/-/react-native-gesture-handler-1.3.0.tgz#d0386f565928ccc1849537f03f2e37fd5f6ad43f"
+  integrity sha512-ASRFIXBuKRvqlmwkWJhV8yP2dTpvcqVrLNpd7FKVBFHYWr6SAxjGyO9Ik8w1lAxDhMlRP2IcJ9p9eq5X2WWeLQ==
   dependencies:
-    "@egjs/hammerjs" "^2.0.17"
     hoist-non-react-statics "^2.3.1"
-    invariant "^2.2.4"
-    prop-types "^15.7.2"
+    invariant "^2.2.2"
+    prop-types "^15.5.10"
 
 react-native-image-slider-box@^1.0.12:
   version "1.0.12"
@@ -6229,6 +6247,14 @@ react-native-material-ui@^1.30.1:
     lodash.merge "^4.0.0"
     prop-types "^15.5.10"
     react-native-material-design-styles "^0.2.6"
+
+react-native-pdf@^5.1.7:
+  version "5.1.7"
+  resolved "https://registry.yarnpkg.com/react-native-pdf/-/react-native-pdf-5.1.7.tgz#14e82e0f2b91aa5b11ea198c8301f13914cb9558"
+  integrity sha512-bNAO6xlwaepp3LpWpVvAzkn5/AVWOwewUM9PzZ0VqIk6Gi1OXxeitCrkF0Ui9ARkEElsmBbDlS/b+l4BiBF3/A==
+  dependencies:
+    crypto-js "^3.1.9-1"
+    prop-types "^15.5.10"
 
 react-native-progress@^3.6.0:
   version "3.6.0"
