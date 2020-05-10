@@ -35,7 +35,9 @@ export default class EventListPage extends React.Component {
         this.fetchData = this.fetchData.bind(this);
         this.fetchCategory = this.fetchCategory.bind(this);
         this.filter = this.filter.bind(this);
+        this.clearFilter = this.clearFilter.bind(this);
         this.setSelectedCategory = this.setSelectedCategory.bind(this);
+        this.setSelectedPostingUnit = this.setSelectedPostingUnit.bind(this);
         this.onPressVenue = this.onPressVenue.bind(this);
         this.checkIsClickable = this.checkIsClickable.bind(this);
     }
@@ -151,6 +153,16 @@ export default class EventListPage extends React.Component {
         await this.fetchData(this.state.dateFrom, this.state.dateTo?this.state.dateTo:null, this.state.selectedCategory?this.state.selectedCategory:null, this.state.selectedPostingUnit?this.state.selectedPostingUnit:null);
     }
 
+    async clearFilter() {
+        await this.setState({
+            selectedPostingUnit: null,
+            selectedCategory: null,
+            dateFrom: moment().format('YYYY-MM-DD'),
+            dateTo: null
+        });
+        // await this.fetchData();
+    }
+
     setFromDate(newDate) {
         this.setState({ dateFrom: moment(newDate).format('YYYY-MM-DD') });
     }
@@ -163,7 +175,7 @@ export default class EventListPage extends React.Component {
         this.setState({ selectedCategory: category });
     }
 
-    setSelectedCategory(unit) {
+    setSelectedPostingUnit(unit) {
         this.setState({ selectedPostingUnit: unit });
     }
 
@@ -295,13 +307,16 @@ export default class EventListPage extends React.Component {
                                 mode="dropdown"
                                 placeholder="Select Posting Unit"
                                 selectedValue={this.state.selectedPostingUnit}
-                                onValueChange={this.setSelectedCategory}
+                                onValueChange={this.setSelectedPostingUnit}
                             >
                                 {this.state.postingUnits.map(unit => {
                                     return (<Picker.Item label={unit.unit_en_name} value={unit.unit_id} key={unit.unit_id}></Picker.Item>)
                                 })}
                             </Picker>
                         </Item>
+                        <Button style={styles.modalClearFilterButton} block onPress={this.clearFilter}>
+                            <Text>Clear Filter</Text>
+                        </Button>
                         <Button style={styles.modalFilterButton} block onPress={this.filter}>
                             <Text>Filter</Text>
                         </Button>
@@ -371,6 +386,13 @@ const styles = StyleSheet.create({
     modalFilterButton: {
         marginTop: 24,
         backgroundColor: '#003366',
+        marginRight: 8,
+        marginLeft: 8,
+    },
+
+    modalClearFilterButton: {
+        marginTop: 24,
+        backgroundColor: 'red',
         marginRight: 8,
         marginLeft: 8,
     },
