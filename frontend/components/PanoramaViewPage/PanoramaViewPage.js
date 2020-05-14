@@ -21,7 +21,7 @@ export default class PanoramaViewPage extends React.Component {
                     style={styles.viewer}
                     dimensions={{ height: Dimensions.get('window').height, width: Dimensions.get("window").width }}
                     inputType="mono"
-                    imageUrl="http://klor.student.ust.hk/image/panorama_sample.jpg"
+                    imageUrl="https://i.ytimg.com/vi/yspFy7_oEKk/hqdefault.jpg"
                 />
             </View>
         );
