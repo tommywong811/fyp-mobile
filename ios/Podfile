@@ -24,6 +24,8 @@ target 'project' do
 
     pod 'RNSVG', :path => '../node_modules/react-native-svg'
 
+    pod 'PanoramaView', :path => '../node_modules/@lightbase/react-native-panorama-view'
+
   end
 
   target 'projectTests' do
