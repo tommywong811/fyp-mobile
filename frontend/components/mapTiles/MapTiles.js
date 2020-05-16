@@ -414,7 +414,7 @@ class MapTiles extends React.Component {
                                         style={[{
                                             flex: 1,
                                             position: 'absolute',
-                                            top: ((node.coordinates[1] - this.props.offSetY) / logicTileSize * 80 + this.state.nodeOffset.y)  + translateY - 4  * Math.cos(deg * 2 * Math.PI / 360),
+                                            top: ((node.coordinates[1] - this.props.offSetY) / logicTileSize * 80 + this.state.nodeOffset.y)  + translateY - 4  * Math.cos(deg * 4 * Math.PI / 360),
                                             left: (node.coordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x  + length / 2 + translateX + 4  * Math.cos(deg * 4 * Math.PI / 360),
                                             transform: [{ rotate: ((deg + 90) + 'deg') }],
                                             width: 0,

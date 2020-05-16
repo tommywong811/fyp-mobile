@@ -205,7 +205,7 @@ export default class BarnHeatMapPage extends React.Component {
         <ScrollView contentContainerStyle={{ paddingTop: 30 }}>
           <TouchableOpacity onPress={this.toggleExpandedA} style={styles.c_bar}>
             <View style={styles.header} >
-              <Text style={styles.headerText}>Barn A: Busy</Text>
+              <Text style={styles.headerText}>Barn A: Not Busy</Text>
               <View style={styles.statusBarR}></View>
             </View>
           </TouchableOpacity>
@@ -213,15 +213,7 @@ export default class BarnHeatMapPage extends React.Component {
             <View style={styles.content}>
               <View style={styles.imageContainer}>
                 <Image
-                  source={{ uri: this.state.selectedBarnUrl_a }}
-                  resizeMode="contain"
-                  style={styles.barnImage}
-                ></Image>
-              </View>
-
-              <View style={styles.imageContainer}>
-                <Image
-                  source={{ uri: this.state.selectedBarnUrl_b }}
+                  source={{ uri: 'http://itsc.ust.hk/apps/realcam/barna_g1_000M.jpg' }}
                   resizeMode="contain"
                   style={styles.barnImage}
                 ></Image>
@@ -238,15 +230,7 @@ export default class BarnHeatMapPage extends React.Component {
             <View style={styles.content}>
               <View style={styles.imageContainer}>
                 <Image
-                  source={{ uri: this.state.selectedBarnUrl_a }}
-                  resizeMode="contain"
-                  style={styles.barnImage}
-                ></Image>
-              </View>
-
-              <View style={styles.imageContainer}>
-                <Image
-                  source={{ uri: this.state.selectedBarnUrl_b }}
+                  source={{ uri: 'http://itsc.ust.hk/apps/realcam/barnb_1_000M.jpg' }}
                   resizeMode="contain"
                   style={styles.barnImage}
                 ></Image>
@@ -255,22 +239,14 @@ export default class BarnHeatMapPage extends React.Component {
           </Collapsible>
           <TouchableOpacity onPress={this.toggleExpandedC} style={styles.c_bar}>
             <View style={styles.header}>
-              <Text style={styles.headerText}>Barn C: Very Busy</Text>
+              <Text style={styles.headerText}>Barn C: Not Busy</Text>
             </View>
           </TouchableOpacity>
           <Collapsible collapsed={this.state.collapsedC} align="center">
             <View style={styles.content}>
               <View style={styles.imageContainer}>
                 <Image
-                  source={{ uri: this.state.selectedBarnUrl_a }}
-                  resizeMode="contain"
-                  style={styles.barnImage}
-                ></Image>
-              </View>
-
-              <View style={styles.imageContainer}>
-                <Image
-                  source={{ uri: this.state.selectedBarnUrl_b }}
+                  source={{ uri: 'http://itsc.ust.hk/apps/realcam/barnc_g1_000M.jpg' }}
                   resizeMode="contain"
                   style={styles.barnImage}
                 ></Image>
