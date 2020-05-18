@@ -9,6 +9,7 @@ import {
   Switch,
   ScrollView,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import Accordion from "react-native-collapsible/Accordion";
 import Collapsible from "react-native-collapsible";
@@ -35,6 +36,12 @@ const BARN_C_TEACHING_AREA_URL =
 
 const BACON_IPSUM =
   "Bacon ipsum dolor amet chuck turducken landjaeger tongue spare ribs. Picanha beef prosciutto meatball turkey shoulder shank salami cupim doner jowl pork belly cow. Chicken shankle rump swine tail frankfurter meatloaf ground round flank ham hock tongue shank andouille boudin brisket. ";
+
+const BUSY_LEVELS = {
+  'very_busy': 'Very Busy',
+  'busy': 'Busy',
+  'not busy': 'Not Busy',
+}
 
 const SELECTORS = [
   {
@@ -80,16 +87,39 @@ export default class BarnHeatMapPage extends React.Component {
       selectBarn: "a",
       selectedBarnUrl_a: BARN_A_GENERAL_AREA_URL,
       selectedBarnUrl_b: BARN_A_TEACHING_AREA_URL,
+      barnABusyLevel: '',
+      barnBBusyLevel: '',
+      barnCBusyLevel: '',
       activeSections: [],
       collapsedA: true,
       collapsedB: true,
       collapsedC: true,
       multipleSelect: false,
+      errorMessage: null,
+      isLoading: true,
     };
     this.selectBarn = this.selectBarn.bind(this);
   }
 
-  async componentWillMount() {}
+  async componentWillMount() {
+    try {
+      const response = await fetch('http://ec2-18-162-46-240.ap-east-1.compute.amazonaws.com:5000/head_count')
+      const result = await response.json();
+      console.log(result)
+      this.setState({
+        barnABusyLevel: result.barn_a[1],
+        barnBBusyLevel: result.barn_b[1],
+        barnCBusyLevel: result.barn_c[1], 
+        isLoading: false,
+      })
+    } catch(e) {
+      console.log(e);
+      this.setState({
+        isLoading: false,
+        errorMessage: 'Please Connect the Network'
+      })
+    }
+  }
 
   selectBarn(value) {
     this.setState({ selectBarn: value });
@@ -177,82 +207,77 @@ export default class BarnHeatMapPage extends React.Component {
   };
 
   render() {
-    const { multipleSelect, activeSections } = this.state;
+    const { multipleSelect, activeSections, isLoading, barnABusyLevel, barnBBusyLevel, barnCBusyLevel, errorMessage } = this.state;
     return (
       <View style={styles.container}>
-        {/* <Item fixedLabel>
-                    <Label>Barn:</Label>
-                    <Picker
-                        mode="dropdown"
-                        selectedValue={this.state.selectBarn}
-                        placeholder="Select Barn"
-                        onValueChange={this.selectBarn}
-                    >
-                        <Picker.Item label='Barn A' value='a' key='a'></Picker.Item>
-                        <Picker.Item label='Barn B' value='b' key='b'></Picker.Item>
-                        <Picker.Item label='Barn C' value='c' key='c'></Picker.Item>
-                    </Picker>
-                </Item>
-
-                <View style={styles.imageContainer}>
-                    <Image source={{uri: this.state.selectedBarnUrl_a}} resizeMode='contain' style={styles.barnImage}></Image>
+        <ScrollView contentContainerStyle={{ paddingTop: 30 }}>
+          {isLoading && 
+          <ActivityIndicator></ActivityIndicator>
+          }
+          {!isLoading &&
+            <React.Fragment>
+              {errorMessage &&
+                <View>
+                  <Text>{errorMessage}</Text>
                 </View>
 
-                <View style={styles.imageContainer}>
-                    <Image source={{uri: this.state.selectedBarnUrl_b}} resizeMode='contain' style={styles.barnImage}></Image>
-                </View> */}
+              }
+              {!errorMessage &&
+                <React.Fragment>
+                  <TouchableOpacity onPress={this.toggleExpandedA} style={styles.c_bar}>
+                    <View style={styles.header} >
+                      <Text style={styles.headerText}>Barn A: {BUSY_LEVELS[barnABusyLevel]}</Text>
+                      <View style={styles.statusBarR}></View>
+                    </View>
+                  </TouchableOpacity>
+                  <Collapsible collapsed={this.state.collapsedA} align="center">
+                    <View style={styles.content}>
+                      <View style={styles.imageContainer}>
+                        <Image
+                          source={{ uri: 'http://itsc.ust.hk/apps/realcam/barna_g1_000M.jpg' }}
+                          resizeMode="contain"
+                          style={styles.barnImage}
+                        ></Image>
+                      </View>
+                    </View>
+                  </Collapsible>
 
-        <ScrollView contentContainerStyle={{ paddingTop: 30 }}>
-          <TouchableOpacity onPress={this.toggleExpandedA} style={styles.c_bar}>
-            <View style={styles.header} >
-              <Text style={styles.headerText}>Barn A: Not Busy</Text>
-              <View style={styles.statusBarR}></View>
-            </View>
-          </TouchableOpacity>
-          <Collapsible collapsed={this.state.collapsedA} align="center">
-            <View style={styles.content}>
-              <View style={styles.imageContainer}>
-                <Image
-                  source={{ uri: 'http://itsc.ust.hk/apps/realcam/barna_g1_000M.jpg' }}
-                  resizeMode="contain"
-                  style={styles.barnImage}
-                ></Image>
-              </View>
-            </View>
-          </Collapsible>
-
-          <TouchableOpacity onPress={this.toggleExpandedB} style={styles.c_bar}>
-            <View style={styles.header}>
-              <Text style={styles.headerText}>Barn B: Not Busy</Text>
-            </View>
-          </TouchableOpacity>
-          <Collapsible collapsed={this.state.collapsedB} align="center">
-            <View style={styles.content}>
-              <View style={styles.imageContainer}>
-                <Image
-                  source={{ uri: 'http://itsc.ust.hk/apps/realcam/barnb_1_000M.jpg' }}
-                  resizeMode="contain"
-                  style={styles.barnImage}
-                ></Image>
-              </View>
-            </View>
-          </Collapsible>
-          <TouchableOpacity onPress={this.toggleExpandedC} style={styles.c_bar}>
-            <View style={styles.header}>
-              <Text style={styles.headerText}>Barn C: Not Busy</Text>
-            </View>
-          </TouchableOpacity>
-          <Collapsible collapsed={this.state.collapsedC} align="center">
-            <View style={styles.content}>
-              <View style={styles.imageContainer}>
-                <Image
-                  source={{ uri: 'http://itsc.ust.hk/apps/realcam/barnc_g1_000M.jpg' }}
-                  resizeMode="contain"
-                  style={styles.barnImage}
-                ></Image>
-              </View>
-            </View>
-          </Collapsible>
+                  <TouchableOpacity onPress={this.toggleExpandedB} style={styles.c_bar}>
+                    <View style={styles.header}>
+                      <Text style={styles.headerText}>Barn B: {BUSY_LEVELS[barnBBusyLevel]}</Text>
+                    </View>
+                  </TouchableOpacity>
+                  <Collapsible collapsed={this.state.collapsedB} align="center">
+                    <View style={styles.content}>
+                      <View style={styles.imageContainer}>
+                        <Image
+                          source={{ uri: 'http://itsc.ust.hk/apps/realcam/barnb_1_000M.jpg' }}
+                          resizeMode="contain"
+                          style={styles.barnImage}
+                        ></Image>
+                      </View>
+                    </View>
+                  </Collapsible>
+                  <TouchableOpacity onPress={this.toggleExpandedC} style={styles.c_bar}>
+                    <View style={styles.header}>
+                      <Text style={styles.headerText}>Barn C: {BUSY_LEVELS[barnABusyLevel]}</Text>
+                    </View>
+                  </TouchableOpacity>
+                  <Collapsible collapsed={this.state.collapsedC} align="center">
+                    <View style={styles.content}>
+                      <View style={styles.imageContainer}>
+                        <Image
+                          source={{ uri: 'http://itsc.ust.hk/apps/realcam/barnc_g1_000M.jpg' }}
+                          resizeMode="contain"
+                          style={styles.barnImage}
+                        ></Image>
+                      </View>
+                    </View>
+                  </Collapsible>
+                </React.Fragment>
+              }
+            </React.Fragment>
+          }
         </ScrollView>
       </View>
     );
