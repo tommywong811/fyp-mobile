@@ -323,7 +323,12 @@ export default class FacilityInfoPage extends React.Component {
     return (
       <View style={{ flex: 1, height: height }}>
         <SliderBox images={this.state.mock_images} dotColor='#003366'/>
-        <Text>{this.props.selectedNode}</Text>
+        <Text style={{
+          paddingTop: 5,
+          textAlign: 'center',
+          fontSize: 22,
+          fontWeight: 'bold'
+        }}>{this.props.selectedNode}</Text>
         <View style={{ flex: 1 }}>
           <View
             style={{
