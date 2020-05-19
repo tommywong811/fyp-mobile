@@ -65,7 +65,7 @@ const autoUpdateHandler = {
   configure: () => {
     console.log("autoUpdate configured")
     BackgroundFetch.configure({
-      minimumFetchInterval: 15,//1440,     // <-- minutes (15 is minimum allowed)
+      minimumFetchInterval: 1440,     // <-- minutes (15 is minimum allowed)
       // Android options
       forceAlarmManager: false,     // <-- Set true to bypass JobScheduler.
       stopOnTerminate: false,
