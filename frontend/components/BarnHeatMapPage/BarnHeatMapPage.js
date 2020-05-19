@@ -234,7 +234,7 @@ export default class BarnHeatMapPage extends React.Component {
                     <View style={styles.content}>
                       <View style={styles.imageContainer}>
                         <Image
-                          source={{ uri: 'http://itsc.ust.hk/apps/realcam/barna_g1_000M.jpg' }}
+                          source={{ uri: 'http://itsc.ust.hk/apps/realcam/barna_g1_000M.jpg' + '?' + new Date()}}
                           resizeMode="contain"
                           style={styles.barnImage}
                         ></Image>
@@ -251,7 +251,7 @@ export default class BarnHeatMapPage extends React.Component {
                     <View style={styles.content}>
                       <View style={styles.imageContainer}>
                         <Image
-                          source={{ uri: 'http://itsc.ust.hk/apps/realcam/barnb_1_000M.jpg' }}
+                          source={{ uri: 'http://itsc.ust.hk/apps/realcam/barnb_1_000M.jpg' + '?' + new Date()}}
                           resizeMode="contain"
                           style={styles.barnImage}
                         ></Image>
@@ -267,7 +267,7 @@ export default class BarnHeatMapPage extends React.Component {
                     <View style={styles.content}>
                       <View style={styles.imageContainer}>
                         <Image
-                          source={{ uri: 'http://itsc.ust.hk/apps/realcam/barnc_g1_000M.jpg' }}
+                          source={{ uri: 'http://itsc.ust.hk/apps/realcam/barnc_g1_000M.jpg' + '?' + new Date()}}
                           resizeMode="contain"
                           style={styles.barnImage}
                         ></Image>
