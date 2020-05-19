@@ -199,7 +199,7 @@ export default class EventListPage extends React.Component {
       return(
           <View style={styles.container}>
               <ScrollView contentContainerStyle={styles.scrollView}>
-                <View style={styles.settingTab}>
+                {/* <View style={styles.settingTab}>
                   <View style={styles.settingTabRow}>
                     <View style={styles.settingTabRowGroup}>
                       <Icon type='FontAwesome5' name='language' style={styles.settingTabIcon}></Icon>
@@ -215,7 +215,7 @@ export default class EventListPage extends React.Component {
                       })}
                     </Picker>
                   </View>
-                </View>
+                </View> */}
 
                 <View
                   style={styles.settingTab}
@@ -262,7 +262,7 @@ export default class EventListPage extends React.Component {
                   {this.renderFeedback()}
                 </TouchableOpacity>
 
-                <View
+                {/* <View
                   style={styles.settingTab}
                 >
                   <View style={styles.settingTabRow}>
@@ -278,7 +278,7 @@ export default class EventListPage extends React.Component {
                     >
                     </Switch>
                   </View>
-                </View>
+                </View> */}
 
                 <TouchableOpacity
                   onPress={() => this.HelpOnPress()}
