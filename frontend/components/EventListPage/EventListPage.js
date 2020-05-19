@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardItem, Text, Body, Badge, DatePicker, Item, Label, Button, Picker } from 'native-base';
 import axios from 'axios';
 import moment from 'moment';
-import { ActivityIndicator, View, StyleSheet, FlatList, Dimensions, Modal, Platform, Linking } from 'react-native';
+import { ActivityIndicator, View, StyleSheet, FlatList, Dimensions, Modal, Platform, Linking, SafeAreaView } from 'react-native';
 import { Actions } from 'react-native-router-flux';
 /**
  * childrenView: 
@@ -223,6 +223,9 @@ export default class EventListPage extends React.Component {
                             <Text style={styles.itemDetailLabel}>Posting Unit : </Text><Text>{item.events_dept || '-'}</Text>
                         </View>
                         <View style={styles.itemDetailRow}>
+                            <Text style={styles.itemDetailLabel}>Category : </Text><Text>{item.events_category || '-'}</Text>
+                        </View>
+                        <View style={styles.itemDetailRow}>
                             <Text style={styles.itemDetailLabel}>Speaker : </Text><Text>{item.events_en_candidate || '-'}</Text>
                         </View>
                         <View style={styles.itemDetailRow}>
@@ -266,61 +269,63 @@ export default class EventListPage extends React.Component {
                     </Text>
                 </Badge>
                 <Modal visible={this.state.isModalVisible}>
-                    <View>
-                        <View style={styles.headerBar}>
-                            <Text style={styles.modalTitle}>Filter</Text>
-                            <Text style={styles.modalBackButton} onPress={this.closeModal}>X</Text>
+                    <SafeAreaView>
+                        <View>
+                            <View style={styles.headerBar}>
+                                <Text style={styles.modalTitle}>Filter</Text>
+                                <Text style={styles.modalBackButton} onPress={this.closeModal}>X</Text>
+                            </View>
+                            <Item fixedLabel>
+                                <Label>Date From:</Label>
+                                <DatePicker
+                                    locale={'en'}
+                                    defaultDate={new Date()} 
+                                    maximumDate={this.state.dateTo?new Date(this.state.dateTo.split('-')[0], Number(this.state.dateTo.split('-')[1])-1, this.state.dateTo.split('-')[2]):new Date(2999,11,31)}
+                                    onDateChange={this.setFromDate}
+                                />
+                            </Item>
+                            <Item fixedLabel>
+                                <Label>Date To:</Label>
+                                <DatePicker
+                                    locale={'en'}
+                                    minimumDate={new Date(this.state.dateFrom.split('-')[0], Number(this.state.dateFrom.split('-')[1])-1, this.state.dateFrom.split('-')[2])}
+                                    onDateChange={this.setToDate}
+                                />
+                            </Item>
+                            <Item fixedLabel>
+                                <Label>Category:</Label>
+                                <Picker
+                                    mode="dropdown"
+                                    placeholder="Select Category"
+                                    selectedValue={this.state.selectedCategory}
+                                    onValueChange={this.setSelectedCategory}
+                                >
+                                    {this.state.categories.map(category => {
+                                        return (<Picker.Item label={category.cat_en_name} value={category.cat_id} key={category.cat_id}></Picker.Item>)
+                                    })}
+                                </Picker>
+                            </Item>
+                            <Item fixedLabel>
+                                <Label>Posting Unit:</Label>
+                                <Picker
+                                    mode="dropdown"
+                                    placeholder="Select Posting Unit"
+                                    selectedValue={this.state.selectedPostingUnit}
+                                    onValueChange={this.setSelectedPostingUnit}
+                                >
+                                    {this.state.postingUnits.map(unit => {
+                                        return (<Picker.Item label={unit.unit_en_name} value={unit.unit_id} key={unit.unit_id}></Picker.Item>)
+                                    })}
+                                </Picker>
+                            </Item>
+                            <Button style={styles.modalClearFilterButton} block onPress={this.clearFilter}>
+                                <Text>Clear Filter</Text>
+                            </Button>
+                            <Button style={styles.modalFilterButton} block onPress={this.filter}>
+                                <Text>Filter</Text>
+                            </Button>
                         </View>
-                        <Item fixedLabel>
-                            <Label>Date From:</Label>
-                            <DatePicker
-                                locale={'en'}
-                                defaultDate={new Date()} 
-                                maximumDate={this.state.dateTo?new Date(this.state.dateTo.split('-')[0], Number(this.state.dateTo.split('-')[1])-1, this.state.dateTo.split('-')[2]):new Date(2999,11,31)}
-                                onDateChange={this.setFromDate}
-                            />
-                        </Item>
-                        <Item fixedLabel>
-                            <Label>Date To:</Label>
-                            <DatePicker
-                                locale={'en'}
-                                minimumDate={new Date(this.state.dateFrom.split('-')[0], Number(this.state.dateFrom.split('-')[1])-1, this.state.dateFrom.split('-')[2])}
-                                onDateChange={this.setToDate}
-                            />
-                        </Item>
-                        <Item fixedLabel>
-                            <Label>Category:</Label>
-                            <Picker
-                                mode="dropdown"
-                                placeholder="Select Category"
-                                selectedValue={this.state.selectedCategory}
-                                onValueChange={this.setSelectedCategory}
-                            >
-                                {this.state.categories.map(category => {
-                                    return (<Picker.Item label={category.cat_en_name} value={category.cat_id} key={category.cat_id}></Picker.Item>)
-                                })}
-                            </Picker>
-                        </Item>
-                        <Item fixedLabel>
-                            <Label>Posting Unit:</Label>
-                            <Picker
-                                mode="dropdown"
-                                placeholder="Select Posting Unit"
-                                selectedValue={this.state.selectedPostingUnit}
-                                onValueChange={this.setSelectedPostingUnit}
-                            >
-                                {this.state.postingUnits.map(unit => {
-                                    return (<Picker.Item label={unit.unit_en_name} value={unit.unit_id} key={unit.unit_id}></Picker.Item>)
-                                })}
-                            </Picker>
-                        </Item>
-                        <Button style={styles.modalClearFilterButton} block onPress={this.clearFilter}>
-                            <Text>Clear Filter</Text>
-                        </Button>
-                        <Button style={styles.modalFilterButton} block onPress={this.filter}>
-                            <Text>Filter</Text>
-                        </Button>
-                    </View>
+                    </SafeAreaView>
                 </Modal>
                 <FlatList
                     data={this.state.event_list}
