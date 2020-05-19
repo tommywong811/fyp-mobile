@@ -766,9 +766,11 @@ class Navigator extends React.Component {
                   <TouchableHighlight style={styles.directionBtn} onPress={()=> this._onPressDirectionLayout()} underlayColor="#428bca">
                     <Text style={styles.directionBtnText}>Direction</Text>
                   </TouchableHighlight>
-                  <TouchableHighlight style={styles.directionBtn} onPress={()=> Actions.PanoramaViewPage({nodeCoord: this.props.currentNode.coordinates, floorId: this.props.currFloor})} underlayColor="#428bca">
-                    <Text style={styles.directionBtnText}>Street View</Text>
-                  </TouchableHighlight>
+                  {Platform.OS === 'android' &&
+                    <TouchableHighlight style={styles.directionBtn} onPress={()=> Actions.PanoramaViewPage({nodeCoord: this.props.currentNode.coordinates, floorId: this.props.currFloor})} underlayColor="#428bca">
+                      <Text style={styles.directionBtnText}>Street View</Text>
+                    </TouchableHighlight>
+                  }
                 </View>
               </View>
             }
