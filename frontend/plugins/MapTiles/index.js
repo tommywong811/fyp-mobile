@@ -372,6 +372,10 @@ export function getNodeImageByTagId(tagId) {
             return require('../../../res/tags/atm.png');
         case 'drinkingFountain': 
             return require('../../../res/tags/drinkingFountain.png');
+        case 'virtualBarnWorkstation':
+            return require('../../../res/tags/virtualBarnWorkstation.png');
+        case 'satellitePrinter':
+            return require('../../../res/tags/satellitePrinter.png');
         default:
             return false;
     }
