@@ -28,7 +28,8 @@ export default class EventListPage extends React.Component {
             selectedCategory: '',
             selectedPostingUnit: '',
             categories: [],
-            postingUnits: []
+            postingUnits: [],
+            is_filter: false
         }
         this.setFromDate = this.setFromDate.bind(this);
         this.setToDate = this.setToDate.bind(this);
@@ -87,11 +88,11 @@ export default class EventListPage extends React.Component {
         })
     }
 
-    async fetchData(date_from=null, date_to=null, cat_id=null, posting_unit=null) {
+    async fetchData(date_from=null, date_to=null, cat_id=null, posting_unit=null, is_filter=false) {
         try {
             let { page, event_list } = this.state;
-            if(!this.state.keepLoading) return;
-            const url = `${BASEPATH}/getEvent.php?date_from=${date_from?date_from:this.state.now}${date_to?`&date_to=${date_to}`:''}${cat_id?`&cat_id=${cat_id}`:''}${posting_unit?`&posting_unit=${posting_unit}`:''}&sort=A&page_size=10&page_num=${page}`
+            if(!this.state.keepLoading && !is_filter) return;
+            const url = `${BASEPATH}/getEvent.php?date_from=${date_from?date_from:this.state.now}${date_to?`&date_to=${date_to}`:''}${cat_id?`&cat_id=${cat_id}`:''}${posting_unit?`&posting_unit=${posting_unit}`:''}&sort=A${is_filter?'':`&page_size=10&page_num=${page}`}`
             let res = await axios.get(url, {
                 headers: {
                     Authorization: `Bearer ${API_KEY}`
@@ -124,6 +125,7 @@ export default class EventListPage extends React.Component {
     }
 
     infiniteScroll() {
+        if (this.state.is_filter) return;
         this.setState((prevState, nextProps)=>({
             page: prevState.page + 1,
             isLoading: true
@@ -147,10 +149,11 @@ export default class EventListPage extends React.Component {
             isLoading: true,
             page: 1,
             totalNumOfItems: 0,
-            keepLoading: true,
-            isModalVisible: !this.state.isModalVisible
+            keepLoading: false,
+            isModalVisible: !this.state.isModalVisible,
+            is_filter: true
         });
-        await this.fetchData(this.state.dateFrom, this.state.dateTo?this.state.dateTo:null, this.state.selectedCategory?this.state.selectedCategory:null, this.state.selectedPostingUnit?this.state.selectedPostingUnit:null);
+        await this.fetchData(this.state.dateFrom, this.state.dateTo?this.state.dateTo:null, this.state.selectedCategory?this.state.selectedCategory:null, this.state.selectedPostingUnit?this.state.selectedPostingUnit:null, true);
     }
 
     async clearFilter() {
@@ -158,7 +161,8 @@ export default class EventListPage extends React.Component {
             selectedPostingUnit: null,
             selectedCategory: null,
             dateFrom: moment().format('YYYY-MM-DD'),
-            dateTo: null
+            dateTo: null,
+            is_filter: false
         });
         // await this.fetchData();
     }
