@@ -604,7 +604,7 @@ class Navigator extends React.Component {
                   }}
                   value={searchInput}
                 />
-                <Icon active name="search-location" type='FontAwesome5' style={{ color: "#003366", fontSize: 17, marginLeft: 5, marginRight: 10 }}></Icon>
+                {/* <Icon active name="search-location" type='FontAwesome5' style={{ color: "#003366", fontSize: 17, marginLeft: 5, marginRight: 10 }}></Icon> */}
               </Item>
               ,
               <View key={1} style={Platform.OS === 'android' ? { maxHeight: 200} : {maxHeight: 200, position: 'absolute', zIndex:1, top: 50}}>
