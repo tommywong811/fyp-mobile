@@ -121,7 +121,7 @@ class MapTiles extends React.Component {
                 this.setMapOffset(-80 - nodeOffset.x, 0);
             }
         }
-        if (nextProps.shortestPath.data && (this.state.pathInCurrFloor.length === 0 || nextProps.currFloor != this.props.currFloor)) {
+        if (nextProps.shortestPath.data && nextProps.currFloor != this.props.currFloor || (nextProps.shortestPath.data != this.props.shortestPath.data && nextProps.shortestPath.data)) {
             this.setState({
                 'pathInCurrFloor': nextProps.shortestPath.data.filter((data) => data.floorId === nextProps.currFloor)
             })
@@ -395,7 +395,7 @@ class MapTiles extends React.Component {
                         translateY = length / 2 * Math.sin(deg * 2 * Math.PI / 360)
                         console.log(key === Math.floor(pathInCurrFloor.length / 2), Math.floor(pathInCurrFloor.length / 2))
                         return (
-                            <React.Fragment key={key}>
+                            <React.Fragment key={node._id}>
                                 <View
                                     style={[{
                                         flex: 1,
