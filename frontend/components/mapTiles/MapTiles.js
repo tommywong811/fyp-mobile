@@ -344,7 +344,7 @@ class MapTiles extends React.Component {
                 })
                 }
 
-                {this.props.currentNode &&
+                {this.props.currentNode && this.state.pathInCurrFloor.length === 0 &&
                     <Image source={require('../../../res/tags/pin.png')}
                         style={{
                             width: 4, height: 9,
@@ -352,6 +352,28 @@ class MapTiles extends React.Component {
                             position: 'absolute',
                             top: (this.props.currentNode.centerCoordinates[1] - this.props.offSetY) / logicTileSize * 80 + this.state.nodeOffset.y - 10,
                             left: (this.props.currentNode.centerCoordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x,
+                        }}>
+                    </Image>
+                }
+                {this.state.pathInCurrFloor.length > 0 && this.props.fromNode && this.state.pathInCurrFloor[0]._id === this.props.shortestPath.data[0]._id &&
+                    <Image source={require('../../../res/tags/pin.png')}
+                        style={{
+                            width: 4, height: 9,
+                            flex: 1,
+                            position: 'absolute',
+                            top: (this.props.fromNode.centerCoordinates[1] - this.props.offSetY) / logicTileSize * 80 + this.state.nodeOffset.y - 10,
+                            left: (this.props.fromNode.centerCoordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x,
+                        }}>
+                    </Image>
+                }
+                {this.state.pathInCurrFloor.length > 0 && this.props.toNode && this.state.pathInCurrFloor[this.state.pathInCurrFloor.length - 1]._id === this.props.shortestPath.data[this.props.shortestPath.data.length - 1]._id &&
+                    <Image source={require('../../../res/tags/pin.png')}
+                        style={{
+                            width: 4, height: 9,
+                            flex: 1,
+                            position: 'absolute',
+                            top: (this.props.toNode.centerCoordinates[1] - this.props.offSetY) / logicTileSize * 80 + this.state.nodeOffset.y - 10,
+                            left: (this.props.toNode.centerCoordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x,
                         }}>
                     </Image>
                 }

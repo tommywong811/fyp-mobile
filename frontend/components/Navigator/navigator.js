@@ -751,6 +751,8 @@ class Navigator extends React.Component {
               }
               _onPressPathNextFloor={this._onPressPathNextFloor.bind(this)}
               _onPressPathPreviousFloor={this._onPressPathPreviousFloor.bind(this)}
+              fromNode={this.state.fromNode}
+              toNode={this.state.toNode}
             ></MapTiles>
 
             {!isClosedRoomDetailBox && !isFindDirection && this.props.currentNode &&
