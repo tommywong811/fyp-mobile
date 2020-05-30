@@ -14,7 +14,7 @@ import EventListPage from './frontend/components/EventListPage/EventListPage';
 import BarnHeatMapPage from './frontend/components/BarnHeatMapPage/BarnHeatMapPage';
 
 import { Router, Scene } from 'react-native-router-flux';
-import { StyleSheet, Alert, View, ActivityIndicator, SafeAreaView, Text} from 'react-native';
+import { StyleSheet, Alert, View, ActivityIndicator, SafeAreaView, Text, Platform } from 'react-native';
 import FacilityInfoPage from './frontend/components/FacilityInfoPage/FacilityInfoPage';
 import SettingsPage from './frontend/components/SettingsPage/SettingsPage';
 import navigator from './frontend/components/Navigator/navigator';
@@ -61,12 +61,12 @@ export default class App extends Component {
           {
             text: "Update Now",
             onPress: async () => {
-              this.setState({'isUpdating': true}); 
+              this.setState({'isUpdating': true});
               await update()
               console.log(UPDATE_FLOOR_DATA,UPDATE_CURRENT_FLOOR,UPDATE_NODE_DATA)
-              store.dispatch({type: UPDATE_FLOOR_DATA, payload: {data: api.floors().data}})                
-              store.dispatch({type: UPDATE_CURRENT_FLOOR, payload: {currentFloor: api.floors().data[0]}})                
-              store.dispatch({type: UPDATE_NODE_DATA, payload: {data:api.nodes().data}})    
+              store.dispatch({type: UPDATE_FLOOR_DATA, payload: {data: api.floors().data}})
+              store.dispatch({type: UPDATE_CURRENT_FLOOR, payload: {currentFloor: api.floors().data[0]}})
+              store.dispatch({type: UPDATE_NODE_DATA, payload: {data:api.nodes().data}})
 
               try {
                 const AsyncStorage = new Store('graphStore');
@@ -80,7 +80,7 @@ export default class App extends Component {
               } catch (error) {
                   console.log('GraphDataGraph Error', error)
               }
-              this.setState({'isUpdating': false});           
+              this.setState({'isUpdating': false});
             },
           }
         ])
@@ -99,12 +99,12 @@ export default class App extends Component {
   }
 
   _renderProgress(){
-    return( 
+    return(
       <SafeAreaView style={{flex: 1}}>
         <View style={{flex: 6, zIndex:1, flexDirection: 'column', backgroundColor: '#003366', justifyContent:'center', alignItems:'center'}}>
             <ActivityIndicator size="large" color="#c9e6ff"></ActivityIndicator>
             <Text style={{color: 'white', fontSize: 14, marginTop: 10}}>{'Please wait, Updating the Database...'}</Text>
-        </View> 
+        </View>
       </SafeAreaView>
     );
   }
@@ -145,7 +145,7 @@ export default class App extends Component {
             <Scene
               key='PanoramaViewPage'
               component={PanoramaViewPage}
-              title='Panorama View'
+              title={Platform.OS === 'ios' ? 'Street View' : 'Panorama View'}
             />
             <Scene key='FacilityInfoPage'
               component={FacilityInfoPage}

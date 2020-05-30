@@ -1,8 +1,10 @@
 import React from 'react';
 import { Item, Label, Picker } from 'native-base';
 import axios from 'axios';
-import { View, StyleSheet, Image, Dimensions } from 'react-native';
+import { View, StyleSheet, Image, Dimensions, Platform } from 'react-native';
 import { PanoramaView } from "@lightbase/react-native-panorama-view";
+import ImageZoom from 'react-native-image-pan-zoom';
+
 /**
  * childrenView:
  */
@@ -35,17 +37,40 @@ export default class PanoramaViewPage extends React.Component {
         })
     }
 
+    renderViewer() {
+      if(this.state.imageUrl !== "") {
+        if( Platform.OS === 'ios') {
+          return (
+            <ImageZoom
+                cropWidth={Dimensions.get('window').width}
+                cropHeight={Dimensions.get('window').height}
+                imageHeight={Dimensions.get('window').height * 5}
+                imageWidth={Dimensions.get('window').width * 6}
+                minScale={5}
+                maxScale={100}
+            >
+                <Image style={styles.staticViewer} source={{uri: this.state.imageUrl}}/>
+            </ImageZoom>
+          )
+        } else {
+          return (
+            <PanoramaView
+                style={styles.viewer}
+                dimensions={{ height: Dimensions.get('window').height, width: Dimensions.get("window").width }}
+                inputType="mono"
+                imageUrl={this.state.imageUrl}
+            />
+          )
+        }
+      } else {
+        return null
+      }
+    }
+
     render() {
         return(
             <View style={styles.container_temp}>
-            { this.state.imageUrl !== "" &&
-                <PanoramaView
-                    style={styles.viewer}
-                    dimensions={{ height: Dimensions.get('window').height, width: Dimensions.get("window").width }}
-                    inputType="mono"
-                    imageUrl={this.state.imageUrl}
-                />
-            }
+              {this.renderViewer()}
             </View>
         );
     }
@@ -55,7 +80,12 @@ const styles = StyleSheet.create({
     container: {
         flex: 1
     },
+    staticViewer: {
+      height: Dimensions.get('window').height * 5,
+      width: Dimensions.get('window').width * 6,
+      resizeMode: 'contain'
+    },
     viewer: {
-        height: Dimensions.get('window').height
+      height: Dimensions.get('window').height,
     }
 })
