@@ -263,6 +263,8 @@ export default class FacilityInfoPage extends React.Component {
       translateXTabTwo: new Animated.Value(width),
       translateY: -1000
     };
+
+    this.openLink = this.openLink.bind(this);
   }
 
   async componentWillMount() {
@@ -310,6 +312,10 @@ export default class FacilityInfoPage extends React.Component {
       ]);
     }
   };
+
+  openLink() {
+    Linking.openURL(this.state.menuSource.uri)
+  }
 
   render() {
     const { height } = Dimensions.get("window");
@@ -473,7 +479,10 @@ export default class FacilityInfoPage extends React.Component {
                     <Text>Menu unavailable</Text>
                   </View> :
                   <View style={styles.container}>
-                    <Pdf source={this.state.menuSource} style={this.restaurantDetailList[this.props.selectedNode]['style']} />
+                    <Button style={styles.downloadButton}>
+                      <Text style={styles.downloadButtonText} onPress={this.openLink}>Download and view Menu</Text>
+                    </Button>
+                    {/* <Pdf source={this.state.menuSource} style={this.restaurantDetailList[this.props.selectedNode]['style']} /> */}
                   </View>
                 }
 
@@ -496,6 +505,15 @@ const styles = StyleSheet.create({
     left: "50%",
     top: "50%",
     transform: [{ translateX: -15 }, { translateY: -50 }]
+  },
+
+  downloadButton: {
+    padding: 5,
+    backgroundColor: '#003366'
+  },
+
+  downloadButtonText: {
+    color: 'white',
   },
 
   item: {
