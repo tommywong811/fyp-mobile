@@ -14,7 +14,7 @@ import EventListPage from './frontend/components/EventListPage/EventListPage';
 import BarnHeatMapPage from './frontend/components/BarnHeatMapPage/BarnHeatMapPage';
 
 import { Router, Scene } from 'react-native-router-flux';
-import { StyleSheet, Alert } from 'react-native';
+import { StyleSheet, Alert, View, ActivityIndicator, SafeAreaView, Text} from 'react-native';
 import FacilityInfoPage from './frontend/components/FacilityInfoPage/FacilityInfoPage';
 import SettingsPage from './frontend/components/SettingsPage/SettingsPage';
 import navigator from './frontend/components/Navigator/navigator';
@@ -22,12 +22,24 @@ import { api } from './backend';
 import AsyncStorage from '@react-native-community/async-storage';
 import autoUpdateHandler from './backend/utils/autoUpdate'
 import { update } from './backend/utils/autoUpdate'
+import { UPDATE_FLOOR_DATA, UPDATE_CURRENT_FLOOR } from './frontend/reducer/floors/actionList';
+import { UPDATE_NODE_DATA } from './frontend/reducer/nodes/actionList'
+
+import buildGraph from "./backend/api/graph/build";
+import graphCache from "./backend/api/graph/cache";
+import Store from 'react-native-fs-store';
 
 import PanoramaViewPage from './frontend/components/PanoramaViewPage/PanoramaViewPage';
 
 export default class App extends Component {
   constructor(props) {
     super(props);
+  }
+
+  componentWillMount() {
+    this.setState({
+      isUpdating: false,
+    });
   }
 
   componentDidMount() {
@@ -48,7 +60,28 @@ export default class App extends Component {
           },
           {
             text: "Update Now",
-            onPress: () => update(),
+            onPress: async () => {
+              this.setState({'isUpdating': true}); 
+              await update()
+              console.log(UPDATE_FLOOR_DATA,UPDATE_CURRENT_FLOOR,UPDATE_NODE_DATA)
+              store.dispatch({type: UPDATE_FLOOR_DATA, payload: {data: api.floors().data}})                
+              store.dispatch({type: UPDATE_CURRENT_FLOOR, payload: {currentFloor: api.floors().data[0]}})                
+              store.dispatch({type: UPDATE_NODE_DATA, payload: {data:api.nodes().data}})    
+
+              try {
+                const AsyncStorage = new Store('graphStore');
+                let cachedGraphCache = await AsyncStorage.getItem('cachedGraphCache');
+                if (!cachedGraphCache) { // prebuild graph for searching path
+                    graphCache.data = buildGraph()
+                    await AsyncStorage.setItem('cachedGraphCache', JSON.stringify(graphCache));
+                } else {
+                    graphCache.data = JSON.parse(cachedGraphCache).data ;
+                }
+              } catch (error) {
+                  console.log('GraphDataGraph Error', error)
+              }
+              this.setState({'isUpdating': false});           
+            },
           }
         ])
       } else {
@@ -65,7 +98,22 @@ export default class App extends Component {
     })
   }
 
+  _renderProgress(){
+    return( 
+      <SafeAreaView style={{flex: 1}}>
+        <View style={{flex: 6, zIndex:1, flexDirection: 'column', backgroundColor: '#003366', justifyContent:'center', alignItems:'center'}}>
+            <ActivityIndicator size="large" color="#c9e6ff"></ActivityIndicator>
+            <Text style={{color: 'white', fontSize: 14, marginTop: 10}}>{'Please wait, Updating the Database...'}</Text>
+        </View> 
+      </SafeAreaView>
+    );
+  }
+
   render() {
+    if (this.state.isUpdating) {
+      return this._renderProgress();
+    }
+
     return (
       <Provider store={store}>
         <Router

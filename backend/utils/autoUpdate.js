@@ -2,7 +2,7 @@ import BackgroundFetch from "react-native-background-fetch";
 import { api } from '../';
 
 export function update() {
-  fetch("https://pathadvisor.ust.hk/api/meta", {
+  return fetch("https://pathadvisor.ust.hk/api/meta", {
     headers: {
       Accept: 'application/json'
     }
@@ -13,49 +13,67 @@ export function update() {
     if(currentVersion !== latestVersion) {
       api.updateMeta(json.data)
       console.log("update check: map version outdated")
-      fetch('https://api.ust.hk/hkust-path-advisor-api/tags', {
-        headers: {
-          'Authorization': '5d0c4f23de394e0001045b5d15b0b0884fda4a28a553e098aa2b5531',
-          Accept: 'application/json'
-        }
-      }).then((response) => response.json())
-      .then((json) => {
-        api.syncTags(json.data)
-      })
-      fetch('https://api.ust.hk/hkust-path-advisor-api/buildings', {
-        headers: {
-          'Authorization': '5d0c4f23de394e0001045b5d15b0b0884fda4a28a553e098aa2b5531',
-          Accept: 'application/json'
-        }
-      }).then((response) => response.json())
-      .then((json) => {
-        api.syncBuildings(json.data)
-      })
-      fetch('https://api.ust.hk/hkust-path-advisor-api/floors', {
-        headers: {
-          'Authorization': '5d0c4f23de394e0001045b5d15b0b0884fda4a28a553e098aa2b5531',
-          Accept: 'application/json'
-        }
-      }).then((response) => response.json())
-      .then((json) => {
-        api.syncFloors(json.data)
-        // fetching all the nodes with floorIds
-        json.data.forEach(function(floor){
-          console.log('fetching nodes in floor '+floor._id+' and bounding box of '+floor.mapWidth+','+floor.mapHeight)
-          fetch('https://api.ust.hk/hkust-path-advisor-api/floors/'+floor._id+'/nodes?boxCoordinates=0,0,'+floor.mapWidth+','+floor.mapHeight+'&includePoints=false', {
-            headers: {
-              'Authorization': '5d0c4f23de394e0001045b5d15b0b0884fda4a28a553e098aa2b5531',
-              Accept: 'application/json'
-            }
-          }).then((response) => response.json())
-          .then((json) => {
-            console.log('fetched results: '+json.data.length)
-            api.syncNodes(json.data)
+      return Promise.all([
+        fetch('https://api.ust.hk/hkust-path-advisor-api/tags', {
+          headers: {
+            'Authorization': '5d0c4f23de394e0001045b5d15b0b0884fda4a28a553e098aa2b5531',
+            Accept: 'application/json'
+          }
+        }).then((response) => response.json())
+        .then((json) => {console.log(1)
+          return api.syncTags(json.data)
+        }),
+        fetch('https://api.ust.hk/hkust-path-advisor-api/buildings', {
+          headers: {
+            'Authorization': '5d0c4f23de394e0001045b5d15b0b0884fda4a28a553e098aa2b5531',
+            Accept: 'application/json'
+          }
+        }).then((response) => response.json())
+        .then((json) => {console.log(2)
+          return api.syncBuildings(json.data)
+        }),
+        fetch('https://api.ust.hk/hkust-path-advisor-api/floors', {
+          headers: {
+            'Authorization': '5d0c4f23de394e0001045b5d15b0b0884fda4a28a553e098aa2b5531',
+            Accept: 'application/json'
+          }
+        }).then((response) => response.json())
+        .then((json) => {
+          return Promise.resolve(api.syncFloors(json.data)).then(() => json)
+          // fetching all the nodes with floorIds
+        }).then((json)=> {
+          const promises = [];
+          json.data.forEach(function(floor){
+            console.log('fetching nodes in floor '+floor._id+' and bounding box of '+floor.mapWidth+','+floor.mapHeight)
+            promises.push(
+              fetch('https://api.ust.hk/hkust-path-advisor-api/floors/'+floor._id+'/nodes?boxCoordinates=0,0,'+floor.mapWidth+','+floor.mapHeight+'&includePoints=false', {
+                headers: {
+                  'Authorization': '5d0c4f23de394e0001045b5d15b0b0884fda4a28a553e098aa2b5531',
+                  Accept: 'application/json'
+                }
+              }).then((response) => response.json())
+              .then((json) => {console.log(3)
+                console.log('fetched results: '+json.data.length)
+                return Promise.resolve(api.syncNodes(json.data))
+              })
+            )
+            // return fetch('https://api.ust.hk/hkust-path-advisor-api/floors/'+floor._id+'/nodes?boxCoordinates=0,0,'+floor.mapWidth+','+floor.mapHeight+'&includePoints=false', {
+            //   headers: {
+            //     'Authorization': '5d0c4f23de394e0001045b5d15b0b0884fda4a28a553e098aa2b5531',
+            //     Accept: 'application/json'
+            //   }
+            // }).then((response) => response.json())
+            // .then((json) => {
+            //   console.log('fetched results: '+json.data.length)
+            //   api.syncNodes(json.data)
+            // })
           })
+          return Promise.all(promises)
         })
-      })
+      ])
     } else {
       console.log("update check: map version latest")
+      return Promise.resolve();
     }
   })
 
