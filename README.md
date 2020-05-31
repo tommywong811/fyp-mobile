@@ -242,7 +242,17 @@
         </li>
         <li><details><summary>
             Progress</summary>
-            <pre>This component is the loading page. It will be used upon initializing the app or switching between floors.
+            <pre>This component is the loading page. It wrapped the Navigator component and initialize the app database or when the app launch at the first time.
+            </pre></details>
+        </li>
+        <li><details><summary>
+            PanoramaViewPage</summary>
+            <pre>This component show the panorama view of searched location. It will be shown after clicked the "Street View" Button in Searched Location Box.
+            </pre></details>
+        </li>
+        <li><details><summary>
+            BarnHeatMapPage</summary>
+            <pre>This component show the crowdedness of barns. It fetch the images from barn's surveillance camera and the busy level of barn calculated in server.
             </pre></details>
         </li>
         <li><details><summary>
@@ -256,6 +266,15 @@
         </li>
     </ul>
 </li>
+
+<li><h3><strong>Container</strong></h3>
+    <ul>
+        <li><details><summary>
+            App</summary>
+            <pre>It is the outermost container of the app. It consists of Router for switching each pages. It also check the latest database version when starting the app and call database update when needs. 
+            </pre></details>    
+        </li>
+		</ul>
 </ol>
 
 
