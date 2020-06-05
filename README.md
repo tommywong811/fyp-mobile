@@ -1,3 +1,5 @@
+
+
 <h1> Path Advisor Mobile Version (Android Frontend Docs)</h1>
 
 <h2>
@@ -315,10 +317,217 @@ d. Enter "npx react-native run-android" to run the application.
 </ul>
 
 
-<h2 id="Part5">Part V: How to Add Small Features</h2>
-<ol>
-<li>Create a folder under "frontent->component".</li>
-<li>Write and export "index.js" that can render your componet.</li>
-<li>Import your component to <a href="#Navigator">Navigator Component</a></li>
-<li>Register your component inside "_renderDrawer()" in <a href="#Navigator">Navigator Component</a></li>
-</ol>
+<h2 id="Part5">Part V: How to Add Plugin</h2>
+
+<h3>Add your component</h3>
+
+Add a new folder which contains the PluginPage component to component folder. 
+```
+├── frontend
+|	├── components
+|	│   ├── NewPluginPage
+|	|	│   └── NewPluginPage.js
+...
+```
+
+
+<h3>Edit your plugin page</h3>
+Below are the template for the plugin component page
+
+```javascript
+export default class NewPluginPage extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      // react state
+    }
+  }
+
+  componentWillMount() {
+    // action before DOM mount
+  }
+
+  componentDidMount() {
+    // action after DOM mount
+  }
+
+  componentWillReceiveProps(nextProps) {
+    // action when props will be updated
+  }
+  
+  componentDidUpdate(nextProps, nextState) {
+    // action when DOM rerender
+  }
+
+  // There are other lifecyle method in React. Please check https://reactjs.org/docs/react-component.html
+
+  render() {
+    return (
+      // JSX, wrapped by "single" root element
+    )
+  }
+}
+
+const styles = StyleSheet.create({
+    // style you want to use in the page
+ })
+```
+<br/>
+
+
+ <h3>Add your plugin page to route and app menu
+
+In ```/App.js```, add your plugin page.
+```javascript
+
+import NewPluginPage from './frontend/components/NewPluginPage';
+// ... 
+export default class App extends Component {
+  // ...
+  render() {
+    // ...
+    return (
+      <Provider store={store}>
+        <Router
+          navigationBarStyle={styles.navBar}
+          titleStyle={styles.navTitle}
+          headerTintColor="#003366"
+        >
+          <Scene key="root">
+            // ...
+            <Scene key='NewPluginPage'
+              component={NewPluginPage}
+              title='NewPluginPage'>
+            </Scene>
+          </Scene>
+        </Router>
+      </Provider>
+    )
+  }
+}
+// ...
+
+```
+
+<br/>
+
+In ```/frontend/components/Navigator/navigator.js```, add your plugin page to the app menu in ```_renderDrawer``` function.
+```javascript
+// ...
+class Navigator extends React.Component {
+  // ...
+  _renderDrawer() {
+    return (
+      <View style={styles.drawerContainer}>
+        <ScrollView>
+          /// ...
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => Actions.NewPluginPage()}
+          >
+            <Text style={styles.drawerSubSection}>
+              New Plugin Page
+            </Text>
+            <Icon type='Ionicons' name='ios-arrow-forward' style={styles.menuItemArrowRight}></Icon>
+          </TouchableOpacity>
+
+        </ScrollView>
+      </View>
+    );
+  }
+  // ...
+}
+// ...
+
+```
+<br/>
+<h3>Create Redux State for your plugin (If needed)</h3>
+
+Redux is a predictable state container for JavaScript apps. It allows state share between components. When a component update the redux state, other component with that state will be updated as well.
+
+To create and use redux state, there are a few steps.
+
+1.  Add a new reducer and its folder in ```/frontend/reducer/ ```
+```
+├── reducer
+│   ├── newPlugin
+│   |	└── actionList.js
+│   |	└── index.js
+```
+- actionList.js
+```javascript
+export  const  ACTION_1 = 'ACTION_1';
+// ...
+```
+- actionList.js
+```javascript
+import {api} from '../../../backend'
+
+import {
+// action 
+  ACTION1,
+} from './actionList'
+
+import AsyncStorage from '@react-native-community/async-storage';
+
+let initialState = {
+  // initial state of redux
+  state1 : null
+}
+
+function someActions(_id) {
+  // do some process (e.g. query) and return something
+  // ...
+  return _id;
+}
+
+export default newPluginReducer = (state = initialState, action) => {
+    switch(action.type){
+        //
+        case ACTION1:
+            return {
+                ...state,
+                'state1': someActions(action._id)
+            };
+        default:
+            return state;
+    }
+}
+
+```
+
+2.  Attach the reducer to redux state in ```/frontend/reducer/index.js```
+```
+	import { combineReducers } from 'redux';
+	// ...
+	import newPluginReducer from './newPlugin'
+	export default combineReducers({
+		   // ...
+		   newPluginReducer,
+	});
+```
+3.  In your plugin page ```/frontend/components/NewPluginPage/NewPluginPage.js```, create function ```mapDispatchToProps``` and ```mapStateToProps```, and export the component with function ```connect``` from ```react-redux``` modules. 
+For more details of how redux works, please read [https://redux.js.org/basics/reducers](https://redux.js.org/basics/reducers)
+
+```javascript
+import { connect } from  'react-redux';
+import {
+ACTION1,
+} from  '../../reducer/newPlugin/actionList';
+
+// ...
+
+function  mapStateToProps(state) {
+	return{
+		state1:  state.newPluginReducer.state1,
+	}
+} 
+
+function  mapDispatchToProps(dispatch) {
+	return{
+		ACTION1: () =>  dispatch({type:  ACTION1, payload:  {_id: 2 // example}}),
+	}
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(NewPluginPage)
+```
