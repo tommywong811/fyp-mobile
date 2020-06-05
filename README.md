@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
 <br/>
 
 
- <h3>Add your plugin page to route and app menu
+ <h3>Add your plugin page to route and app menu</h3>
 
 In ```/App.js```, add your plugin page.
 ```javascript
