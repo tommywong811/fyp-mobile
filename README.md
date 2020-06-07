@@ -1,6 +1,5 @@
-#Image-based Indoor Positioning System(Administration Application)
-##Content
-##Introduction
+# Image-based Indoor Positioning System(Administration Application)
+## Introduction
 Image-based indoor positioning system allowed user to know their location in HKUST by simply take a photo or upload a 
 existing photo. This system consist of the following project:
 
@@ -40,7 +39,7 @@ You can check Ricoh Theta S's [User Manual](https://support.theta360.com/uk/manu
 You can take photo of any room by pressing the label of the room. Wait for a while until the live preview prop out. Press the `shoot` button to take a photo. You can then press
 `save` to save the photo to the phone.  
    All the photo taken will be stored at the `saved_images` folder on your phone's device storage
-##Project Structure
+## Project Structure
 #### Ricoh Theta SDK
 ```
 android/app/src/main
