@@ -1,6 +1,5 @@
-#Image-based Indoor Positioning System(Mobile application)
-##Content
-##Introduction
+# Image-based Indoor Positioning System(Mobile application)
+## Introduction
 Image-based indoor positioning system allowed user to know their location in HKUST by simply take a photo or upload a 
 existing photo. This system consist of the following project:
 
@@ -11,7 +10,7 @@ existing photo. This system consist of the following project:
 
 For the mobile application that help take panorama image, please checkout the 
 [Administration](https://github.com/tommywong811/project/tree/Administration) branch of this repository.
-##About Path Advisor Mobile Version
+## About Path Advisor Mobile Version
 This project is forked from [Path Advisor Mobile Version](https://gitlab.com/samor412/project), more documentation about
 the mobile version of HKUST Path Advisor could be found there. 
 ## Getting Started
@@ -28,11 +27,11 @@ npm install --save-dev jetifier
 npx jetify
 ```
 Run the application using the following command:
-######Android
+##### Android
 ```
 react-native run-android
 ```
-######iOS
+##### iOS
 ```
 react-native run-ios
 ```
