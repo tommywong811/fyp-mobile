@@ -22,6 +22,8 @@ NodesModel.schema = {
         geoLocs: 'string?', // multipolygon geoJSON, stringified
         unsearchable: 'bool?',
         others: 'string?', // arbitrary object, stringified
+        tagIdsKeyword: 'string?',
+        keywordCSV: 'string?'
     }
 }
 

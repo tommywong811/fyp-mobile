@@ -24,6 +24,7 @@ import {
   CHANGE_NODE,
   RENDER_LOADING_PAGE,
   SAVE_PREVIOUS_NODE,
+  CLEAR_NODE,
 } from "../../reducer/floors/actionList";
 import {UPDATE_PATH, CLEAR_PATH_STATE} from "../../reducer/path/actionList";
 import {
@@ -61,8 +62,7 @@ class Navigator extends React.Component {
     this.isInputting = false;
     this.delay_execution = null;
     this.state = {
-      allFloorIds: this._getAllFloors(),
-      isBuilding: true,
+      allFloors: this._getAllFloors(),
       expandedFloorId: null,
       photo : null,
       modalVisible: false,
@@ -94,6 +94,7 @@ class Navigator extends React.Component {
       isKeyBoardShown: false,
       isFindDirection: false,
       previousSearchNode: null,
+      isClosedRoomDetailBox: true
     });
   }
 
@@ -103,6 +104,9 @@ class Navigator extends React.Component {
     this.setState({
       searchInput: this.props.searchKeyword ? this.props.searchKeyword : ''
     })
+    if (this.props.searchKeyword !== '' && this.props.searchKeyword !== undefined && this.props.searchKeyword !== null) {
+      this._onChangeSearchText(this.props.searchKeyword)
+    }
   }
 
   componentWillUnmount() {
@@ -111,7 +115,7 @@ class Navigator extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.currentNode != this.props.currentNode) {
+    if (nextProps.currentNode && nextProps.currentNode != this.props.currentNode) {
       // for _searchRoom function after find_node
       this.props.change_floor(nextProps.currFloor, nextProps.currentBuilding);
       this.setState({
@@ -159,7 +163,7 @@ class Navigator extends React.Component {
   _onChangeSearchText(text) {
     this.isInputting = true;
     this.setState({
-      searchInput: text.trim()
+      searchInput: text
     });
     if (text !== "" && text !== " ") {
       var nodes = api.nodes({ name: text }).data;
@@ -267,7 +271,8 @@ class Navigator extends React.Component {
   _searchRoom(currentNode = null) {
     this.setState({
       isLoading: currentNode === this.props.currentNode ? false : true,
-      suggestionList: [] // suggestion dropdown dismiss after search button press
+      suggestionList: [], // suggestion dropdown dismiss after search button press
+      isClosedRoomDetailBox: false
     });
     Keyboard.dismiss();
     setTimeout(() => {
@@ -287,7 +292,7 @@ class Navigator extends React.Component {
     setTimeout(() => {
       this.props.change_node(this.state.fromSearchInput, this.state.fromNode);
       if (this.state.fromSearchInput && this.state.toSearchInput) {
-        this.props.search_shortest_path(this.state.fromNode._id, this.state.toNode._id, true, false)  // TO DO: set the fromTo through user input
+        this.props.search_shortest_path(this.state.fromNode._id, this.state.toNode._id, false, true)  // TO DO: set the fromTo through user input
       }
     }, 1)
   }
@@ -311,8 +316,12 @@ class Navigator extends React.Component {
     return result;
   }
   //Get all floor names in one building
-  _getAllFloors(buildingId) {
-    return this.props.allFloors.filter(item => item.buildingId === buildingId);
+  _getAllFloors() {
+    let buildingFloorObject = {}
+    this._allBuildings.map(building => {
+      buildingFloorObject[building] = this.props.allFloors.filter(item => item.buildingId === building)
+    })
+    return buildingFloorObject;
   }
   _buildingnameToString(name) {
     switch (name) {
@@ -343,6 +352,8 @@ class Navigator extends React.Component {
   }
 
   _onPressPathNextFloor() {
+    // console.log(this.props.shortestPath.floors);
+
     this.props.change_floor(this.props.shortestPath.floors[this.state.currentPathFloorIndex + 1], null)
 
     const nextCurrNode = this.props.shortestPath.data.find(node =>  node.floorId === this.props.shortestPath.floors[this.state.currentPathFloorIndex + 1])
@@ -353,16 +364,49 @@ class Navigator extends React.Component {
     })
   }
 
+  _onPressSwapSearch() {
+    this.setState({
+      fromSearchInput: this.state.toSearchInput,
+      toSearchInput: this.state.fromSearchInput,
+      fromNode: this.state.toNode,
+      toNode: this.state.fromNode
+    })
+  }
+
   _renderDrawer() {
     return (
       <View style={styles.drawerContainer}>
         <ScrollView>
 
           <Image source={require('../../asset/hkust_icon.png')} style={styles.ustBannerImage}></Image>
+
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => {
+              if (this.props.currFloor !== 'Overall') {
+                setTimeout(() => {
+                  // to let the menu close
+                  this.props.render_loading_page();
+                  this.props.change_floor(
+                    'Overall',
+                    'campusMap'
+                  );
+                  this.props.clear_current_node();
+                }, 100);
+              }
+              this.drawer.closeDrawer();
+            }}
+          >
+            <Text style={styles.drawerSubSection}>
+              University Map
+            </Text>
+            <Icon type='Ionicons' name='ios-arrow-forward' style={styles.menuItemArrowRight}></Icon>
+          </TouchableOpacity>
+
           <Text style={styles.drawerSubSection}>Buildings</Text>
 
           <View style={styles.lineStyle} />
-          {this._allBuildings.map(item => (
+          {this._allBuildings.map(item => item !== 'campusMap' && (
             <View style={styles.drawerItems} key={item}>
               <TouchableOpacity style={styles.buildingItems}
                   onPress={() => {
@@ -378,12 +422,13 @@ class Navigator extends React.Component {
                   {this._buildingnameToString(item)}
                 </Text>
                 <Icon
-                  name="arrow-dropdown"
+                  name="caret-down"
+                  type='FontAwesome'
                   style={styles.drawerItemsIcon}
                 ></Icon>
               </TouchableOpacity>
               {this.state.expandedFloorId === item
-                ? this._getAllFloors(item).map(floor => {
+                ? this.state.allFloors[item].map(floor => {
                   floor_ID = null;
                   listToAddF = ['1','2','3','4','5','6','7','G']
                   style = Object.assign({}, item._id === this.props.currFloor ? styles.activeFloor : {}, styles.drawerSubItems)
@@ -406,6 +451,7 @@ class Navigator extends React.Component {
                                 floor._id,
                                 floor.buildingId
                               );
+                              this.props.clear_current_node();
                             }, 100);
                           }
                           this.drawer.closeDrawer();
@@ -425,6 +471,16 @@ class Navigator extends React.Component {
           >
             <Text style={styles.drawerSubSection}>
               Events
+            </Text>
+            <Icon type='Ionicons' name='ios-arrow-forward' style={styles.menuItemArrowRight}></Icon>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => Actions.BarnHeatMapPage()}
+          >
+            <Text style={styles.drawerSubSection}>
+              Barn Heatmap
             </Text>
             <Icon type='Ionicons' name='ios-arrow-forward' style={styles.menuItemArrowRight}></Icon>
           </TouchableOpacity>
@@ -523,6 +579,7 @@ class Navigator extends React.Component {
       toNode,
       currentPathFloorIndex,
       isFindDirection,
+      isClosedRoomDetailBox
     } = this.state;
 
     floor_ID = null;
@@ -781,9 +838,9 @@ class Navigator extends React.Component {
               >
                 <Icon
                   active
-                  name="md-menu"
-                  style={{ color: "#003366", fontSize: 20}}
-                  onPress={() => this.drawer.openDrawer()}
+                  name="my-location"
+                  type='MaterialIcons'
+                  style={{ color: "#003366", fontSize: 14}}
                 ></Icon>
                 <Input
                   placeholder="From"
@@ -834,6 +891,12 @@ class Navigator extends React.Component {
                   zIndex: 999
                 }}
               >
+                <Icon
+                  active
+                  name="location-pin"
+                  type='Entypo'
+                  style={{ color: "#dd0022", fontSize: 14}}
+                ></Icon>
                 <Input
                   placeholder="To"
                   placeholderTextColor="#003366"
@@ -847,15 +910,19 @@ class Navigator extends React.Component {
                     backgroundColor: "transparent",
                     borderRadius: 10,
                     height: 48,
-                    padding: 10,
-                    paddingLeft: 40,
+                    padding: 10
                   }}
                   value={toSearchInput}
                 />
                 {fromNode && toNode &&
-                  <TouchableHighlight onPress={()=> this._onPressSearchPath()} underlayColor="white">
-                    <Icon active name="search" style={{ color: "#003366" }}></Icon>
-                  </TouchableHighlight>
+                  <View style={{flexDirection: 'row'}}>
+                    <TouchableHighlight onPress={()=> this._onPressSwapSearch()} underlayColor="white">
+                      <Icon style={{color: "#003366" }} active name="swap-vertical" type='MaterialCommunityIcons'></Icon>
+                    </TouchableHighlight>
+                    <TouchableHighlight onPress={()=> this._onPressSearchPath()} underlayColor="white">
+                      <Icon active name="search" style={{ color: "#003366", marginRight: 10}}></Icon>
+                    </TouchableHighlight>
+                  </View>
                 }
               </Item>
               ,
@@ -883,20 +950,33 @@ class Navigator extends React.Component {
               resetCurrentSearchKeyword={() =>
                 this._resetCurrentSearchKeyword()
               }
+              _onPressPathNextFloor={this._onPressPathNextFloor.bind(this)}
+              _onPressPathPreviousFloor={this._onPressPathPreviousFloor.bind(this)}
+              fromNode={this.state.fromNode}
+              toNode={this.state.toNode}
             ></MapTiles>
 
-            {!isFindDirection && this.props.currentNode &&
+            {!isClosedRoomDetailBox && !isFindDirection && this.props.currentNode &&
               <View
                 style={styles.roomDetailBox}
                 >
-                <Text style={styles.roomName}>{this.props.currentNode.name}</Text>
+                <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                  <Text style={styles.roomName}>{this.props.currentNode.name}</Text>
+                  <Icon onPress={()=>{ this.setState({isClosedRoomDetailBox: true}) }} style={{color: "white" }} active name="close"></Icon>
+                </View>
                 <Text style={styles.roomFloor}>{`${this._buildingnameToString(this.props.currBuilding)} - ${floor_ID}`}</Text>
-                <TouchableHighlight style={styles.directionBtn} onPress={()=> this._onPressDirectionLayout()} underlayColor="#428bca">
-                  <Text style={styles.directionBtnText}>Direction</Text>
-                </TouchableHighlight>
+                <View style={{flexDirection: 'row', marginTop: 10}}>
+                  <TouchableHighlight style={styles.directionBtn} onPress={()=> this._onPressDirectionLayout()} underlayColor="#428bca">
+                    <Text style={styles.directionBtnText}>Direction</Text>
+                  </TouchableHighlight>
+                  <TouchableHighlight style={styles.directionBtn} onPress={()=> Actions.PanoramaViewPage({nodeCoord: this.props.currentNode.coordinates, floorId: this.props.currFloor})} underlayColor="#428bca">
+                    <Text style={styles.directionBtnText}>Street View</Text>
+                  </TouchableHighlight>
+                </View>
               </View>
             }
-            <View>
+            { isClosedRoomDetailBox &&
+              <View>
               <Text
                 style={{
                   padding: 5,
@@ -909,6 +989,7 @@ class Navigator extends React.Component {
                 {floor_ID}
               </Text>
             </View>
+            }
             <View
               style={styles.pathFloorControlContainer}
               >
@@ -920,7 +1001,7 @@ class Navigator extends React.Component {
                   <Icon
                   reverse
                   name="ios-arrow-back"
-                  style={{fontSize: 20}}
+                  style={{fontSize: 20, backgroundColor: '#1773c2'}}
                   reverseColor='white'></Icon>
                 </TouchableHighlight>
               }
@@ -932,7 +1013,7 @@ class Navigator extends React.Component {
                   <Icon
                   reverse
                   name="ios-arrow-forward"
-                  style={{fontSize: 20}}
+                  style={{fontSize: 20, backgroundColor: '#1773c2'}}
                   reverseColor="white"></Icon>
                 </TouchableHighlight>
               }
@@ -949,7 +1030,7 @@ class Navigator extends React.Component {
                         zIndex: 100,
                         position: "absolute",
                         }}>
-                <ActivityIndicator size="large" color="#0000ff" ></ActivityIndicator>
+                <ActivityIndicator size="large" color="#003366" ></ActivityIndicator>
               </View>
             }
           </LoadingPage>
@@ -986,6 +1067,10 @@ function mapDispatchToProps(dispatch) {
       dispatch({
         type: CHANGE_NODE,
         payload: { name: name, currentNode: currentNode }
+      }),
+    clear_current_node: () =>
+      dispatch({
+        type: CLEAR_NODE,
       }),
     search_shortest_path: (fromId, toId, noStairCase, noEscalator) =>{
       dispatch({
@@ -1050,7 +1135,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between"
   },
-  drawerItemsIcon: {},
+  drawerItemsIcon: {
+    color: '#003366',
+    fontSize: 16
+  },
   drawerSubItems: {
     backgroundColor: "white",
     color: "#003366",
@@ -1074,7 +1162,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "white",
+    backgroundColor: "#1773c2",
     marginRight: 12,
     justifyContent: "center",
     alignItems: "center",
@@ -1085,7 +1173,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "white",
+    backgroundColor: "#1773c2",
     marginRight: "auto",
     justifyContent: "center",
     alignItems: "center",
@@ -1114,7 +1202,7 @@ const styles = StyleSheet.create({
   },
 
   roomDetailBox: {
-    backgroundColor: "white",
+    backgroundColor: "#003366",
     width: "95%",
     alignSelf: "center",
     margin: 5,
@@ -1125,12 +1213,12 @@ const styles = StyleSheet.create({
 
   roomName: {
     fontSize: 20,
-    color: "#003366",
+    color: "white",
     // paddingBottom: 10,
   },
   roomFloor: {
     fontSize: 16,
-    color: "#003366",
+    color: "white",
   },
   directionBtn: {
     backgroundColor: "#428bca",
@@ -1141,6 +1229,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     width: 100,
     marginTop: 'auto',
+    marginRight: 5
   },
   directionBtnText: {
     color: "white",
@@ -1148,7 +1237,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   backToSearchBtn: {
-    backgroundColor: "#428bca",
+    backgroundColor: "#003366",
     borderRadius: 12,
     padding: 5,
     width: 100,

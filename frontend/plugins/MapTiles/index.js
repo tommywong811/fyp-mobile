@@ -1,6 +1,7 @@
 import throttle from 'lodash.throttle';
 import {api} from '../../../backend';
 import {Platform, Image} from 'react-native';
+import { connectors } from '../../../backend/api';
 
 const MAP_TILE_WIDTH = 200;
 const MAP_TILE_HEIGHT = 200;
@@ -350,7 +351,11 @@ export function getNodeImageByConnectorId(connectorId) {
         return require('../../../res/tags/stair.png');
     } else if (connectorId.includes('ESCALATOR')) {
         return require('../../../res/tags/escalator.png');
-    } else {
+    } else if (connectorId.includes('Entrance')) {
+        return require('../../../res/tags/crossBuildingConnector.png');
+    }
+    
+    else {
         return false;
     }
 }
@@ -367,6 +372,10 @@ export function getNodeImageByTagId(tagId) {
             return require('../../../res/tags/atm.png');
         case 'drinkingFountain': 
             return require('../../../res/tags/drinkingFountain.png');
+        case 'virtualBarnWorkstation':
+            return require('../../../res/tags/virtualBarnWorkstation.png');
+        case 'satellitePrinter':
+            return require('../../../res/tags/satellitePrinter.png');
         default:
             return false;
     }

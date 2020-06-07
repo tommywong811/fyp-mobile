@@ -1,6 +1,9 @@
 import React from 'react';
 import { Container, Header, Content, Text, Body, Icon } from 'native-base';
-import { Picker, ScrollView, Switch, View, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import { Picker, ScrollView, Switch, View, StyleSheet, Dimensions, TouchableOpacity, TextInput, TouchableHighlight } from 'react-native';
+import { api } from '../../../backend';
+import AsyncStorage from '@react-native-community/async-storage';
+import autoUpdateHandler from "../../../backend/utils/autoUpdate";
 
 const SUPPORT_LANGUAGES = [
   {label: 'English', value: 'english'}
@@ -14,10 +17,32 @@ export default class EventListPage extends React.Component {
           renderHelp: false,
           renderAboutUs: false,
           renderTAS: false,
+          renderFeedback: false,
           notifications: false,
-          language: 'English'
+          autoUpdate: false,
+          dbResponse: '',
+          language: 'English',
+          feedback: "",
+          feedbackResponse: "",
 
       }
+  }
+
+  componentDidMount() {
+    AsyncStorage.getItem('autoUpdate', (err, result) => {
+      if(!err) {
+        if(result !== null) {
+          this.setState({autoUpdate: JSON.parse(result)})
+        }
+      }
+    })
+    AsyncStorage.getItem('notifications', (err, result) => {
+      if(!err) {
+        if(result !== null) {
+          this.setState({notifications: JSON.parse(result)})
+        }
+      }
+    })
   }
 
   componentWillMount() {
@@ -28,10 +53,23 @@ export default class EventListPage extends React.Component {
       }
   }
 
-  notificationsOnPress() {
+  async notificationsOnPress() {
+    var notifications = !this.state.notifications
+    await AsyncStorage.setItem('notifications', JSON.stringify(notifications))
     this.setState({
-      notifications: !this.state.notifications
+      notifications: notifications
     })
+  }
+
+  async autoUpdateOnPress() {
+    var autoUpdate = !this.state.autoUpdate
+    await AsyncStorage.setItem('autoUpdate', JSON.stringify(autoUpdate))
+    this.setState({autoUpdate: autoUpdate})
+    if(autoUpdate) {
+      autoUpdateHandler.configure()
+    } else {
+      autoUpdateHandler.stop()
+    }
   }
 
   TASOnPress() {
@@ -50,6 +88,54 @@ export default class EventListPage extends React.Component {
     this.setState({
       renderAboutUs: !this.state.renderAboutUs
     })
+  }
+
+  FeedbackOnPress() {
+    this.setState({
+      renderFeedback: !this.state.renderFeedback,
+      feedbackResponse: ""
+    })
+  }
+
+  sendFeedback() {
+    fetch('http://18.163.180.15:8080/feedback', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({feedback: this.state.feedback})
+    }).then((response) => response.text())
+    .then((data) => {
+      if(data="true") {
+        this.setState({feedbackResponse: "Sent!"})
+      } else {
+        this.setState({feedbackResponse: "Error"})
+      }
+    })
+    this.setState({
+      feedback: "",
+      renderFeedback: false,
+    })
+
+  }
+
+  renderFeedback() {
+    if(this.state.renderFeedback)
+      return (
+        <View style={styles.collapsedContent}>
+          <TextInput
+            multiline={true}
+            numberofLines={4}
+            onChangeText={(text) => this.setState({feedback:text})}
+            value={this.state.feedback}
+            style={styles.textInput}
+            placeholder="Tell us what you think about Path Advisor 2.0"
+          />
+        </View>
+      )
+      else
+        return null
+
   }
 
   renderHelp() {
@@ -76,10 +162,12 @@ export default class EventListPage extends React.Component {
     if(this.state.renderAboutUs)
       return(
         <View style={styles.collapsedContent}>
-          <Text style={[styles.text_title, styles.text_color]}>About Us</Text>
-          <Text style={[styles.text_subtitle, styles.text_color]}>What is Path Advisor</Text>
+          <Text style={[styles.text_title, styles.text_color]}>Who are we?</Text>
           <Text style={[styles.text_content, styles.text_color]}>
-          Path Advisor is a ....Path Advisor is a ....Path Advisor is a ....Path Advisor is a ....Path Advisor is a ....Path Advisor is a ....Path Advisor is a ....
+            By Hugo, Ernest, Alpha, Sam
+          </Text>
+          <Text style={[styles.text_content, styles.text_color]}>
+            Thanks Raymond &lt;3
           </Text>
         </View>
       )
@@ -111,7 +199,7 @@ export default class EventListPage extends React.Component {
       return(
           <View style={styles.container}>
               <ScrollView contentContainerStyle={styles.scrollView}>
-                <View style={styles.settingTab}>
+                {/* <View style={styles.settingTab}>
                   <View style={styles.settingTabRow}>
                     <View style={styles.settingTabRowGroup}>
                       <Icon type='FontAwesome5' name='language' style={styles.settingTabIcon}></Icon>
@@ -127,18 +215,54 @@ export default class EventListPage extends React.Component {
                       })}
                     </Picker>
                   </View>
+                </View> */}
+
+                <View
+                  style={styles.settingTab}
+                >
+                  <View style={styles.settingTabRow}>
+                    <View style={styles.settingTabRowGroup}>
+                      <Icon type='AntDesign' name='bells' style={styles.settingTabIcon}></Icon>
+                      <Text style={styles.settingTabTitle}>Auto Update</Text>
+                    </View>
+                    <Text style={styles.settingTabTitle}>{this.state.dbResponse}</Text>
+                    <Switch
+                      onValueChange={(value) => this.autoUpdateOnPress()}
+                      value={this.state.autoUpdate}
+                      thumbColor='white'
+                      trackColor={{true: '#003366', false: 'grey'}}
+                    >
+                    </Switch>
+                  </View>
                 </View>
 
-                <TouchableOpacity style={styles.settingTab}>
+
+                <TouchableOpacity
+                  onPress={() => this.FeedbackOnPress()}
+                  style={styles.settingTab}
+                >
                   <View style={styles.settingTabRow}>
                     <View style={styles.settingTabRowGroup}>
                       <Icon type='MaterialIcons' name='feedback' style={styles.settingTabIcon}></Icon>
                       <Text style={styles.settingTabTitle}>Feedback</Text>
                     </View>
+                    {
+                      !this.state.renderFeedback &&
+                      <Text style={styles.feedbackResponse}>{this.state.feedbackResponse}</Text>
+                    }
+                    { this.state.renderFeedback &&
+                      <TouchableHighlight
+                        onPress={() => this.sendFeedback()}
+                        style={styles.button}
+                      >
+                        <Text style={styles.buttonText}>Send</Text>
+                      </TouchableHighlight>
+                    }
                   </View>
+                  {this.renderFeedback()}
                 </TouchableOpacity>
 
-                <View
+                {/* <View
                   style={styles.settingTab}
                 >
                   <View style={styles.settingTabRow}>
@@ -154,7 +278,7 @@ export default class EventListPage extends React.Component {
                     >
                     </Switch>
                   </View>
-                </View>
+                </View> */}
 
                 <TouchableOpacity
                   onPress={() => this.HelpOnPress()}
@@ -201,6 +325,28 @@ export default class EventListPage extends React.Component {
 }
 
 const styles = StyleSheet.create({
+  feedbackResponse: {
+    fontSize: 14,
+    color: 'white'
+  },
+  button: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: 'white',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    maxWidth: 80
+  },
+  buttonText: {
+    color: '#003366',
+    textAlign: 'center',
+    fontSize: 12
+  },
+  textInput: {
+    backgroundColor: 'white',
+    padding: 15
+  },
   languagePicker: {
     width: 120,
     color: 'white'
@@ -252,6 +398,7 @@ const styles = StyleSheet.create({
   settingTabRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center'
   },
 
   settingTabRowGroup: {

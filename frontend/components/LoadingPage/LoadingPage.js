@@ -3,14 +3,12 @@ import { connect } from 'react-redux';
 import {  
     Text, 
     View, 
-    ActivityIndicator,
-    Image,
+    ActivityIndicator
 } from 'react-native';
 import { 
     RENDER_LOADING_PAGE,
 } from '../../reducer/floors/actionList';
 
-import Logo from '../../../res/tags/escalator.png';
 /**
  * childrenView: 
  */
@@ -58,8 +56,7 @@ class loadingPage extends React.Component{
         }
 
         return(
-                <View style={{flex: 1, flexDirection: 'column', backgroundColor: '#5e9cff', justifyContent:'center', alignItems:'center'}}>
-                    {/* <Image style={{width: 100, height: 100, marginBottom: 20}} source={Logo}></Image> */}
+                <View style={{flex: 1, flexDirection: 'column', backgroundColor: '#003366', justifyContent:'center', alignItems:'center'}}>
                     <ActivityIndicator size="large" color="#c9e6ff"></ActivityIndicator>
                     <Text style={{color: 'white', fontSize: 14, marginTop: 10}}>{this.props.text ? this.props.text : 'Loading'}</Text>
                 </View> 

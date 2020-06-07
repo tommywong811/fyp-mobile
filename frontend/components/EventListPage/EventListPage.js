@@ -1,10 +1,9 @@
 import React from 'react';
-import { Container, Header, Content, Card, CardItem, Text, Body, Badge, DatePicker, Item, Label, Button, Picker } from 'native-base';
+import { Card, CardItem, Text, Body, Badge, DatePicker, Item, Label, Button, Picker } from 'native-base';
 import axios from 'axios';
 import moment from 'moment';
-import { ActivityIndicator, View, StyleSheet, FlatList, Dimensions, Modal, Platform } from 'react-native';
+import { ActivityIndicator, View, StyleSheet, FlatList, Dimensions, Modal, Platform, Linking, SafeAreaView } from 'react-native';
 import { Actions } from 'react-native-router-flux';
-import { WebView } from 'react-native-webview';
 /**
  * childrenView: 
  */
@@ -27,21 +26,29 @@ export default class EventListPage extends React.Component {
             dateFrom: moment().format('YYYY-MM-DD'),
             dateTo: null,
             selectedCategory: '',
-            categories: []
+            selectedPostingUnit: '',
+            categories: [],
+            postingUnits: [],
+            is_filter: false
         }
         this.setFromDate = this.setFromDate.bind(this);
         this.setToDate = this.setToDate.bind(this);
         this.fetchData = this.fetchData.bind(this);
         this.fetchCategory = this.fetchCategory.bind(this);
         this.filter = this.filter.bind(this);
+        this.clearFilter = this.clearFilter.bind(this);
         this.setSelectedCategory = this.setSelectedCategory.bind(this);
+        this.setSelectedPostingUnit = this.setSelectedPostingUnit.bind(this);
+        this.onPressVenue = this.onPressVenue.bind(this);
+        this.checkIsClickable = this.checkIsClickable.bind(this);
     }
 
     async componentWillMount() {
         try {
             this.setState({isLoading: true})
-            await this.fetchData();
             await this.fetchCategory();
+            await this.fetchPostUnit();
+            await this.fetchData();
         } catch (err) {
             alert(JSON.stringify(err, null, 2))
         }
@@ -69,11 +76,23 @@ export default class EventListPage extends React.Component {
         })
     }
 
-    async fetchData(date_from=null, date_to=null, cat_id=null) {
+    async fetchPostUnit() {
+        const url = `${BASEPATH}/getEventPostingunit.php`
+        const res = await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${API_KEY}`
+            }
+        })
+        this.setState({
+            postingUnits: res['data']
+        })
+    }
+
+    async fetchData(date_from=null, date_to=null, cat_id=null, posting_unit=null, is_filter=false) {
         try {
             let { page, event_list } = this.state;
-            if(!this.state.keepLoading) return;
-            const url = `${BASEPATH}/getEvent.php?date_from=${date_from?date_from:this.state.now}${date_to?`&date_to=${date_to}`:''}${cat_id?`&cat_id=${cat_id}`:''}&sort=A&page_size=10&page_num=${page}`
+            if(!this.state.keepLoading && !is_filter) return;
+            const url = `${BASEPATH}/getEvent.php?date_from=${date_from?date_from:this.state.now}${date_to?`&date_to=${date_to}`:''}${cat_id?`&cat_id=${cat_id}`:''}${posting_unit?`&posting_unit=${posting_unit}`:''}&sort=A${is_filter?'':`&page_size=10&page_num=${page}`}`
             let res = await axios.get(url, {
                 headers: {
                     Authorization: `Bearer ${API_KEY}`
@@ -90,6 +109,10 @@ export default class EventListPage extends React.Component {
             }
             const new_list = this.processEventList(res['data']['event']);
             event_list = event_list.concat(new_list)
+            event_list.map(e=> {
+                let res = this.state.postingUnits.find(unit => unit['unit_id'] === e['events_dept'])
+                e['events_dept'] = res ? res['unit_en_name']: e['events_dept']
+            })
             this.setState({
                 event_list: event_list,
                 totalNumOfItems: res['data']['total_cnt'],
@@ -102,6 +125,7 @@ export default class EventListPage extends React.Component {
     }
 
     infiniteScroll() {
+        if (this.state.is_filter) return;
         this.setState((prevState, nextProps)=>({
             page: prevState.page + 1,
             isLoading: true
@@ -125,10 +149,22 @@ export default class EventListPage extends React.Component {
             isLoading: true,
             page: 1,
             totalNumOfItems: 0,
-            keepLoading: true,
-            isModalVisible: !this.state.isModalVisible
+            keepLoading: false,
+            isModalVisible: !this.state.isModalVisible,
+            is_filter: true
         });
-        await this.fetchData(this.state.dateFrom, this.state.dateTo?this.state.dateTo:null, this.state.selectedCategory?this.state.selectedCategory:null);
+        await this.fetchData(this.state.dateFrom, this.state.dateTo?this.state.dateTo:null, this.state.selectedCategory?this.state.selectedCategory:null, this.state.selectedPostingUnit?this.state.selectedPostingUnit:null, true);
+    }
+
+    async clearFilter() {
+        await this.setState({
+            selectedPostingUnit: null,
+            selectedCategory: null,
+            dateFrom: moment().format('YYYY-MM-DD'),
+            dateTo: null,
+            is_filter: false
+        });
+        // await this.fetchData();
     }
 
     setFromDate(newDate) {
@@ -143,8 +179,37 @@ export default class EventListPage extends React.Component {
         this.setState({ selectedCategory: category });
     }
 
-    goToMapTilePage() {
+    setSelectedPostingUnit(unit) {
+        this.setState({ selectedPostingUnit: unit });
+    }
 
+    async onPressVenue(venue) {
+        if (venue === '' || venue === null || venue.toLowerCase().includes('online') || venue.toLowerCase().includes('zoom')) {
+            if (venue.includes('http')) {
+                let testUrl = venue.match(/\bhttps?:\/\/\S+/gi);
+                Linking.canOpenURL(testUrl[0]).then(supported => {
+                    if(supported) Linking.openURL(testUrl[0])
+                }).catch(err => {})
+            } else {
+                return;
+            }
+        } else {
+            Actions.push('NavigatorPage', {
+                searchKeyword: venue || ''
+            })
+        }
+    }
+
+    checkIsClickable(venue) {
+        if (venue === '' || venue === null || venue.toLowerCase().includes('online') || venue.toLowerCase().includes('zoom')) {
+            if (venue.includes('http')) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return true;
+        }
     }
 
     renderCard(item) {
@@ -159,6 +224,12 @@ export default class EventListPage extends React.Component {
                 <CardItem>
                     <Body>
                         <View style={styles.itemDetailRow}>
+                            <Text style={styles.itemDetailLabel}>Posting Unit : </Text><Text>{item.events_dept || '-'}</Text>
+                        </View>
+                        <View style={styles.itemDetailRow}>
+                            <Text style={styles.itemDetailLabel}>Category : </Text><Text>{item.events_category || '-'}</Text>
+                        </View>
+                        <View style={styles.itemDetailRow}>
                             <Text style={styles.itemDetailLabel}>Speaker : </Text><Text>{item.events_en_candidate || '-'}</Text>
                         </View>
                         <View style={styles.itemDetailRow}>
@@ -168,9 +239,13 @@ export default class EventListPage extends React.Component {
                             <Text style={styles.itemDetailLabel}>Time : </Text><Text>{moment(item.events_start_dt, 'YYYY-MM-DD HH:mm:ss').format('HH:mm')} - {moment(item.events_end_dt, 'YYYY-MM-DD HH:mm:ss').format('HH:mm')}</Text>
                         </View>
                         <View style={styles.itemDetailRow}>
-                            <Text style={styles.itemDetailLabel}>Venue : </Text><Text style={styles.link} onPress={()=>{Actions.push('NavigatorPage', {
-                                searchKeyword: item.events_en_venue || ''
-                            })}}>{item.events_en_venue || '-'}</Text>
+                            <Text style={styles.itemDetailLabel}>Venue : </Text>
+                            <Text style={
+                                    this.checkIsClickable(item.events_en_venue) ? styles.link : null
+                                } 
+                                onPress={()=>this.onPressVenue(item.events_en_venue)}>
+                                {item.events_en_venue || '-'}
+                            </Text>
                         </View>
                         {/* event.events_en_abstract */}
                     </Body>
@@ -198,49 +273,63 @@ export default class EventListPage extends React.Component {
                     </Text>
                 </Badge>
                 <Modal visible={this.state.isModalVisible}>
-                    <View>
-                        <View style={styles.headerBar}>
-                            <Text style={styles.modalTitle}>Filter</Text>
-                            <Text style={styles.modalBackButton} onPress={this.closeModal}>X</Text>
+                    <SafeAreaView>
+                        <View>
+                            <View style={styles.headerBar}>
+                                <Text style={styles.modalTitle}>Filter</Text>
+                                <Text style={styles.modalBackButton} onPress={this.closeModal}>X</Text>
+                            </View>
+                            <Item fixedLabel>
+                                <Label>Date From:</Label>
+                                <DatePicker
+                                    locale={'en'}
+                                    defaultDate={new Date()} 
+                                    maximumDate={this.state.dateTo?new Date(this.state.dateTo.split('-')[0], Number(this.state.dateTo.split('-')[1])-1, this.state.dateTo.split('-')[2]):new Date(2999,11,31)}
+                                    onDateChange={this.setFromDate}
+                                />
+                            </Item>
+                            <Item fixedLabel>
+                                <Label>Date To:</Label>
+                                <DatePicker
+                                    locale={'en'}
+                                    minimumDate={new Date(this.state.dateFrom.split('-')[0], Number(this.state.dateFrom.split('-')[1])-1, this.state.dateFrom.split('-')[2])}
+                                    onDateChange={this.setToDate}
+                                />
+                            </Item>
+                            <Item fixedLabel>
+                                <Label>Category:</Label>
+                                <Picker
+                                    mode="dropdown"
+                                    placeholder="Select Category"
+                                    selectedValue={this.state.selectedCategory}
+                                    onValueChange={this.setSelectedCategory}
+                                >
+                                    {this.state.categories.map(category => {
+                                        return (<Picker.Item label={category.cat_en_name} value={category.cat_id} key={category.cat_id}></Picker.Item>)
+                                    })}
+                                </Picker>
+                            </Item>
+                            <Item fixedLabel>
+                                <Label>Posting Unit:</Label>
+                                <Picker
+                                    mode="dropdown"
+                                    placeholder="Select Posting Unit"
+                                    selectedValue={this.state.selectedPostingUnit}
+                                    onValueChange={this.setSelectedPostingUnit}
+                                >
+                                    {this.state.postingUnits.map(unit => {
+                                        return (<Picker.Item label={unit.unit_en_name} value={unit.unit_id} key={unit.unit_id}></Picker.Item>)
+                                    })}
+                                </Picker>
+                            </Item>
+                            <Button style={styles.modalClearFilterButton} block onPress={this.clearFilter}>
+                                <Text>Clear Filter</Text>
+                            </Button>
+                            <Button style={styles.modalFilterButton} block onPress={this.filter}>
+                                <Text>Filter</Text>
+                            </Button>
                         </View>
-                        <Item fixedLabel>
-                            <Label>Date From:</Label>
-                            <DatePicker
-                                locale={'en'}
-                                maximumDate={this.state.dateTo?new Date(this.state.dateTo.split('-')[0], Number(this.state.dateTo.split('-')[1])-1, this.state.dateTo.split('-')[2]):new Date(2999,11,31)}
-                                onDateChange={this.setFromDate}
-                            />
-                        </Item>
-                        <Item fixedLabel>
-                            <Label>Date To:</Label>
-                            <DatePicker
-                                locale={'en'}
-                                minimumDate={new Date(this.state.dateFrom.split('-')[0], Number(this.state.dateFrom.split('-')[1])-1, this.state.dateFrom.split('-')[2])}
-                                onDateChange={this.setToDate}
-                            />
-                        </Item>
-                        <Item fixedLabel>
-                            <Label>Category:</Label>
-                            <Picker
-                                mode="dropdown"
-                                placeholder="Select Category"
-                                selectedValue={this.state.selectedCategory}
-                                onValueChange={this.setSelectedCategory}
-                            >
-                                {/* <Picker.Item label='Test1' value='1'></Picker.Item>
-                                <Picker.Item label='Test2' value='2'></Picker.Item>
-                                <Picker.Item label='Test3' value='3'></Picker.Item>
-                                <Picker.Item label='Test4' value='4'></Picker.Item>
-                                <Picker.Item label='Test5' value='5'></Picker.Item> */}
-                                {this.state.categories.map(category => {
-                                    return (<Picker.Item label={category.cat_en_name} value={category.cat_id} key={category.cat_id}></Picker.Item>)
-                                })}
-                            </Picker>
-                        </Item>
-                        <Button style={styles.modalFilterButton} block onPress={this.filter}>
-                            <Text>Filter</Text>
-                        </Button>
-                    </View>
+                    </SafeAreaView>
                 </Modal>
                 <FlatList
                     data={this.state.event_list}
@@ -306,6 +395,13 @@ const styles = StyleSheet.create({
     modalFilterButton: {
         marginTop: 24,
         backgroundColor: '#003366',
+        marginRight: 8,
+        marginLeft: 8,
+    },
+
+    modalClearFilterButton: {
+        marginTop: 24,
+        backgroundColor: 'red',
         marginRight: 8,
         marginLeft: 8,
     },

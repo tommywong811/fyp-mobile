@@ -13,6 +13,7 @@ import {
     RENDER_LOADING_PAGE,
     UPDATE_MAPTILE_CACHE,
     SAVE_PREVIOUS_NODE,
+    CLEAR_NODE,
 } from './actionList'
 
 import AsyncStorage from '@react-native-community/async-storage';
@@ -166,6 +167,11 @@ export default floorReducer = (state = initialState, action) => {
             return {
                 ...state,
                 'previousNode': action.payload.node,
+            }
+        case CLEAR_NODE:
+            return {
+                ...state,
+                'currentNode': null,
             }
         default:
             return state;

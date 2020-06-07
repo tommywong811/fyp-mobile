@@ -126,6 +126,7 @@ function searchShortestPath(fromId, toId, mode=MODES.SHORTEST_TIME, noStairCase=
       };
     })
     .reverse();
+    console.log(data)
   return { data };
 }
 

@@ -3,6 +3,14 @@ package com.project;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.horcrux.svg.SvgPackage;
+import com.swmansion.rnscreens.RNScreensPackage;
+import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
+import com.transistorsoft.rnbackgroundfetch.RNBackgroundFetchPackage;
+import org.reactnative.maskedview.RNCMaskedViewPackage;
+import nl.lightbase.PanoramaViewPackage;
+import org.wonday.pdf.RCTPdfView;
+import com.reactnativecommunity.webview.RNCWebViewPackage;
 import com.imagepicker.ImagePickerPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
 import com.swmansion.reanimated.ReanimatedPackage;
@@ -32,6 +40,14 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new SvgPackage(),
+            new RNScreensPackage(),
+            new SafeAreaContextPackage(),
+            new RNBackgroundFetchPackage(),
+            new RNCMaskedViewPackage(),
+            new PanoramaViewPackage(),
+            new RCTPdfView(),
+            new RNCWebViewPackage(),
             new ImagePickerPackage(),
             new VectorIconsPackage(),
             new ReanimatedPackage(),

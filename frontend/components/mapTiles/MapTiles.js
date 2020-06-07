@@ -17,7 +17,9 @@ import { mapTileSize, logicTileSize } from './config';
 import { api } from '../../../backend';
 import store from '../../../store.js';
 import {
-    UPDATE_MAPTILE_CACHE
+    UPDATE_MAPTILE_CACHE,
+    CHANGE_FLOOR,
+    CHANGE_NODE
 } from '../../reducer/floors/actionList.js';
 import {
     TouchableOpacity,
@@ -54,6 +56,29 @@ class MapTiles extends React.Component {
             modalVisible: false,
             selectedNode: null,
         };
+    }
+
+    isValidRestaurant(name) {
+        let restaurant = [
+            "Starbucks Coffee", 
+            "Pacific Coffee",
+            "Chinese Restaurant",
+            "UC Bistro",
+            "McDonalds",
+            "Passion",
+            "Subway",
+            "LG1 canteen",
+            "Gold Rice Bowl",
+            "Asia Pacific",
+            "Seafront Cafeteria",
+            "Halal Food Counter",
+            "UniBar",
+            "Food Truck"
+        ]
+        if(restaurant.indexOf(name)>-1)
+            return true;
+        else
+            return false;
     }
 
     componentWillMount() {
@@ -96,11 +121,17 @@ class MapTiles extends React.Component {
                 this.setMapOffset(-80 - nodeOffset.x, 0);
             }
         }
-        if (nextProps.shortestPath.data) {
+        if (nextProps.shortestPath.data && nextProps.currFloor != this.props.currFloor || (nextProps.shortestPath.data != this.props.shortestPath.data && nextProps.shortestPath.data)) {
             this.setState({
                 'pathInCurrFloor': nextProps.shortestPath.data.filter((data) => data.floorId === nextProps.currFloor)
             })
+        } 
+        if (!nextProps.shortestPath.data) {
+            this.setState({
+                'pathInCurrFloor': [],
+            })
         }
+
     }
 
     setMapOffset(x, y) {
@@ -198,7 +229,7 @@ class MapTiles extends React.Component {
                         if (nodeName.includes('ROOM')) {
                             return (
                                 <View
-                                    key={key}
+                                    key={node._id}
                                     style={[{
                                         flex: 1,
                                         position: 'absolute',
@@ -214,10 +245,11 @@ class MapTiles extends React.Component {
                                     </Text>
                                 </View>
                             )
-                        } else if (node.connectorId && getNodeImageByConnectorId(node.connectorId)) {
+                        }
+                        else if (node.connectorId && getNodeImageByConnectorId(node.connectorId)) {
                             return (
                                 <View
-                                    key={key}
+                                    key={node._id}
                                     style={[{
                                         flex: 1,
                                         position: 'absolute',
@@ -227,7 +259,11 @@ class MapTiles extends React.Component {
                                     <TouchableOpacity onPress={() => {
                                         // this.setModalVisible(true);
                                         // this.setState({ selectedNode: node.name });
-                                        Actions.FacilityInfoPage({ selectedNode: node.name });
+                                        // Actions.FacilityInfoPage({ selectedNode: node.name });
+                                        // alert(node.name)
+                                        // console.log(this.props.shortestPath);
+                                        this._onPressChangeFloor(node);
+                                        // this._onPressPathNextFloor();
                                     }}>
                                         <Image
                                             source={getNodeImageByConnectorId(node.connectorId)}
@@ -237,10 +273,33 @@ class MapTiles extends React.Component {
                                     </TouchableOpacity>
                                 </View>
                             )
-                        } else if (node.tagIds && node.tagIds.length > 0 && getNodeImageByTagId(node.tagIds[0])) {
+                        } 
+                        else if (node.connectorId && getNodeImageByConnectorId(node.name)) {
                             return (
                                 <View
-                                    key={key}
+                                    key={node._id}
+                                    style={[{
+                                        flex: 1,
+                                        position: 'absolute',
+                                        top: (node.centerCoordinates[1] - this.props.offSetY) / logicTileSize * 80 + this.state.nodeOffset.y,
+                                        left: (node.centerCoordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x + 2,
+                                    }]}>
+                                    <TouchableOpacity onPress={() => {
+                                        this._onPressChangeFloor(node);
+                                    }}>
+                                        <Image
+                                            source={getNodeImageByConnectorId(node.name)}
+                                            style={[{ height: 10, width: 10 }]}
+                                        >
+                                        </Image>
+                                    </TouchableOpacity>
+                                </View>
+                            )
+                        }
+                        else if (node.tagIds && node.tagIds.length > 0 && getNodeImageByTagId(node.tagIds[0])) {
+                            return (
+                                <View
+                                    key={node._id}
                                     style={[{
                                         flex: 1,
                                         position: 'absolute',
@@ -249,7 +308,9 @@ class MapTiles extends React.Component {
                                     }]}>
                                     <TouchableOpacity onPress={() => {
                                         // alert(node.name)
-                                        Actions.FacilityInfoPage({ selectedNode: node.name });
+                                        if(this.isValidRestaurant(node.name)){
+                                            Actions.FacilityInfoPage({ selectedNode: node.name });
+                                        }
                                     }
                                     }>
                                         <Image
@@ -283,7 +344,7 @@ class MapTiles extends React.Component {
                 })
                 }
 
-                {this.props.currentNode &&
+                {this.props.currentNode && this.state.pathInCurrFloor.length === 0 &&
                     <Image source={require('../../../res/tags/pin.png')}
                         style={{
                             width: 4, height: 9,
@@ -291,6 +352,28 @@ class MapTiles extends React.Component {
                             position: 'absolute',
                             top: (this.props.currentNode.centerCoordinates[1] - this.props.offSetY) / logicTileSize * 80 + this.state.nodeOffset.y - 10,
                             left: (this.props.currentNode.centerCoordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x,
+                        }}>
+                    </Image>
+                }
+                {this.state.pathInCurrFloor.length > 0 && this.props.fromNode && this.state.pathInCurrFloor[0]._id === this.props.shortestPath.data[0]._id &&
+                    <Image source={require('../../../res/tags/pin.png')}
+                        style={{
+                            width: 4, height: 9,
+                            flex: 1,
+                            position: 'absolute',
+                            top: (this.props.fromNode.centerCoordinates[1] - this.props.offSetY) / logicTileSize * 80 + this.state.nodeOffset.y - 10,
+                            left: (this.props.fromNode.centerCoordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x,
+                        }}>
+                    </Image>
+                }
+                {this.state.pathInCurrFloor.length > 0 && this.props.toNode && this.state.pathInCurrFloor[this.state.pathInCurrFloor.length - 1]._id === this.props.shortestPath.data[this.props.shortestPath.data.length - 1]._id &&
+                    <Image source={require('../../../res/tags/pin.png')}
+                        style={{
+                            width: 4, height: 9,
+                            flex: 1,
+                            position: 'absolute',
+                            top: (this.props.toNode.centerCoordinates[1] - this.props.offSetY) / logicTileSize * 80 + this.state.nodeOffset.y - 10,
+                            left: (this.props.toNode.centerCoordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x,
                         }}>
                     </Image>
                 }
@@ -332,27 +415,77 @@ class MapTiles extends React.Component {
                         deg = Math.atan2((y2 - y1), (x2 - x1)) / 2 / Math.PI * 360;
                         translateX = - (length / 2) * (1 - Math.cos(deg * 2 * Math.PI / 360))
                         translateY = length / 2 * Math.sin(deg * 2 * Math.PI / 360)
-
+                        console.log(key === Math.floor(pathInCurrFloor.length / 2), Math.floor(pathInCurrFloor.length / 2))
                         return (
-                            <View
-                                key={key}
-                                style={[{
-                                    flex: 1,
-                                    position: 'absolute',
-                                    top: ((node.coordinates[1] - this.props.offSetY) / logicTileSize * 80 + this.state.nodeOffset.y) + translateY,
-                                    left: (node.coordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x + translateX,
-                                    width: length,
-                                    transform: [{ rotate: (deg + 'deg') }],
-                                    height: 2,
-                                    backgroundColor: 'red',
-                                    borderRadius: 2,
-                                }]}>
-                            </View>
+                            <React.Fragment key={node._id}>
+                                <View
+                                    style={[{
+                                        flex: 1,
+                                        position: 'absolute',
+                                        top: ((node.coordinates[1] - this.props.offSetY) / logicTileSize * 80 + this.state.nodeOffset.y) + translateY,
+                                        left: (node.coordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x + translateX,
+                                        width: length,
+                                        transform: [{ rotate: (deg + 'deg') }],
+                                        height: 2,
+                                        backgroundColor: 'red',
+                                        borderRadius: 2,
+                                    }]}>
+                                </View>
+                                {key === Math.floor(pathInCurrFloor.length / 2) &&
+                                    <View
+                                        style={[{
+                                            flex: 1,
+                                            position: 'absolute',
+                                            top: ((node.coordinates[1] - this.props.offSetY) / logicTileSize * 80 + this.state.nodeOffset.y)  + translateY - 4  * Math.cos(deg * 4 * Math.PI / 360),
+                                            left: (node.coordinates[0] - this.props.offSetX) / logicTileSize * 80 + this.state.nodeOffset.x  + length / 2 + translateX + 4  * Math.cos(deg * 4 * Math.PI / 360),
+                                            transform: [{ rotate: ((deg + 90) + 'deg') }],
+                                            width: 0,
+                                            height: 0,
+                                            backgroundColor: 'transparent',
+                                            borderStyle: 'solid',
+                                            borderLeftWidth: 4,
+                                            borderRightWidth: 4,
+                                            borderBottomWidth: 8,
+                                            borderLeftColor: 'transparent',
+                                            borderRightColor: 'transparent',
+                                            borderBottomColor: 'red'
+                                        }]}
+                                    >
+
+                                    </View>
+
+                                }
+                            </React.Fragment>
                         )
                     }
                 })}
             </View>
         );
+    }
+
+    _onPressChangeFloor(node) {
+        let connectors = []
+
+        if(this.props.shortestPath.data != null) {
+            let indexOfConnector;
+            for (var i = 0; i < this.props.shortestPath.data.length; i++) {
+                if((this.props.shortestPath.data[i]._id == node._id)) {
+                    indexOfConnector = i;
+                }
+                if(this.props.shortestPath.data[i].connectorId) {
+                    console.log(this.props.shortestPath.data[i])
+                }
+            }
+            // console.log("gfvregvwer");
+            // console.log(indexOfConnector);
+
+            if (this.props.shortestPath.data[indexOfConnector].floorId == this.props.shortestPath.data[indexOfConnector - 1].floorId) {
+                this.props._onPressPathNextFloor()
+            }
+            else {
+                this.props._onPressPathPreviousFloor()
+            }
+        }
     }
 
     _onPanEndHandler(evt, gestureState, zoomableViewEventObject) {  
@@ -386,29 +519,6 @@ class MapTiles extends React.Component {
         this.state.zoom = zoomableViewEventObject.zoomLevel
     }
 
-    // _renderModal() {
-    //     var selectedNode = this.state.selectedNode;
-    //     return (
-    //         <Modal
-    //             animationType="slide"
-    //             transparent={false}
-    //             visible={this.state.modalVisible}
-    //         >
-    //             <Button
-    //                 onPress={() => {
-    //                     this.setModalVisible(!this.state.modalVisible);
-    //                 }}
-    //             >
-    //                 <Text>X</Text>
-    //             </Button>
-    //             <SliderBox images={this.state.images} />
-    //             <Text>{selectedNode}★★★★★ </Text>
-
-
-    //         </Modal>
-    //     );
-    // }
-
     setModalVisible(visible) {
         this.setState({ modalVisible: visible });
     }
@@ -436,7 +546,7 @@ class MapTiles extends React.Component {
                 >
                     {this._renderAllMapTile()}
                     {this._renderAllNodes()}
-                    {this.props.shortestPath.data && this._renderPath()}
+                    {this.state.pathInCurrFloor.length > 0 && this._renderPath()}
                     {/* {this._renderModal()} */}
                 </Animated.View>
             </ReactNativeZoomableView>
@@ -517,4 +627,19 @@ function mapStateToProps(state) {
     });
 }
 
-export default connect(mapStateToProps, null)(MapTiles);
+function mapDispatchToProps(dispatch) {
+    return {
+        change_floor: (floor, buildingId) =>
+            dispatch({
+            type: CHANGE_FLOOR,
+            payload: { floor: floor, buildingId: buildingId }
+        }),
+        change_node: (name, currentNode = null) => 
+            dispatch({
+            type: CHANGE_NODE,
+            payload: { name: name, currentNode: currentNode }
+        })
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(MapTiles);

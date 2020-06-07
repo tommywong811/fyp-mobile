@@ -10,6 +10,22 @@ target 'project' do
   target 'project-tvOSTests' do
     inherit! :search_paths
     # Pods for testing
+    pod 'react-native-webview', :path => '../node_modules/react-native-webview'
+
+    pod 'react-native-pdf', :path => '../node_modules/react-native-pdf'
+
+    pod 'RNCMaskedView', :path => '../node_modules/@react-native-community/masked-view'
+
+    pod 'RNBackgroundFetch', :path => '../node_modules/react-native-background-fetch'
+
+    pod 'react-native-safe-area-context', :path => '../node_modules/react-native-safe-area-context'
+
+    pod 'RNScreens', :path => '../node_modules/react-native-screens'
+
+    pod 'RNSVG', :path => '../node_modules/react-native-svg'
+
+    pod 'PanoramaView', :path => '../node_modules/@lightbase/react-native-panorama-view'
+
     pod 'react-native-image-picker', :path => '../node_modules/react-native-image-picker'
 
   end

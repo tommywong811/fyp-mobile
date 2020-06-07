@@ -94,6 +94,33 @@ def enableSeparateBuildPerCPUArchitecture = false
 def enableProguardInReleaseBuilds = false
 
 android {
+
+    dexOptions{
+        javaMaxHeapSize "4g"
+    }
+
+    signingConfigs {
+        release {
+        storeFile file('android_production_build_key.keystore')
+        storePassword '123123'
+        keyAlias 'key0'
+        keyPassword '123123'
+        // storeFile file('android_production_build_key.keystore')
+        // storePassword System.console().readLine(" \nKeystore password:")
+        // keyAlias System.console().readLine(" \nAlias: ")
+        // keyPassword System.console().readLine(" \nAlias password: ")
+        }
+    }
+
+    packagingOptions {
+       pickFirst 'lib/x86/libc++_shared.so'
+       pickFirst 'lib/x86_64/libjsc.so'
+       pickFirst 'lib/arm64-v8a/libjsc.so'
+       pickFirst 'lib/arm64-v8a/libc++_shared.so'
+       pickFirst 'lib/x86_64/libc++_shared.so'
+       pickFirst 'lib/armeabi-v7a/libc++_shared.so'
+    }
+
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     compileOptions {
@@ -107,6 +134,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
     splits {
         abi {
@@ -120,6 +148,7 @@ android {
         release {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            signingConfig signingConfigs.release
         }
     }
     // applicationVariants are e.g. debug, release
@@ -138,6 +167,14 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-svg')
+    implementation project(':react-native-screens')
+    implementation project(':react-native-safe-area-context')
+    implementation project(':react-native-background-fetch')
+    implementation project(':@react-native-community_masked-view')
+    implementation project(':@lightbase_react-native-panorama-view')
+    implementation project(':react-native-pdf')
+    implementation project(':react-native-webview')
     implementation project(':react-native-image-picker')
     implementation project(':react-native-vector-icons')
     implementation project(':react-native-reanimated')
