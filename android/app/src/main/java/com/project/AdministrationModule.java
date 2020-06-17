@@ -31,6 +31,7 @@ public class AdministrationModule extends  ReactContextBaseJavaModule{
         MainActivity activity = (MainActivity) getCurrentActivity();
         if (activity != null) {
             Intent intent = new Intent(activity, ImageListActivity.class);
+            intent.putExtra("roomName",name);
             activity.startActivity(intent);
         }
     }

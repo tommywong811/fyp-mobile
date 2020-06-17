@@ -71,6 +71,7 @@ public class ImageListActivity extends Activity implements ImageSizeDialog.Dialo
 	private ImageSize currentImageSize;
 	private MJpegView mMv;
 	private boolean mConnectionSwitchEnabled = false;
+	private String roomName;
 
 	private LoadObjectListTask sampleTask = null;
 	private ShowLiveViewTask livePreviewTask = null;
@@ -84,6 +85,8 @@ public class ImageListActivity extends Activity implements ImageSizeDialog.Dialo
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Intent intent = getIntent();
+		roomName = intent.getStringExtra("roomName");
 		setContentView(R.layout.activity_object_list);
 		cameraIpAddress = getResources().getString(R.string.theta_ip_address);
 		layoutCameraArea = (LinearLayout) findViewById(R.id.shoot_area);
@@ -474,7 +477,7 @@ public class ImageListActivity extends Activity implements ImageSizeDialog.Dialo
 						if (selectedItem.isPhoto()) {
 							byte[] thumbnail = selectedItem.getThumbnail();
 							String fileId = selectedItem.getFileId();
-							GLPhotoActivity.startActivityForResult(ImageListActivity.this, cameraIpAddress, fileId, thumbnail, false);
+							GLPhotoActivity.startActivityForResult(ImageListActivity.this, cameraIpAddress, fileId, thumbnail, false, roomName);
 						} else {
 							Toast.makeText(getApplicationContext(), "This isn't a photo.", Toast.LENGTH_SHORT).show();
 						}
@@ -644,7 +647,7 @@ public class ImageListActivity extends Activity implements ImageSizeDialog.Dialo
 				thumbnail.compress(Bitmap.CompressFormat.JPEG, 100, baos);
 				byte[] thumbnailImage = baos.toByteArray();
 
-				GLPhotoActivity.startActivityForResult(ImageListActivity.this, cameraIpAddress, fileId, thumbnailImage, true);
+				GLPhotoActivity.startActivityForResult(ImageListActivity.this, cameraIpAddress, fileId, thumbnailImage, true, roomName);
 			} else {
 				publishProgress("failed to get file data.");
 			}

@@ -9,11 +9,13 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 
 import com.project.glview.GLPhotoView;
@@ -26,6 +28,10 @@ import com.project.view.ConfigurationDialog;
 import com.project.view.LogView;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 /**
@@ -43,6 +49,8 @@ public class GLPhotoActivity extends Activity implements ConfigurationDialog.Dia
     private LoadPhotoTask mLoadPhotoTask = null;
 
     private RotateInertia mRotateInertia = RotateInertia.INERTIA_0;
+    private String roomName;
+    private Button saveButton;
 
     public static final int REQUEST_REFRESH_LIST = 100;
     public static final int REQUEST_NOT_REFRESH_LIST = 101;
@@ -61,6 +69,7 @@ public class GLPhotoActivity extends Activity implements ConfigurationDialog.Dia
         String cameraIpAddress = intent.getStringExtra(CAMERA_IP_ADDRESS);
         String fileId = intent.getStringExtra(OBJECT_ID);
         byte[] byteThumbnail = intent.getByteArrayExtra(THUMBNAIL);
+        roomName = intent.getStringExtra("roomName");
 
         ByteArrayInputStream inputStreamThumbnail = new ByteArrayInputStream(byteThumbnail);
         Drawable thumbnail = BitmapDrawable.createFromStream(inputStreamThumbnail, null);
@@ -70,6 +79,29 @@ public class GLPhotoActivity extends Activity implements ConfigurationDialog.Dia
         mGLPhotoView = (GLPhotoView) findViewById(R.id.photo_image);
         mGLPhotoView.setTexture(_thumbnail);
         mGLPhotoView.setmRotateInertia(mRotateInertia);
+        saveButton = (Button) findViewById(R.id.saveButton);
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String root = Environment.getExternalStorageDirectory().toString();
+                File myDir = new File(root + "/saved_images/" + roomName);
+                myDir.mkdirs();
+
+                String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+                String fname = "Panorama_"+ timeStamp +".jpg";
+
+                File file = new File(myDir, fname);
+                if (file.exists()) file.delete ();
+                try {
+                    FileOutputStream out = new FileOutputStream(file);
+                    mTexture.getPhoto().compress(Bitmap.CompressFormat.JPEG, 100, out);
+                    out.flush();
+                    out.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         mLoadPhotoTask = new LoadPhotoTask(cameraIpAddress, fileId);
         mLoadPhotoTask.execute();
@@ -167,17 +199,20 @@ public class GLPhotoActivity extends Activity implements ConfigurationDialog.Dia
         private String fileId;
         private long fileSize;
         private long receivedDataSize = 0;
+        private Button saveButton;
 
         public LoadPhotoTask(String cameraIpAddress, String fileId) {
             this.logViewer = (LogView) findViewById(R.id.photo_info);
             this.progressBar = (ProgressBar) findViewById(R.id.loading_photo_progress_bar);
             this.cameraIpAddress = cameraIpAddress;
             this.fileId = fileId;
+            this.saveButton = (Button) findViewById(R.id.saveButton);
         }
 
         @Override
         protected void onPreExecute() {
             progressBar.setVisibility(View.VISIBLE);
+            saveButton.setEnabled(false);
         }
 
         @Override
@@ -246,6 +281,7 @@ public class GLPhotoActivity extends Activity implements ConfigurationDialog.Dia
                 if (null != mGLPhotoView) {
                     mGLPhotoView.setTexture(mTexture);
                 }
+                saveButton.setEnabled(true);
             } else {
                 logViewer.append("failed to download image");
             }
@@ -261,7 +297,7 @@ public class GLPhotoActivity extends Activity implements ConfigurationDialog.Dia
      * @param thumbnail Thumbnail
      * @param refreshAfterClose true is to refresh list after closing this activity, otherwise is not to refresh
      */
-    public static void startActivityForResult(Activity activity, String cameraIpAddress, String fileId, byte[] thumbnail, boolean refreshAfterClose) {
+    public static void startActivityForResult(Activity activity, String cameraIpAddress, String fileId, byte[] thumbnail, boolean refreshAfterClose, String roomName) {
         int requestCode;
         if (refreshAfterClose) {
             requestCode = REQUEST_REFRESH_LIST;
@@ -273,6 +309,7 @@ public class GLPhotoActivity extends Activity implements ConfigurationDialog.Dia
         intent.putExtra(CAMERA_IP_ADDRESS, cameraIpAddress);
         intent.putExtra(OBJECT_ID, fileId);
         intent.putExtra(THUMBNAIL, thumbnail);
+        intent.putExtra("roomName", roomName);
         activity.startActivityForResult(intent, requestCode);
     }
 }
